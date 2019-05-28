@@ -99,10 +99,10 @@ int main()
     signal(SIGINT, signal_handler);
 
     sensor_init_t init = {
-            .bus_id = "/dev/ttyACM0",
-            .bus_type = SENSOR_BUS_MODBUS,
-//            .bus_id = "/dev/i2c-3",
-//            .bus_type = SENSOR_BUS_I2C,
+//            .bus_id = "/dev/ttyACM0",
+//            .bus_type = SENSOR_BUS_MODBUS,
+            .bus_id = "/dev/i2c-3",
+            .bus_type = SENSOR_BUS_I2C,
             .gpio_id = 16,
             .event_callback = example_callback,
             .event_callback_ctx = &sensor,
@@ -170,7 +170,7 @@ int main()
             printf("%0.2f %s \t", reading, unit);
         }
         printf("\n");
-       // sleep(1000);
+        sleep(1);
     }
 
     // close the device

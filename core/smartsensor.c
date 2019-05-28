@@ -7,9 +7,9 @@ int get_sensor_reading(sensor_t *ctx, int sensor_num, const float *reading)
     data_buffer_t buffer = {.data = (uint8_t *) reading, .data_len = sizeof(reading)};
     if (sensor_num >= MAX_SENSOR_COUNT)
         return E_INVALID_PARAM;
-    ss_register_t reg = sensor_num == 0 ? SENSOR_1_DATA :
-                        sensor_num == 1 ? SENSOR_2_DATA :
-                        sensor_num == 2 ? SENSOR_3_DATA : SENSOR_4_DATA;
+    ss_register_t reg = sensor_num == 0 ? SENSOR_0_DATA :
+                        sensor_num == 1 ? SENSOR_1_DATA :
+                        sensor_num == 2 ? SENSOR_2_DATA : SENSOR_3_DATA;
     return sensor_read(ctx, reg, &buffer);
 }
 
@@ -25,9 +25,9 @@ int get_sensor_unit(sensor_t *ctx, int sensor_num, sensor_unit_t unit)
     data_buffer_t buffer = {.data = (uint8_t *) unit, .data_len = sizeof(sensor_unit_t)-1};
     if (sensor_num >= MAX_SENSOR_COUNT)
         return E_INVALID_PARAM;
-    ss_register_t reg = sensor_num == 0 ? SENSOR_1_UNIT :
-                        sensor_num == 1 ? SENSOR_2_UNIT :
-                        sensor_num == 2 ? SENSOR_3_UNIT : SENSOR_4_UNIT;
+    ss_register_t reg = sensor_num == 0 ? SENSOR_0_UNIT :
+                        sensor_num == 1 ? SENSOR_1_UNIT :
+                        sensor_num == 2 ? SENSOR_2_UNIT : SENSOR_3_UNIT;
     memset(unit, 0, sizeof(sensor_unit_t));
     return sensor_read(ctx, reg, &buffer);
 }
@@ -37,9 +37,9 @@ int get_sensor_descriptor(sensor_t *ctx, int sensor_num, Sensor_Descriptor_t *de
     data_buffer_t buffer = {.data = (uint8_t *) descriptor, .data_len = sizeof(Sensor_Descriptor_t)};
     if (sensor_num >= MAX_SENSOR_COUNT)
         return E_INVALID_PARAM;
-    ss_register_t reg = sensor_num == 0 ? SENSOR_1_DESCRIPTOR :
-                        sensor_num == 1 ? SENSOR_2_DESCRIPTOR :
-                        sensor_num == 2 ? SENSOR_3_DESCRIPTOR : SENSOR_4_DESCRIPTOR;
+    ss_register_t reg = sensor_num == 0 ? SENSOR_0_DESCRIPTOR :
+                        sensor_num == 1 ? SENSOR_1_DESCRIPTOR :
+                        sensor_num == 2 ? SENSOR_2_DESCRIPTOR : SENSOR_3_DESCRIPTOR;
     return sensor_read(ctx, reg, &buffer);
 }
 
@@ -122,7 +122,7 @@ int get_calibration_date(sensor_t *ctx, calendar_t *calendar)
 {
     uint16_t data;
     data_buffer_t buffer = {.data = (uint8_t *) &data, .data_len = sizeof(data)};
-    int ret = sensor_read(ctx, MFR_CALIBRATION_DATE, &buffer);
+    int ret = sensor_read(ctx, CALIBRATION_DATE, &buffer);
     if (ret == E_OK)
         convert_to_calendar(data, calendar);
     return ret;
@@ -132,7 +132,7 @@ int get_manufacturing_date(sensor_t *ctx, calendar_t *calendar)
 {
     uint16_t data;
     data_buffer_t buffer = {.data = (uint8_t *) &data, .data_len = sizeof(data)};
-    int ret = sensor_read(ctx, MFR_MANUFACTURING_DATE, &buffer);
+    int ret = sensor_read(ctx, MANUFACTURED_DATE, &buffer);
     if (ret == E_OK)
         convert_to_calendar(data, calendar);
     return ret;
@@ -174,7 +174,7 @@ int preset_config(sensor_t *ctx)
     int ret;
     uint16_t u16 = 1;
     data_buffer_t buffer16 = {.data = (uint8_t *) &u16, .data_len = sizeof(u16)};
-    if ((ret = sensor_write(ctx, EVENT_1_TIME_BASE, &buffer16)) != E_OK)
+    if ((ret = sensor_write(ctx, EVENT_0_TIME_BASE, &buffer16)) != E_OK)
         return ret;
 
     uint32_t u32 = ENABLE_DATA_READY_INTR;

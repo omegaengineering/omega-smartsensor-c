@@ -32,94 +32,181 @@ typedef enum {
 static const _register_t _def [] =
 {
     // register             Modbus      I2C     Access  Size
-    [DEVICE_ID]             =   {0xf000,    R_DEVICE_ID,            RD,     sizeof(uint32_t)},
-    [FIRMARE_VERSION]       =   {0xf002,    R_VERSION,              RD,     sizeof(uint32_t)},
-    [HARDWARE_VERSION]      =   {0xf004,    R_HARDWARE_VERSION,     RD,     sizeof(uint32_t)},
-    [SENSOR_LIST_SELECT]    =   {0xf006,    R_DEVICE_LIST_INDEX,    RD|BYTES,  sizeof(list_select_t)},
-    [BLOCK_OPTIONS]         =   {0xf006,    R_DEVICE_LIST_INDEX,    RD|WR|BYTES,  sizeof(list_select_t)},
-    [OPERATING_HOURS]       =   {0xf007,    R_USER_HOURS,           RD|WR,  sizeof(uint16_t)},
-    [EVENT_1_TIME_BASE]     =   {0xf008,    R_EVENT_0_TIMEBASE,     RD|WR,  sizeof(uint16_t)},
-    [EVENT_2_TIME_BASE]     =   {0xf009,    R_EVENT_1_TIMEBASE,     RD|WR,  sizeof(uint16_t)},
-    [SYSTEM_CONTROL]        =   {0xf00a,    R_SYSTEM_CONTROL,       RD|WR,  sizeof(uint16_t)},
-    [INTERRUPT_STATUS]      =   {0xf00b,    R_INTERRUPT_STATUS,     RD|WR,  sizeof(uint16_t)},
-    [INTERRUPT_CONTROL]     =   {0xf00c,    R_INTERRUPT_CONTROL,    RD|WR,  sizeof(uint16_t)},
-    [NUMBER_OF_SENSORS]     =   {0xf00d,    R_NUMOFSENSORS,         RD|BYTES,     sizeof(io_count_t)},
-    [NUMBER_OF_OUTPUTS]     =   {0xf00d,    R_NUMOFOUTPUTS,         RD|BYTES,     sizeof(io_count_t)},
-    [OPERATING_TEMP]        =   {0xf00e,    R_OPERATING_TEMP,       RD|BYTES,     sizeof(operating_stat_t)},
-    [OPERATING_VOLTAGE]     =   {0xf00e,    R_OPERATING_TEMP,       RD|BYTES,     sizeof(operating_stat_t)},
-    [FAULT_PROCESS]         =   {0xf00f,    R_FAULT_PROCESS,        RD|BYTES,     sizeof(fault_stat_t)},
-    [FAULT_CODE]            =   {0xf00f,    R_FAULT_PROCESS,        RD|BYTES,     sizeof(fault_stat_t)},
-    [EVENT_1_TIMER]         =   {0xf010,    R_EVENT_0_TIMER,        RD,     sizeof(uint16_t)},
-    [EVENT_2_TIMER]         =   {0xf011,    R_EVENT_1_TIMER,        RD,     sizeof(uint16_t)},
-    [SYSTEM_STATUS]         =   {0xf012,    R_SYSTEM_STATUS,        RD|BYTES,     sizeof(uint16_t)},
-    [TRIGGER_REQUESTS]      =   {0xf013,    R_TRIGGERS,             RD|WR,  sizeof(uint16_t)},
-    [EXTRACT_START_TIME]    =   {0xf014,    R_EXTRACT_START_TIME,   RD|WR,  sizeof(uint16_t)},
-    [EXTRACT_END_TIME]      =   {0xf015,    R_EXTRACT_END_TIME,     RD|WR,  sizeof(uint16_t)},
-    [NUMBER_OF_RECORDS]     =   {0xf01b,    R_NUMBER_RECORDS,       RD,     sizeof(uint16_t)},
-    [CURRENT_TIME]          =   {0xf01c,    R_CURRENT_TIME,         RD,  sizeof(uint32_t)},
-    [DEVICE_NAME]           =   {0xf070,    R_DEVICE_NAME,          RD|BYTES,     sizeof(device_name_t)-1},
+    [DEVICE_ID]                 =   {0xf000,    R_DEVICE_ID,            RD,     sizeof(uint32_t)},
+    [FIRMARE_VERSION]           =   {0xf002,    R_VERSION,              RD,     sizeof(uint32_t)},
+    [HARDWARE_VERSION]          =   {0xf004,    R_HARDWARE_VERSION,     RD,     sizeof(uint32_t)},
+    [LIST_INDEX_BLOCK_SELECT]   =   {0xf006,    R_DEVICE_LIST_INDEX,    RD|BYTES,  sizeof(list_select_t)},
+    [USER_HOURS]                =   {0xf007,    R_USER_HOURS,           RD|WR,  sizeof(uint16_t)},
 
-    [SENSOR_1_DATA]         =   {0xf01e,    R_SENSOR_0_VALUE,       RD,  sizeof(float)},
-    [SENSOR_2_DATA]         =   {0xf020,    R_SENSOR_1_VALUE,       RD,  sizeof(float)},
-    [SENSOR_3_DATA]         =   {0xf022,    R_SENSOR_2_VALUE,       RD,  sizeof(float)},
-    [SENSOR_4_DATA]         =   {0xf024,    R_SENSOR_3_VALUE,       RD,  sizeof(float)},
+    [EVENT_0_TIME_BASE]         =   {0xf008,    R_EVENT_0_TIMEBASE,     RD|WR,  sizeof(uint16_t)},
+    [EVENT_1_TIME_BASE]         =   {0xf009,    R_EVENT_1_TIMEBASE,     RD|WR,  sizeof(uint16_t)},
+    [SYSTEM_CONTROL]            =   {0xf00a,    R_SYSTEM_CONTROL,       RD|WR,  sizeof(uint16_t)},
+    [INTERRUPT_STATUS]          =   {0xf00b,    R_INTERRUPT_STATUS,     RD|WR,  sizeof(uint16_t)},
+    [INTERRUPT_CONTROL]         =   {0xf00c,    R_INTERRUPT_CONTROL,    RD|WR,  sizeof(uint16_t)},
 
-    [EXTRACTED_TIME_STAMP]  =   {0xf026,    R_EXTRACTED_TIME,       RD,  sizeof(uint32_t)},
-    [SENSOR_1_EXTRACTED_DATA] = {0xf028,    R_EXTRACTED_0_VALUE,    RD,  sizeof(float)},
-    [SENSOR_2_EXTRACTED_DATA] = {0xf02a,    R_EXTRACTED_1_VALUE,    RD,  sizeof(float)},
-    [SENSOR_3_EXTRACTED_DATA] = {0xf02c,    R_EXTRACTED_2_VALUE,    RD,  sizeof(float)},
-    [SENSOR_4_EXTRACTED_DATA] = {0xf02e,    R_EXTRACTED_3_VALUE,    RD,  sizeof(float)},
+    [NUMBER_OF_SENSORS]         =   {0xf00d,    R_NUMOFSENSORS,         RD|BYTES,     sizeof(io_count_t)},
+    [NUMBER_OF_OUTPUTS]         =   {0xf00d,    R_NUMOFOUTPUTS,         RD|BYTES,     sizeof(io_count_t)},
+    [OPERATING_TEMP]            =   {0xf00e,    R_OPERATING_TEMP,       RD|BYTES,     sizeof(operating_stat_t)},
+    [OPERATING_VOLTAGE]         =   {0xf00e,    R_OPERATING_TEMP,       RD|BYTES,     sizeof(operating_stat_t)},
+    [FAULT_PROCESS]             =   {0xf00f,    R_FAULT_PROCESS,        RD|BYTES,     sizeof(fault_stat_t)},
+    [FAULT_CODE]                =   {0xf00f,    R_FAULT_PROCESS,        RD|BYTES,     sizeof(fault_stat_t)},
+    [EVENT_0_TIMER]             =   {0xf010,    R_EVENT_0_TIMER,        RD,     sizeof(uint16_t)},
+    [EVENT_1_TIMER]             =   {0xf011,    R_EVENT_1_TIMER,        RD,     sizeof(uint16_t)},
+    [SYSTEM_STATUS]             =   {0xf012,    R_SYSTEM_STATUS,        RD|BYTES,     sizeof(uint16_t)},
+    [TRIGGER_REQUESTS]          =   {0xf013,    R_TRIGGERS,             RD|WR,  sizeof(uint16_t)},
 
-    [SENSOR_1_DESCRIPTOR]   =   {0xf030,    R_SENSOR_0_DESCRIPTOR,  RD,  sizeof(Sensor_Descriptor_t)},
-    [SENSOR_2_DESCRIPTOR]   =   {0xf034,    R_SENSOR_1_DESCRIPTOR,  RD,  sizeof(Sensor_Descriptor_t)},
-    [SENSOR_3_DESCRIPTOR]   =   {0xf038,    R_SENSOR_2_DESCRIPTOR,  RD,  sizeof(Sensor_Descriptor_t)},
-    [SENSOR_4_DESCRIPTOR]   =   {0xf03c,    R_SENSOR_3_DESCRIPTOR,  RD,  sizeof(Sensor_Descriptor_t)},
+    [EXTRACT_START_TIME]        =   {0xf014,    R_EXTRACT_START_TIME,   RD|WR,  sizeof(uint16_t)},
+    [EXTRACT_END_TIME]          =   {0xf015,    R_EXTRACT_END_TIME,     RD|WR,  sizeof(uint16_t)},
 
-    [SENSOR_1_GAIN]         =   {0xf060,    R_SENSOR_0_GAIN,        RD|WR,  sizeof(float)},
-    [SENSOR_2_GAIN]         =   {0xf064,    R_SENSOR_1_GAIN,        RD|WR,  sizeof(float)},
-    [SENSOR_3_GAIN]         =   {0xf068,    R_SENSOR_2_GAIN,        RD|WR,  sizeof(float)},
-    [SENSOR_4_GAIN]         =   {0xf06c,    R_SENSOR_3_GAIN,        RD|WR,  sizeof(float)},
+    [NUMBER_OF_RECORDS]         =   {0xf01b,    R_NUMBER_RECORDS,       RD,     sizeof(uint16_t)},
+    [CURRENT_TIME]              =   {0xf01c,    R_CURRENT_TIME,         RD,  sizeof(uint32_t)},
 
-    [SENSOR_1_OFFSET]       =   {0xf062,    R_SENSOR_0_OFFSET,      RD|WR,  sizeof(float)},
-    [SENSOR_2_OFFSET]       =   {0xf066,    R_SENSOR_1_OFFSET,      RD|WR,  sizeof(float)},
-    [SENSOR_3_OFFSET]       =   {0xf06a,    R_SENSOR_2_OFFSET,      RD|WR,  sizeof(float)},
-    [SENSOR_4_OFFSET]       =   {0xf06e,    R_SENSOR_3_OFFSET,      RD|WR,  sizeof(float)},
+    [SENSOR_0_DATA]             =   {0xf01e,    R_SENSOR_0_VALUE,       RD,  sizeof(float)},
+    [SENSOR_1_DATA]             =   {0xf020,    R_SENSOR_1_VALUE,       RD,  sizeof(float)},
+    [SENSOR_2_DATA]             =   {0xf022,    R_SENSOR_2_VALUE,       RD,  sizeof(float)},
+    [SENSOR_3_DATA]             =   {0xf024,    R_SENSOR_3_VALUE,       RD,  sizeof(float)},
 
-    [SENSOR_1_UNIT]         =   {0xf032,    R_SENSOR_0_UNITS,       RD|WR|BYTES,  sizeof(sensor_unit_t)-1},
-    [SENSOR_2_UNIT]         =   {0xf036,    R_SENSOR_1_UNITS,       RD|WR|BYTES,  sizeof(sensor_unit_t)-1},
-    [SENSOR_3_UNIT]         =   {0xf03a,    R_SENSOR_2_UNITS,       RD|WR|BYTES,  sizeof(sensor_unit_t)-1},
-    [SENSOR_4_UNIT]         =   {0xf03e,    R_SENSOR_3_UNITS,       RD|WR|BYTES,  sizeof(sensor_unit_t)-1},
+    [EXTRACTED_TIME_STAMP]      =   {0xf026,    R_EXTRACTED_TIME,       RD,  sizeof(uint32_t)},
+    [EXTRACTED_DATA_0]          =   {0xf028,    R_EXTRACTED_0_VALUE,    RD,  sizeof(float)},
+    [EXTRACTED_DATA_1]          =   {0xf02a,    R_EXTRACTED_1_VALUE,    RD,  sizeof(float)},
+    [EXTRACTED_DATA_2]          =   {0xf02c,    R_EXTRACTED_2_VALUE,    RD,  sizeof(float)},
+    [EXTRACTED_DATA_3]          =   {0xf02e,    R_EXTRACTED_3_VALUE,    RD,  sizeof(float)},
 
+    [SENSOR_0_DESCRIPTOR]       =   {0xf030,    R_SENSOR_0_DESCRIPTOR,  RD,  sizeof(Sensor_Descriptor_t)},
+    [SENSOR_1_DESCRIPTOR]       =   {0xf034,    R_SENSOR_1_DESCRIPTOR,  RD,  sizeof(Sensor_Descriptor_t)},
+    [SENSOR_2_DESCRIPTOR]       =   {0xf038,    R_SENSOR_2_DESCRIPTOR,  RD,  sizeof(Sensor_Descriptor_t)},
+    [SENSOR_3_DESCRIPTOR]       =   {0xf03c,    R_SENSOR_3_DESCRIPTOR,  RD,  sizeof(Sensor_Descriptor_t)},
 
-    [OUTPUT_1]              =   {0xf078,    R_OUTPUT_0_VALUE,       RD,  sizeof(float)},
-    [OUTPUT_2]              =   {0xf07a,    R_OUTPUT_1_VALUE,       RD,  sizeof(float)},
-    [OUTPUT_3]              =   {0xf07c,    R_OUTPUT_2_VALUE,       RD,  sizeof(float)},
-    [OUTPUT_4]              =   {0xf07e,    R_OUTPUT_3_VALUE,       RD,  sizeof(float)},
+    [USER_PARAMETER_0]          =   {0xf040,    R_USER_PARAMETER_0_VALUE,   RD|WR,  4},
+    [USER_PARAMETER_1]          =   {0xf042,    R_USER_PARAMETER_1_VALUE,   RD|WR,  4},
+    [USER_PARAMETER_2]          =   {0xf044,    R_USER_PARAMETER_2_VALUE,   RD|WR,  4},
+    [USER_PARAMETER_3]          =   {0xf046,    R_USER_PARAMETER_3_VALUE,   RD|WR,  4},
+    [USER_PARAMETER_4]          =   {0xf048,    R_USER_PARAMETER_4_VALUE,   RD|WR,  4},
+    [USER_PARAMETER_5]          =   {0xf04a,    R_USER_PARAMETER_5_VALUE,   RD|WR,  4},
+    [USER_PARAMETER_6]          =   {0xf04c,    R_USER_PARAMETER_6_VALUE,   RD|WR,  4},
+    [USER_PARAMETER_7]          =   {0xf04e,    R_USER_PARAMETER_7_VALUE,   RD|WR,  4},
+    [USER_PARAMETER_8]          =   {0xf050,    R_USER_PARAMETER_8_VALUE,   RD|WR,  4},
+    [USER_PARAMETER_9]          =   {0xf052,    R_USER_PARAMETER_9_VALUE,   RD|WR,  4},
+    [USER_PARAMETER_10]         =   {0xf054,    R_USER_PARAMETER_10_VALUE,  RD|WR,  4},
+    [USER_PARAMETER_11]         =   {0xf056,    R_USER_PARAMETER_11_VALUE,  RD|WR,  4},
+    [USER_PARAMETER_12]         =   {0xf058,    R_USER_PARAMETER_12_VALUE,  RD|WR,  4},
+    [USER_PARAMETER_13]         =   {0xf05a,    R_USER_PARAMETER_13_VALUE,  RD|WR,  4},
+    [USER_PARAMETER_14]         =   {0xf05c,    R_USER_PARAMETER_14_VALUE,  RD|WR,  4},
+    [USER_PARAMETER_15]         =   {0xf05e,    R_USER_PARAMETER_15_VALUE,  RD|WR,  4},
 
-    [MFR_DEVICE_ID]                 =   {0xf080,    0x00,   RD,  sizeof(uint32_t)},
-    [MFR_HARDWARE_VERSION]          =   {0xf082,    0x00,   RD,  sizeof(uint32_t)},
-    [MFR_CORE_FIRMWARE_VER]         =   {0xf084,    0x00,   RD,  sizeof(uint32_t)},
-    [MFR_BLOCK_I2C_RETRY]           =   {0xf086,    0x00,   RD,  sizeof(uint16_t)},
-    [MFR_RTC_CALIBRATION]           =   {0xf087,    0x00,   RD,  sizeof(uint16_t)},
-    [MFR_FEATURE_BITS]              =   {0xf088,    0x00,   RD,  sizeof(uint32_t)},
-    [MFR_DEFAULT_EVENT_1_TIME_BASE] =   {0xf08a,    0x00,   RD,  sizeof(uint16_t)},
-    [MFR_DEFAULT_EVENT_2_TIME_BASE] =   {0xf08b,    0x00,   RD,  sizeof(uint16_t)},
-    [MFR_SYSTEM_CONTROL]            =   {0xf08c,    0x00,   RD,  sizeof(uint16_t)},
-    [MFR_SYSTEM_INTERRUPT]          =   {0xf08d,    0x00,   RD,  sizeof(uint16_t)},
-    [MFR_SENSOR_LIST_INDEX]         =   {0xf08e,    0x00,   RD,  sizeof(uint16_t)},
-    [MFR_SENSOR_LIST_SELECT]        =   {0xf08f,    0x00,   RD,  sizeof(uint16_t)},
-    [MFR_ERROR_COUNT_1]             =   {0xf090,    0x00,   RD,  sizeof(uint16_t)},
-    [MFR_ERROR_COUNT_2]             =   {0xf091,    0x00,   RD,  sizeof(uint16_t)},
-    [MFR_ERROR_COUNT_3]             =   {0xf092,    0x00,   RD,  sizeof(uint16_t)},
-    [MFR_ERROR_COUNT_4]             =   {0xf093,    0x00,   RD,  sizeof(uint16_t)},
-    [MFR_MANUFACTURING_DATE]        =   {0xf094,    0x00,   RD,  sizeof(uint16_t)}, ///todo bad i2c
-    [MFR_CALIBRATION_DATE]          =   {0xf095,    0x00,   RD,  sizeof(uint16_t)}, ///todo bad i2c
-    [MFR_OPERATING_TIME]            =   {0xf096,    0x00,   RD,  sizeof(uint32_t)},
-    [MFR_CALIBRATION_TIME]          =   {0xf098,    0x00,   RD,  sizeof(uint32_t)},
-    [MFR_OUTPUT_CONFIG_1]           =   {0xf09a,    0x00,   RD,  sizeof(uint16_t)},
-    [MFR_OUTPUT_CONFIG_2]           =   {0xf09b,    0x00,   RD,  sizeof(uint16_t)},
-    [MFR_OUTPUT_CONFIG_3]           =   {0xf09c,    0x00,   RD,  sizeof(uint16_t)},
-    [MFR_OUTPUT_CONFIG_4]           =   {0xf09d,    0x00,   RD,  sizeof(uint16_t)},
+    [SENSOR_0_GAIN]             =   {0xf060,    R_SENSOR_0_GAIN,        RD|WR,  sizeof(float)},
+    [SENSOR_1_GAIN]             =   {0xf064,    R_SENSOR_1_GAIN,        RD|WR,  sizeof(float)},
+    [SENSOR_2_GAIN]             =   {0xf068,    R_SENSOR_2_GAIN,        RD|WR,  sizeof(float)},
+    [SENSOR_3_GAIN]             =   {0xf06c,    R_SENSOR_3_GAIN,        RD|WR,  sizeof(float)},
+
+    [SENSOR_0_OFFSET]           =   {0xf062,    R_SENSOR_0_OFFSET,      RD|WR,  sizeof(float)},
+    [SENSOR_1_OFFSET]           =   {0xf066,    R_SENSOR_1_OFFSET,      RD|WR,  sizeof(float)},
+    [SENSOR_2_OFFSET]           =   {0xf06a,    R_SENSOR_2_OFFSET,      RD|WR,  sizeof(float)},
+    [SENSOR_3_OFFSET]           =   {0xf06e,    R_SENSOR_3_OFFSET,      RD|WR,  sizeof(float)},
+
+    [SENSOR_0_UNIT]             =   {0xf032,    R_SENSOR_0_UNITS,       RD|WR|BYTES,  sizeof(sensor_unit_t)-1},
+    [SENSOR_1_UNIT]             =   {0xf036,    R_SENSOR_1_UNITS,       RD|WR|BYTES,  sizeof(sensor_unit_t)-1},
+    [SENSOR_2_UNIT]             =   {0xf03a,    R_SENSOR_2_UNITS,       RD|WR|BYTES,  sizeof(sensor_unit_t)-1},
+    [SENSOR_3_UNIT]             =   {0xf03e,    R_SENSOR_3_UNITS,       RD|WR|BYTES,  sizeof(sensor_unit_t)-1},
+
+    [DEVICE_NAME]               =   {0xf070,    R_DEVICE_NAME,          RD|BYTES,     sizeof(device_name_t)-1},
+    [OUTPUT_0]                  =   {0xf078,    R_OUTPUT_0_VALUE,       RD,  sizeof(float)},
+    [OUTPUT_1]                  =   {0xf07a,    R_OUTPUT_1_VALUE,       RD,  sizeof(float)},
+    [OUTPUT_2]                  =   {0xf07c,    R_OUTPUT_2_VALUE,       RD,  sizeof(float)},
+    [OUTPUT_3]                  =   {0xf07e,    R_OUTPUT_3_VALUE,       RD,  sizeof(float)},
+
+    [LONG_DEVICE_ID]            =   {0xf080,    0x00,   RD,  sizeof(uint64_t)},
+    [CORE_VERSION]              =   {0xf084,    0x00,   RD,  sizeof(uint32_t)},
+    [BLOCK_START_RETRY_COUNT]   =   {0xf086,    0x00,   RD,  sizeof(uint16_t)},
+    [RTC_CALIBRATION_CONTROL]   =   {0xf087,    0x00,   RD,  sizeof(uint16_t)},
+    [FEATURE_BITS]              =   {0xf088,    0x00,   RD,  sizeof(uint32_t)},
+    [DEFAULT_EVENT_0_TIMEBASE]  =   {0xf08a,    0x00,   RD,  sizeof(uint16_t)},
+    [DEFAULT_EVENT_1_TIMEBASE]  =   {0xf08b,    0x00,   RD,  sizeof(uint16_t)},
+    [DEFAULT_SYSTEM_CONTROL]    =   {0xf08c,    0x00,   RD,  sizeof(uint16_t)},
+    [DEFAULT_INTERRUPT_CONTROL] =   {0xf08d,    0x00,   RD,  sizeof(uint16_t)},
+    [SENSOR_LIST_INDEX]         =   {0xf08e,    0x00,   RD,  sizeof(uint16_t)},
+    [SENSOR_LIST_SELECT]        =   {0xf08f,    0x00,   RD,  sizeof(uint16_t)},
+    [SENSOR_0_ERROR_COUNT]      =   {0xf090,    0x00,   RD,  sizeof(uint16_t)},
+    [SENSOR_1_ERROR_COUNT]      =   {0xf091,    0x00,   RD,  sizeof(uint16_t)},
+    [SENSOR_2_ERROR_COUNT]      =   {0xf092,    0x00,   RD,  sizeof(uint16_t)},
+    [SENSOR_3_ERROR_COUNT]      =   {0xf093,    0x00,   RD,  sizeof(uint16_t)},
+    [MANUFACTURED_DATE]         =   {0xf094,    0x00,   RD,  sizeof(uint16_t)}, ///todo bad i2c
+    [CALIBRATION_DATE]          =   {0xf095,    0x00,   RD,  sizeof(uint16_t)}, ///todo bad i2c
+    [OPERATING_TIME]            =   {0xf096,    0x00,   RD,  sizeof(uint32_t)},
+    [CALIBRATION_TIME]          =   {0xf098,    0x00,   RD,  sizeof(uint32_t)},
+    [OUTPUT_0_CONFIG]           =   {0xf09a,    0x00,   RD,  sizeof(uint16_t)},
+    [OUTPUT_1_CONFIG]           =   {0xf09b,    0x00,   RD,  sizeof(uint16_t)},
+    [OUTPUT_2_CONFIG]           =   {0xf09c,    0x00,   RD,  sizeof(uint16_t)},
+    [OUTPUT_3_CONFIG]           =   {0xf09d,    0x00,   RD,  sizeof(uint16_t)},
+    [BASE_HARDWARE_TYPE]        =   {0xf09e,    0x00,   RD,  sizeof(uint16_t)},
+    [EXTRACT_STOP_SIZE]         =   {0xf09f,    0x00,   RD,  sizeof(uint16_t)},
+    [DEVICE_NAME_LIST]          =   {0xf0a0,    0x00,   RD,  sizeof(device_name_list_t)-1},
+
+    [CALIBRATION_DATA]          =   {0xf100,    0x00,   RD,  4},
+    [DEVICE_PARAMETER_DATA]     =   {0xf1f0,    0x00,   RD, 4*8},
+
+    [FUNCTION_BLOCK_PROGRAM]    =   {0xf200,    0x00,   RD,  1 *512},
+    [FUNCTION_BLOCK_PARAM]      =   {0xf300,    0x00,   RD,  4 *32},
+    [FUNCTION_BLOCK_PARAM_TYPE] =   {0xf340,    0x00,   RD,  2 *32},
+    [FUNCTION_BLOCK_STATUS]     =   {0xf360,    0x00,   RD,  2 *32},
+    [OUTPUT_0_NAME_LIST]        =   {0xf380,    0x00,   RD,  1 *64},
+    [OUTPUT_1_NAME_LIST]        =   {0xf3a0,    0x00,   RD,  1 *64},
+    [OUTPUT_2_NAME_LIST]        =   {0xf3c0,    0x00,   RD,  1 *64},
+    [OUTPUT_3_NAME_LIST]        =   {0xf3e0,    0x00,   RD,  1 *64},
+
+    [SENSOR_0_NAME_LIST]        =   {0xf400,    0x00,   RD,  164},
+    [SENSOR_0_IPSO_TYPE]        =   {0xf454,    0x00,   RD,     sizeof(uint16_t)},
+    [SENSOR_0_PRECISION]        =   {0xf455,    0x00,   RD,     sizeof(uint16_t)},
+    [SENSOR_0_FUNCTION]         =   {0xf456,    0x00,   RD,     sizeof(uint16_t)},
+    [SENSOR_0_MIN_VALUE]        =   {0xf458,    0x00,   RD,     sizeof(float)},
+    [SENSOR_0_MAX_VALUE]        =   {0xf45a,    0x00,   RD,     sizeof(float)},
+    [SENSOR_0_MIN_RANGE]        =   {0xf45c,    0x00,   RD,     sizeof(float)},
+    [SENSOR_0_MAX_RANGE]        =   {0xf45e,    0x00,   RD,     sizeof(float)},
+    [SENSOR_0_PARAM_0_VALUE]    =   {0xf460,    0x00,   RD|WR,  sizeof(float)},
+    [SENSOR_0_PARAM_0_MIN]      =   {0xf462,    0x00,   RD,     sizeof(float)},
+    [SENSOR_0_PARAM_0_MAX]      =   {0xf464,    0x00,   RD,     sizeof(float)},
+    [SENSOR_0_PARAM_0_INCREMENT]=   {0xf466,    0x00,   RD,     sizeof(float)},
+    [SENSOR_0_PARAM_1_VALUE]    =   {0xf468,    0x00,   RD|WR,  sizeof(float)},
+    [SENSOR_0_PARAM_1_MIN]      =   {0xf46a,    0x00,   RD,     sizeof(float)},
+    [SENSOR_0_PARAM_1_MAX]      =   {0xf46c,    0x00,   RD,     sizeof(float)},
+    [SENSOR_0_PARAM_1_INCREMENT]=   {0xf46e,    0x00,   RD,     sizeof(float)},
+    [SENSOR_0_PARAM_2_VALUE]    =   {0xf470,    0x00,   RD|WR,  sizeof(float)},
+    [SENSOR_0_PARAM_2_MIN]      =   {0xf472,    0x00,   RD,     sizeof(float)},
+    [SENSOR_0_PARAM_2_MAX]      =   {0xf474,    0x00,   RD,     sizeof(float)},
+    [SENSOR_0_PARAM_2_INCREMENT]=   {0xf476,    0x00,   RD,     sizeof(float)},
+    [SENSOR_0_PARAM_3_VALUE]    =   {0xf478,    0x00,   RD|WR,  sizeof(float)},
+    [SENSOR_0_PARAM_3_MIN]      =   {0xf47a,    0x00,   RD,     sizeof(float)},
+    [SENSOR_0_PARAM_3_MAX]      =   {0xf47c,    0x00,   RD,     sizeof(float)},
+    [SENSOR_0_PARAM_3_INCREMENT]=   {0xf47e,    0x00,   RD,     sizeof(float)},
+
+    [DEVICE_EXTENSION_SPACE]    =   {0xf600,    0x00,   RD|WR,     2 * 128},
+    [USER_EXTENSION_SPACE]      =   {0xf680,    0x00,   RD|WR,     1 * 256},
+    [SENSOR_0_NAME]             =   {0xf700,    0x00,   RD|WR,     16},
+    [SENSOR_1_NAME]             =   {0xf709,    0x00,   RD|WR,     16},
+    [SENSOR_2_NAME]             =   {0xf710,    0x00,   RD|WR,     16},
+    [SENSOR_3_NAME]             =   {0xf719,    0x00,   RD|WR,     16},
+    [OUTPUT_0_NAME]             =   {0xf720,    0x00,   RD|WR,     16},
+    [OUTPUT_1_NAME]             =   {0xf729,    0x00,   RD|WR,     16},
+    [OUTPUT_2_NAME]             =   {0xf730,    0x00,   RD|WR,     16},
+    [OUTPUT_3_NAME]             =   {0xf739,    0x00,   RD|WR,     16},
+    [PARAM_0_NAME]              =   {0xf740,    0x00,   RD|WR,     16},
+    [PARAM_1_NAME]              =   {0xf748,    0x00,   RD|WR,     16},
+    [PARAM_2_NAME]              =   {0xf750,    0x00,   RD|WR,     16},
+    [PARAM_3_NAME]              =   {0xf758,    0x00,   RD|WR,     16},
+    [PARAM_4_NAME]              =   {0xf760,    0x00,   RD|WR,     16},
+    [PARAM_5_NAME]              =   {0xf768,    0x00,   RD|WR,     16},
+    [PARAM_6_NAME]              =   {0xf770,    0x00,   RD|WR,     16},
+    [PARAM_7_NAME]              =   {0xf778,    0x00,   RD|WR,     16},
+    [PARAM_8_NAME]              =   {0xf780,    0x00,   RD|WR,     16},
+    [PARAM_9_NAME]              =   {0xf788,    0x00,   RD|WR,     16},
+    [PARAM_10_NAME]             =   {0xf790,    0x00,   RD|WR,     16},
+    [PARAM_11_NAME]             =   {0xf798,    0x00,   RD|WR,     16},
+    [PARAM_12_NAME]             =   {0xf7a0,    0x00,   RD|WR,     16},
+    [PARAM_13_NAME]             =   {0xf7a8,    0x00,   RD|WR,     16},
+    [PARAM_14_NAME]             =   {0xf7b0,    0x00,   RD|WR,     16},
+    [PARAM_15_NAME]             =   {0xf7b8,    0x00,   RD|WR,     16},
+    [CALIBRATION_STRING]        =   {0xf7e0,    0x00,   RD,        64},
+
 };
 
 s19_log_create("Sensor");
@@ -446,19 +533,19 @@ static int probe_init(sensor_t *ctx)
 
 #ifdef FORCE_SAMPLE_TIME
     data16 = DEFAULT_SAMPLE_TIME;
-    if ((ret = sensor_write(ctx, EVENT_1_TIME_BASE, &buffer16)))
+    if ((ret = sensor_write(ctx, EVENT_0_TIME_BASE, &buffer16)))
         return ret;
-    if ((ret = sensor_write(ctx, EVENT_2_TIME_BASE, &buffer16)))
+    if ((ret = sensor_write(ctx, EVENT_1_TIME_BASE, &buffer16)))
         return ret;
 
 #else
-    if ((ret = sensor_read(ctx, EVENT_1_TIME_BASE, &buffer16)))
+    if ((ret = sensor_read(ctx, EVENT_0_TIME_BASE, &buffer16)))
         return ret;
 
     if (data16 < DEFAULT_SAMPLE_TIME)
     {
         data16 = DEFAULT_SAMPLE_TIME;
-        if ((ret = sensor_write(ctx, EVENT_1_TIME_BASE, &buffer16)))
+        if ((ret = sensor_write(ctx, EVENT_0_TIME_BASE, &buffer16)))
             return ret;
     }
 #endif
@@ -572,3 +659,15 @@ static void timeout_triggered(void *ctx)
     //s19_log_dbg("Heartbeat timeout\n");
     event_handler_low_level(ctx, SENSOR_EVT_TIMEOUT);
 }
+
+#if ENABLE_UNIT_TEST
+int get_def_table_size()
+{
+    return sizeof(_def);
+}
+
+_register_t* get_def_table()
+{
+    return (_register_t*) &_def[0];
+}
+#endif

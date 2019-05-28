@@ -18,7 +18,7 @@ int main()
     sensor_init_t init = {
 //            .bus_id = "/dev/ttyACM0",
 //            .bus_type = SENSOR_BUS_MODBUS,
-            .bus_id = "/dev/i2c-1",
+            .bus_id = "/dev/i2c-3",
             .bus_type = SENSOR_BUS_I2C,
             .gpio_id = 16,
             .event_callback = NULL
@@ -49,10 +49,10 @@ int main()
     /// test read/write float
     f_value = 123.45;
     memcpy(buffer64.data, &f_value, sizeof(f_value));
-    ret = sensor_write(sensor, SENSOR_1_OFFSET, &buffer64);
+    ret = sensor_write(sensor, SENSOR_0_OFFSET, &buffer64);
     assert(ret == E_OK);
     memset(buffer64.data, 0, buffer64.data_len);
-    ret = sensor_read(sensor, SENSOR_1_OFFSET, &buffer64);
+    ret = sensor_read(sensor, SENSOR_0_OFFSET, &buffer64);
     assert(ret == E_OK);
     assert((int)(f_value * 100) == (int)(*(float*)(buffer64.data) * 100));
 
