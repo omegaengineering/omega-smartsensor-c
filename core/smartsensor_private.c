@@ -116,7 +116,7 @@ static const _register_t _def [] =
     [OUTPUT_3]                  =   {0xf07e,    R_OUTPUT_3_VALUE,       RD,  sizeof(float)},
 
     [LONG_DEVICE_ID]            =   {0xf080,    0x00,   RD,  sizeof(uint64_t)},
-    [CORE_VERSION]              =   {0xf084,    0x00,   RD,  sizeof(uint32_t)},
+    [CORE_VERSION]              =   {0xf084,    R_CORE_VERSION,   RD,  sizeof(uint32_t)},
     [BLOCK_START_RETRY_COUNT]   =   {0xf086,    0x00,   RD,  sizeof(uint16_t)},
     [RTC_CALIBRATION_CONTROL]   =   {0xf087,    0x00,   RD,  sizeof(uint16_t)},
     [FEATURE_BITS]              =   {0xf088,    0x00,   RD,  sizeof(uint32_t)},
