@@ -1,27 +1,30 @@
-#include "contiki.h"
+#include "smartsensor_private.h"
+#include "hw/ti/bus_ti_i2c.h"
+#include "hw/ti/bus_ti_uart_modbus.h"
 
-#include <stdio.h> /* For printf() */
-/*---------------------------------------------------------------------------*/
-PROCESS(hello_world_process, "Hello world process");
-AUTOSTART_PROCESSES(&hello_world_process);
-/*---------------------------------------------------------------------------*/
-PROCESS_THREAD(hello_world_process, ev, data)
+bus_ti_i2c_cfg_t my_config = {
+        .periph_idx = 0,
+        .bit_rate = I2C_100kHz,
+        .sda_pin = 4,
+        .clk_pin = 5,
+        .slave_addr = 0x68
+};
+
+const bus_new_dr    port_bus_i2c_new = bus_ti_i2c_new;
+const void*         port_bus_i2c_cfg = &my_config;
+const bus_new_dr    port_bus_modbus_new = &bus_ti_uart_modbus_new;
+const void*         port_bus_modbus_cfg = (const void*)NULL;
+
+
+port_intr_init(sensor_t *sensor)
 {
-  static struct etimer timer;
 
-  PROCESS_BEGIN();
-
-  /* Setup a periodic timer that expires after 10 seconds. */
-  etimer_set(&timer, CLOCK_SECOND * 10);
-
-  while(1) {
-    printf("Hello, world\n");
-
-    /* Wait for the periodic timer to expire and then restart the timer. */
-    PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&timer));
-    etimer_reset(&timer);
-  }
-
-  PROCESS_END();
 }
-/*------
+int port_platform_init(sensor_t *sensor)
+{
+
+}
+int port_platform_exit(sensor_t *sensor)
+{
+
+}

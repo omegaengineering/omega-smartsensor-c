@@ -277,15 +277,17 @@ ERROR:
 int sensor_open(sensor_t *ctx)
 {
     int ret;
+    if (ctx == NULL)
+        return E_INVALID_PARAM;
     if ((ret = bus_open(ctx->bus, ctx->bus_cfg)) != E_OK)
         return ret;
 
     if (ctx->bus_type == SENSOR_BUS_I2C)
     {
-        if ((ret = port_intr_init(ctx)) != E_OK)
-            return ret;
-        if ((ret = port_platform_init(ctx)) != E_OK)
-            return ret;
+//        if ((ret = port_intr_init(ctx)) != E_OK)
+//            return ret;
+//        if ((ret = port_platform_init(ctx)) != E_OK)
+//            return ret;
     }
 #if HEARTBEAT
     if (ctx->heartbeat_period)
@@ -368,6 +370,9 @@ int sensor_read(sensor_t *ctx, ss_register_t ss_register, data_buffer_t *data_bu
     uint16_t reg_addr;
     const _register_t *reg = &_def[ss_register];
 
+    if(ctx == NULL)
+        return E_INVALID_PARAM;
+
     if (data_buffer->data_len < reg->size)
     {
         ret = E_BUFFER_MEM_SIZE;
@@ -407,6 +412,9 @@ int sensor_write(sensor_t *ctx, ss_register_t ss_register, data_buffer_t *data_b
     int ret;
     uint16_t reg_addr;
     const _register_t *reg = &_def[ss_register];
+
+    if(ctx == NULL)
+        return E_INVALID_PARAM;
 
     if (data_buffer->data_len < reg->size)
     {
