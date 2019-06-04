@@ -23,8 +23,13 @@ target_link_libraries(registers_integrity omega_smartsensor_lib pthread modbus)
 
 add_executable(test_ti
         ../lib/src/hw/ti/bus_ti_i2c.c
-        ../lib/src/hw/ti/bus_uart.c
+        ../lib/src/hw/ti/bus_ti_uart_modbus.c
+        ../lib/src/platform/contiki/contiki_memory.c
+        ../lib/src/platform/contiki/contiki_mutex.c
+        ../port/contiki/port_contiki.c
+        ../examples/contiki/basic_sensor.c
         )
 target_include_directories(test_ti
         PRIVATE ../../../ti/simplelink_cc13x2_sdk_2_30_00_45/source
+        PRIVATE ../../contiki-ng/os
         )

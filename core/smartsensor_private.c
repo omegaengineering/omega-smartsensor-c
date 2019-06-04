@@ -52,7 +52,7 @@ static const _register_t _def [] =
     [FAULT_CODE]                =   {0xf00f,    R_FAULT_PROCESS,        RD|BYTES,     sizeof(fault_stat_t)},
     [EVENT_0_TIMER]             =   {0xf010,    R_EVENT_0_TIMER,        RD,     sizeof(uint16_t)},
     [EVENT_1_TIMER]             =   {0xf011,    R_EVENT_1_TIMER,        RD,     sizeof(uint16_t)},
-    [SYSTEM_STATUS]             =   {0xf012,    R_SYSTEM_STATUS,        RD|BYTES,     sizeof(uint16_t)},
+    [SYSTEM_STATUS]             =   {0xf012,    R_SYSTEM_STATUS,        RD,     sizeof(uint16_t)},
     [TRIGGER_REQUESTS]          =   {0xf013,    R_TRIGGERS,             RD|WR,  sizeof(uint16_t)},
 
     [EXTRACT_START_TIME]        =   {0xf014,    R_EXTRACT_START_TIME,   RD|WR,  sizeof(uint16_t)},
@@ -72,10 +72,10 @@ static const _register_t _def [] =
     [EXTRACTED_DATA_2]          =   {0xf02c,    R_EXTRACTED_2_VALUE,    RD,  sizeof(float)},
     [EXTRACTED_DATA_3]          =   {0xf02e,    R_EXTRACTED_3_VALUE,    RD,  sizeof(float)},
 
-    [SENSOR_0_DESCRIPTOR]       =   {0xf030,    R_SENSOR_0_DESCRIPTOR,  RD,  sizeof(Sensor_Descriptor_t)},
-    [SENSOR_1_DESCRIPTOR]       =   {0xf034,    R_SENSOR_1_DESCRIPTOR,  RD,  sizeof(Sensor_Descriptor_t)},
-    [SENSOR_2_DESCRIPTOR]       =   {0xf038,    R_SENSOR_2_DESCRIPTOR,  RD,  sizeof(Sensor_Descriptor_t)},
-    [SENSOR_3_DESCRIPTOR]       =   {0xf03c,    R_SENSOR_3_DESCRIPTOR,  RD,  sizeof(Sensor_Descriptor_t)},
+    [SENSOR_0_DESCRIPTOR]       =   {0xf030,    R_SENSOR_0_DESCRIPTOR,  RD|BYTES,  sizeof(sensor_descriptor_t)},
+    [SENSOR_1_DESCRIPTOR]       =   {0xf034,    R_SENSOR_1_DESCRIPTOR,  RD|BYTES,  sizeof(sensor_descriptor_t)},
+    [SENSOR_2_DESCRIPTOR]       =   {0xf038,    R_SENSOR_2_DESCRIPTOR,  RD|BYTES,  sizeof(sensor_descriptor_t)},
+    [SENSOR_3_DESCRIPTOR]       =   {0xf03c,    R_SENSOR_3_DESCRIPTOR,  RD|BYTES,  sizeof(sensor_descriptor_t)},
 
     [USER_PARAMETER_0]          =   {0xf040,    R_USER_PARAMETER_0_VALUE,   RD|WR,  4},
     [USER_PARAMETER_1]          =   {0xf042,    R_USER_PARAMETER_1_VALUE,   RD|WR,  4},
@@ -115,32 +115,32 @@ static const _register_t _def [] =
     [OUTPUT_2]                  =   {0xf07c,    R_OUTPUT_2_VALUE,       RD,  sizeof(float)},
     [OUTPUT_3]                  =   {0xf07e,    R_OUTPUT_3_VALUE,       RD,  sizeof(float)},
 
-    [LONG_DEVICE_ID]            =   {0xf080,    0x00,   RD,  sizeof(uint64_t)},
-    [CORE_VERSION]              =   {0xf084,    R_CORE_VERSION,   RD,  sizeof(uint32_t)},
-    [BLOCK_START_RETRY_COUNT]   =   {0xf086,    0x00,   RD,  sizeof(uint16_t)},
-    [RTC_CALIBRATION_CONTROL]   =   {0xf087,    0x00,   RD,  sizeof(uint16_t)},
-    [FEATURE_BITS]              =   {0xf088,    0x00,   RD,  sizeof(uint32_t)},
-    [DEFAULT_EVENT_0_TIMEBASE]  =   {0xf08a,    0x00,   RD,  sizeof(uint16_t)},
-    [DEFAULT_EVENT_1_TIMEBASE]  =   {0xf08b,    0x00,   RD,  sizeof(uint16_t)},
-    [DEFAULT_SYSTEM_CONTROL]    =   {0xf08c,    0x00,   RD,  sizeof(uint16_t)},
-    [DEFAULT_INTERRUPT_CONTROL] =   {0xf08d,    0x00,   RD,  sizeof(uint16_t)},
-    [SENSOR_LIST_INDEX]         =   {0xf08e,    0x00,   RD,  sizeof(uint16_t)},
-    [SENSOR_LIST_SELECT]        =   {0xf08f,    0x00,   RD,  sizeof(uint16_t)},
-    [SENSOR_0_ERROR_COUNT]      =   {0xf090,    0x00,   RD,  sizeof(uint16_t)},
-    [SENSOR_1_ERROR_COUNT]      =   {0xf091,    0x00,   RD,  sizeof(uint16_t)},
-    [SENSOR_2_ERROR_COUNT]      =   {0xf092,    0x00,   RD,  sizeof(uint16_t)},
-    [SENSOR_3_ERROR_COUNT]      =   {0xf093,    0x00,   RD,  sizeof(uint16_t)},
-    [MANUFACTURED_DATE]         =   {0xf094,    0x00,   RD,  sizeof(uint16_t)}, ///todo bad i2c
-    [CALIBRATION_DATE]          =   {0xf095,    0x00,   RD,  sizeof(uint16_t)}, ///todo bad i2c
-    [OPERATING_TIME]            =   {0xf096,    0x00,   RD,  sizeof(uint32_t)},
-    [CALIBRATION_TIME]          =   {0xf098,    0x00,   RD,  sizeof(uint32_t)},
-    [OUTPUT_0_CONFIG]           =   {0xf09a,    0x00,   RD,  sizeof(uint16_t)},
-    [OUTPUT_1_CONFIG]           =   {0xf09b,    0x00,   RD,  sizeof(uint16_t)},
-    [OUTPUT_2_CONFIG]           =   {0xf09c,    0x00,   RD,  sizeof(uint16_t)},
-    [OUTPUT_3_CONFIG]           =   {0xf09d,    0x00,   RD,  sizeof(uint16_t)},
-    [BASE_HARDWARE_TYPE]        =   {0xf09e,    0x00,   RD,  sizeof(uint16_t)},
-    [EXTRACT_STOP_SIZE]         =   {0xf09f,    0x00,   RD,  sizeof(uint16_t)},
-    [DEVICE_NAME_LIST]          =   {0xf0a0,    0x00,   RD,  sizeof(device_name_list_t)-1},
+    [LONG_DEVICE_ID]            =   {0xf080,    F_DEVICE_ID,                    RD,  sizeof(uint64_t)},
+    [CORE_VERSION]              =   {0xf084,    R_CORE_VERSION,                 RD,  sizeof(uint32_t)},
+    [BLOCK_START_RETRY_COUNT]   =   {0xf086,    R_BLOCK_START_RETRY,            RD,  sizeof(uint16_t)},
+    [RTC_CALIBRATION_CONTROL]   =   {0xf087,    R_RTC_TUNING,                   RD,  sizeof(uint16_t)},
+    [FEATURE_BITS]              =   {0xf088,    R_FEATURE_BITS,                 RD,  sizeof(uint32_t)},
+    [DEFAULT_EVENT_0_TIMEBASE]  =   {0xf08a,    R_DEFAULT_EVENT_0_TIMEBASE,     RD,  sizeof(uint16_t)},
+    [DEFAULT_EVENT_1_TIMEBASE]  =   {0xf08b,    R_DEFAULT_EVENT_1_TIMEBASE,     RD,  sizeof(uint16_t)},
+    [DEFAULT_SYSTEM_CONTROL]    =   {0xf08c,    R_DEFAULT_SYSTEM_CONTROL,       RD,  sizeof(uint16_t)},
+    [DEFAULT_INTERRUPT_CONTROL] =   {0xf08d,    R_DEFAULT_INTERRUPT_CONTROL,    RD,  sizeof(uint16_t)},
+    [SENSOR_LIST_INDEX]         =   {0xf08e,    R_DEVICE_NUMBER_INDEX,          RD,  sizeof(list_select_t)},
+    [SENSOR_LIST_SELECT]        =   {0xf08e,    R_DEVICE_NUMBER_INDEX,          RD,  sizeof(list_select_t)},
+    [SENSOR_0_ERROR_COUNT]      =   {0xf090,    R_SENSOR_0_ERRORS,              RD,  sizeof(uint16_t)},
+    [SENSOR_1_ERROR_COUNT]      =   {0xf091,    R_SENSOR_1_ERRORS,              RD,  sizeof(uint16_t)},
+    [SENSOR_2_ERROR_COUNT]      =   {0xf092,    R_SENSOR_2_ERRORS,              RD,  sizeof(uint16_t)},
+    [SENSOR_3_ERROR_COUNT]      =   {0xf093,    R_SENSOR_3_ERRORS,              RD,  sizeof(uint16_t)},
+    [MANUFACTURED_DATE]         =   {0xf094,    R_MANUFACTURED_DATE,            RD,  sizeof(uint16_t)}, ///todo bad i2c
+    [CALIBRATION_DATE]          =   {0xf095,    R_CALIBRATION_DATE,             RD,  sizeof(uint16_t)}, ///todo bad i2c
+    [OPERATING_TIME]            =   {0xf096,    R_TOTAL_OPERATING_TIME,         RD,  sizeof(uint32_t)},
+    [CALIBRATION_TIME]          =   {0xf098,    R_TIME_SINCE_CALIBRATION,       RD,  sizeof(uint32_t)},
+    [OUTPUT_0_CONFIG]           =   {0xf09a,    R_OUTPUT_0_DESCRIPTOR,          RD,  sizeof(uint16_t)},
+    [OUTPUT_1_CONFIG]           =   {0xf09b,    R_OUTPUT_1_DESCRIPTOR,          RD,  sizeof(uint16_t)},
+    [OUTPUT_2_CONFIG]           =   {0xf09c,    R_OUTPUT_2_DESCRIPTOR,          RD,  sizeof(uint16_t)},
+    [OUTPUT_3_CONFIG]           =   {0xf09d,    R_OUTPUT_3_DESCRIPTOR,          RD,  sizeof(uint16_t)},
+    [BASE_HARDWARE_TYPE]        =   {0xf09e,    R_BASE_TYPE,                    RD,  sizeof(uint16_t)},
+    [EXTRACT_STOP_SIZE]         =   {0xf09f,    R_SENTINEL,                     RD,  sizeof(uint16_t)},
+    [DEVICE_NAME_LIST]          =   {0xf0a0,    R_IO_DEVICE_LIST_NAMES,         RD,  sizeof(device_name_list_t)-1},
 
     [CALIBRATION_DATA]          =   {0xf100,    0x00,   RD,  4},
     [DEVICE_PARAMETER_DATA]     =   {0xf1f0,    0x00,   RD, 4*8},
@@ -149,32 +149,32 @@ static const _register_t _def [] =
     [FUNCTION_BLOCK_PARAM]      =   {0xf300,    0x00,   RD,  4 *32},
     [FUNCTION_BLOCK_PARAM_TYPE] =   {0xf340,    0x00,   RD,  2 *32},
     [FUNCTION_BLOCK_STATUS]     =   {0xf360,    0x00,   RD,  2 *32},
-    [OUTPUT_0_NAME_LIST]        =   {0xf380,    0x00,   RD,  1 *64},
-    [OUTPUT_1_NAME_LIST]        =   {0xf3a0,    0x00,   RD,  1 *64},
-    [OUTPUT_2_NAME_LIST]        =   {0xf3c0,    0x00,   RD,  1 *64},
-    [OUTPUT_3_NAME_LIST]        =   {0xf3e0,    0x00,   RD,  1 *64},
+    [OUTPUT_0_NAME_LIST]        =   {0xf380,    R_OUTPUT_0_NAMELIST,   RD,  1 *64},
+    [OUTPUT_1_NAME_LIST]        =   {0xf3a0,    R_OUTPUT_1_NAMELIST,   RD,  1 *64},
+    [OUTPUT_2_NAME_LIST]        =   {0xf3c0,    R_OUTPUT_2_NAMELIST,   RD,  1 *64},
+    [OUTPUT_3_NAME_LIST]        =   {0xf3e0,    R_OUTPUT_3_NAMELIST,   RD,  1 *64},
 
-    [SENSOR_0_NAME_LIST]        =   {0xf400,    0x00,   RD,  164},
-    [SENSOR_0_IPSO_TYPE]        =   {0xf454,    0x00,   RD,     sizeof(uint16_t)},
-    [SENSOR_0_PRECISION]        =   {0xf455,    0x00,   RD,     sizeof(uint16_t)},
+    [SENSOR_0_NAME_LIST]        =   {0xf400,    R_SENSOR_0_NAMELIST,   RD,  164},
+    [SENSOR_0_IPSO_TYPE]        =   {0xf454,    R_SENSOR_0_IPSO_TYPE,   RD,     sizeof(uint16_t)},
+    [SENSOR_0_PRECISION]        =   {0xf455,    R_SENSOR_0_PRECISION,   RD,     sizeof(uint16_t)},
     [SENSOR_0_FUNCTION]         =   {0xf456,    0x00,   RD,     sizeof(uint16_t)},
-    [SENSOR_0_MIN_VALUE]        =   {0xf458,    0x00,   RD,     sizeof(float)},
-    [SENSOR_0_MAX_VALUE]        =   {0xf45a,    0x00,   RD,     sizeof(float)},
-    [SENSOR_0_MIN_RANGE]        =   {0xf45c,    0x00,   RD,     sizeof(float)},
-    [SENSOR_0_MAX_RANGE]        =   {0xf45e,    0x00,   RD,     sizeof(float)},
-    [SENSOR_0_PARAM_0_VALUE]    =   {0xf460,    0x00,   RD|WR,  sizeof(float)},
+    [SENSOR_0_MIN_VALUE]        =   {0xf458,    R_SENSOR_0_MINVALUE,   RD,     sizeof(float)},
+    [SENSOR_0_MAX_VALUE]        =   {0xf45a,    R_SENSOR_0_MAXVALUE,   RD,     sizeof(float)},
+    [SENSOR_0_MIN_RANGE]        =   {0xf45c,    R_SENSOR_0_MINRANGE,   RD,     sizeof(float)},
+    [SENSOR_0_MAX_RANGE]        =   {0xf45e,    R_SENSOR_0_MAXRANGE,   RD,     sizeof(float)},
+    [SENSOR_0_PARAM_0_VALUE]    =   {0xf460,    R_SENSOR_0_PARAMETER_0,   RD|WR,  sizeof(float)},
     [SENSOR_0_PARAM_0_MIN]      =   {0xf462,    0x00,   RD,     sizeof(float)},
     [SENSOR_0_PARAM_0_MAX]      =   {0xf464,    0x00,   RD,     sizeof(float)},
     [SENSOR_0_PARAM_0_INCREMENT]=   {0xf466,    0x00,   RD,     sizeof(float)},
-    [SENSOR_0_PARAM_1_VALUE]    =   {0xf468,    0x00,   RD|WR,  sizeof(float)},
+    [SENSOR_0_PARAM_1_VALUE]    =   {0xf468,    R_SENSOR_1_PARAMETER_1,   RD|WR,  sizeof(float)},
     [SENSOR_0_PARAM_1_MIN]      =   {0xf46a,    0x00,   RD,     sizeof(float)},
     [SENSOR_0_PARAM_1_MAX]      =   {0xf46c,    0x00,   RD,     sizeof(float)},
     [SENSOR_0_PARAM_1_INCREMENT]=   {0xf46e,    0x00,   RD,     sizeof(float)},
-    [SENSOR_0_PARAM_2_VALUE]    =   {0xf470,    0x00,   RD|WR,  sizeof(float)},
+    [SENSOR_0_PARAM_2_VALUE]    =   {0xf470,    R_SENSOR_2_PARAMETER_1,   RD|WR,  sizeof(float)},
     [SENSOR_0_PARAM_2_MIN]      =   {0xf472,    0x00,   RD,     sizeof(float)},
     [SENSOR_0_PARAM_2_MAX]      =   {0xf474,    0x00,   RD,     sizeof(float)},
     [SENSOR_0_PARAM_2_INCREMENT]=   {0xf476,    0x00,   RD,     sizeof(float)},
-    [SENSOR_0_PARAM_3_VALUE]    =   {0xf478,    0x00,   RD|WR,  sizeof(float)},
+    [SENSOR_0_PARAM_3_VALUE]    =   {0xf478,    R_SENSOR_3_PARAMETER_1,   RD|WR,  sizeof(float)},
     [SENSOR_0_PARAM_3_MIN]      =   {0xf47a,    0x00,   RD,     sizeof(float)},
     [SENSOR_0_PARAM_3_MAX]      =   {0xf47c,    0x00,   RD,     sizeof(float)},
     [SENSOR_0_PARAM_3_INCREMENT]=   {0xf47e,    0x00,   RD,     sizeof(float)},
@@ -189,27 +189,27 @@ static const _register_t _def [] =
     [OUTPUT_1_NAME]             =   {0xf729,    0x00,   RD|WR,     16},
     [OUTPUT_2_NAME]             =   {0xf730,    0x00,   RD|WR,     16},
     [OUTPUT_3_NAME]             =   {0xf739,    0x00,   RD|WR,     16},
-    [PARAM_0_NAME]              =   {0xf740,    0x00,   RD|WR,     16},
-    [PARAM_1_NAME]              =   {0xf748,    0x00,   RD|WR,     16},
-    [PARAM_2_NAME]              =   {0xf750,    0x00,   RD|WR,     16},
-    [PARAM_3_NAME]              =   {0xf758,    0x00,   RD|WR,     16},
-    [PARAM_4_NAME]              =   {0xf760,    0x00,   RD|WR,     16},
-    [PARAM_5_NAME]              =   {0xf768,    0x00,   RD|WR,     16},
-    [PARAM_6_NAME]              =   {0xf770,    0x00,   RD|WR,     16},
-    [PARAM_7_NAME]              =   {0xf778,    0x00,   RD|WR,     16},
-    [PARAM_8_NAME]              =   {0xf780,    0x00,   RD|WR,     16},
-    [PARAM_9_NAME]              =   {0xf788,    0x00,   RD|WR,     16},
-    [PARAM_10_NAME]             =   {0xf790,    0x00,   RD|WR,     16},
-    [PARAM_11_NAME]             =   {0xf798,    0x00,   RD|WR,     16},
-    [PARAM_12_NAME]             =   {0xf7a0,    0x00,   RD|WR,     16},
-    [PARAM_13_NAME]             =   {0xf7a8,    0x00,   RD|WR,     16},
-    [PARAM_14_NAME]             =   {0xf7b0,    0x00,   RD|WR,     16},
-    [PARAM_15_NAME]             =   {0xf7b8,    0x00,   RD|WR,     16},
+    [PARAM_0_NAME]              =   {0xf740,    R_USER_PARAMETER_0_NAME,   RD|WR,     16},
+    [PARAM_1_NAME]              =   {0xf748,    R_USER_PARAMETER_1_NAME,   RD|WR,     16},
+    [PARAM_2_NAME]              =   {0xf750,    R_USER_PARAMETER_2_NAME,   RD|WR,     16},
+    [PARAM_3_NAME]              =   {0xf758,    R_USER_PARAMETER_3_NAME,   RD|WR,     16},
+    [PARAM_4_NAME]              =   {0xf760,    R_USER_PARAMETER_4_NAME,   RD|WR,     16},
+    [PARAM_5_NAME]              =   {0xf768,    R_USER_PARAMETER_5_NAME,   RD|WR,     16},
+    [PARAM_6_NAME]              =   {0xf770,    R_USER_PARAMETER_6_NAME,   RD|WR,     16},
+    [PARAM_7_NAME]              =   {0xf778,    R_USER_PARAMETER_7_NAME,   RD|WR,     16},
+    [PARAM_8_NAME]              =   {0xf780,    R_USER_PARAMETER_8_NAME,   RD|WR,     16},
+    [PARAM_9_NAME]              =   {0xf788,    R_USER_PARAMETER_9_NAME,   RD|WR,     16},
+    [PARAM_10_NAME]             =   {0xf790,    R_USER_PARAMETER_10_NAME,   RD|WR,     16},
+    [PARAM_11_NAME]             =   {0xf798,    R_USER_PARAMETER_11_NAME,   RD|WR,     16},
+    [PARAM_12_NAME]             =   {0xf7a0,    R_USER_PARAMETER_12_NAME,   RD|WR,     16},
+    [PARAM_13_NAME]             =   {0xf7a8,    R_USER_PARAMETER_13_NAME,   RD|WR,     16},
+    [PARAM_14_NAME]             =   {0xf7b0,    R_USER_PARAMETER_14_NAME,   RD|WR,     16},
+    [PARAM_15_NAME]             =   {0xf7b8,    R_USER_PARAMETER_15_NAME,   RD|WR,     16},
     [CALIBRATION_STRING]        =   {0xf7e0,    0x00,   RD,        64},
 
 };
 
-s19_log_create("Sensor");
+s19_log_create("Sensor", LOG_LEVEL_DEBUG);
 
 static void timeout_triggered(void *ctx);
 static void run_user_callback(sensor_t * ctx, api_event_t event);
@@ -284,10 +284,10 @@ int sensor_open(sensor_t *ctx)
 
     if (ctx->bus_type == SENSOR_BUS_I2C)
     {
-//        if ((ret = port_intr_init(ctx)) != E_OK)
-//            return ret;
-//        if ((ret = port_platform_init(ctx)) != E_OK)
-//            return ret;
+        if ((ret = port_intr_init(ctx)) != E_OK)
+            return ret;
+        if ((ret = port_platform_init(ctx)) != E_OK)
+            return ret;
     }
 #if HEARTBEAT
     if (ctx->heartbeat_period)
@@ -372,28 +372,25 @@ int sensor_read(sensor_t *ctx, ss_register_t ss_register, data_buffer_t *data_bu
 
     if(ctx == NULL)
         return E_INVALID_PARAM;
-
     if (data_buffer->data_len < reg->size)
-    {
-        ret = E_BUFFER_MEM_SIZE;
-        goto ERROR;
-    }
-    s19_mutex_lock(ctx->bus_lock);
+        return E_BUFFER_MEM_SIZE;
+    if (ctx->bus_type != SENSOR_BUS_I2C && ctx->bus_type != SENSOR_BUS_MODBUS)
+        return E_API_ERROR;
 
-    switch (ctx->bus_type)
+    if ((ret = s19_mutex_lock(ctx->bus_lock)) != E_OK)
     {
-        case SENSOR_BUS_I2C:
-            reg_addr = reg->i2c_addr;
-            if ((ret = i2c_set_index(ctx->bus, reg_addr, &reg_addr) != E_OK))
-                goto ERROR;
-            break;
-        case SENSOR_BUS_MODBUS:
-            reg_addr = reg->modbus_addr;
-            break;
-        default:
-            ret = E_API_ERROR;
+        s19_log_dbg("%s, failed to lock bus\n", __FUNCTION__);
+        return ret;
+    }
+
+    reg_addr = reg->modbus_addr;    // assume modbus
+    if (ctx->bus_type == SENSOR_BUS_I2C)
+    {
+        reg_addr = reg->i2c_addr;
+        if ((ret = i2c_set_index(ctx->bus, reg_addr, &reg_addr) != E_OK))
             goto ERROR;
     }
+
     // only read up to the actual data size
     data_buffer_t buf = {data_buffer->data, reg->size};
     ret = bus_read(ctx->bus, reg_addr, &buf);
@@ -415,27 +412,25 @@ int sensor_write(sensor_t *ctx, ss_register_t ss_register, data_buffer_t *data_b
 
     if(ctx == NULL)
         return E_INVALID_PARAM;
-
     if (data_buffer->data_len < reg->size)
+        return E_BUFFER_MEM_SIZE;
+    if (ctx->bus_type != SENSOR_BUS_I2C && ctx->bus_type != SENSOR_BUS_MODBUS)
+        return E_API_ERROR;
+
+    if ((ret = s19_mutex_lock(ctx->bus_lock)) != E_OK)
     {
-        ret = E_BUFFER_MEM_SIZE;
-        goto ERROR;
+        s19_log_dbg("%s, failed to lock bus\n", __FUNCTION__);
+        return ret;
     }
-    s19_mutex_lock(ctx->bus_lock);
-    switch (ctx->bus_type)
+
+    reg_addr = reg->modbus_addr;    // assume modbus
+    if (ctx->bus_type == SENSOR_BUS_I2C)
     {
-        case SENSOR_BUS_I2C:
-            reg_addr = reg->i2c_addr;
-            if ((ret = i2c_set_index(ctx->bus, reg_addr, &reg_addr) != E_OK))
-                goto ERROR;
-            break;
-        case SENSOR_BUS_MODBUS:
-            reg_addr = reg->modbus_addr;
-            break;
-        default:
-            ret = E_API_ERROR;
+        reg_addr = reg->i2c_addr;
+        if ((ret = i2c_set_index(ctx->bus, reg_addr, &reg_addr) != E_OK))
             goto ERROR;
     }
+
     // only write up to the actual data size
     data_buffer_t buf = {data_buffer->data, reg->size};
     if (ret == E_OK && !(reg->access & BYTES))    // reverse I2C data (in MSB) to LSB format
@@ -534,10 +529,10 @@ static int probe_init(sensor_t *ctx)
     if ((ret = sensor_write(ctx, EXTRACT_END_TIME, &buffer32)))
         return ret;
 
-    // data16 = SEARCH_RECORD_TRIGGER;
-    data16 = TRIGGER_CLEAR_LOG;
-    if ((ret = sensor_write(ctx, TRIGGER_REQUESTS, &buffer16)))
-        return ret;
+    // crashes smartsensor ?
+//    data16 = TRIGGER_CLEAR_LOG;
+//    if ((ret = sensor_write(ctx, TRIGGER_REQUESTS, &buffer16)))
+//        return ret;
 
 #ifdef FORCE_SAMPLE_TIME
     data16 = DEFAULT_SAMPLE_TIME;
@@ -573,7 +568,7 @@ void miss_heartbeat(sensor_t * ctx)
     {
         ctx->data.sensor_attached = false;
         run_user_callback(ctx, API_EVENT_SENSOR_DETACHED);
-        s19_log_dbg("Probe detached\n");
+        s19_log_info("Probe detached\n");
     }
 }
 
@@ -598,7 +593,7 @@ static void do_probe_attach(sensor_t * ctx)
     int ret;
     ctx->data.stat_attach_counter++;
     ret = probe_init(ctx);
-    s19_log_dbg("Probe attached %d\n", ret);
+    s19_log_info("Probe attached %d\n", ret);
     if (ret == E_OK)
     {   // okay, new probe attached
         wait_for_device_ready(ctx, 1000);
@@ -607,7 +602,7 @@ static void do_probe_attach(sensor_t * ctx)
         run_user_callback(ctx, API_EVENT_SENSOR_ATTACHED);
     }
     else
-        s19_log_warn("Probe attached failed with code %d\n", ret);
+        s19_log_warn("Probe attached failed with code %08x\n", ret);
 }
 
 /// level 2 handling
@@ -628,6 +623,8 @@ static void event_handler_low_level(sensor_t *ctx, event_type_t intr)
             {
                 do_probe_attach(ctx);
             }
+            else
+                s19_log_dbg("System Status %d %d\n", ret, status.device_ready);
         }
     } else if (intr == SENSOR_EVT_TIMEOUT)
     {
@@ -656,7 +653,7 @@ void hard_intr_triggered(sensor_t *ctx)
 {
     if (ctx->ready)
     {
-        //s19_log_dbg("Hard interrupt\n");
+        s19_log_dbg("Hard interrupt\n");
         event_handler_low_level(ctx, SENSOR_EVT_HARD_INTR);
     }
 }
@@ -664,7 +661,7 @@ void hard_intr_triggered(sensor_t *ctx)
 /// level 1 signal
 static void timeout_triggered(void *ctx)
 {
-    //s19_log_dbg("Heartbeat timeout\n");
+    s19_log_dbg("Heartbeat timeout\n");
     event_handler_low_level(ctx, SENSOR_EVT_TIMEOUT);
 }
 

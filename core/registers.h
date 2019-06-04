@@ -8,6 +8,17 @@
 
 #include <stdint.h>
 
+#if defined(__GNU__)
+#define GCC_PACKED __attribute__((packed))
+    #define PACKED
+#elif defined(__DCC__)
+#define GCC_PACKED
+    #define PACKED __packed__
+#else
+#define GCC_PACKED
+#define PACKED packed
+#endif
+
 #define MAX_SENSOR_COUNT    4
 #define MAX_OUTPUT_COUNT    4
 
@@ -21,20 +32,20 @@ typedef struct {
 } list_select_t;
 
 typedef struct {
-    uint8_t device_locked : 1;
-    uint8_t factory_access: 1;
-    uint8_t device_ready:   1;
-    uint8_t health_fault:   1;
-    uint8_t sensor_fault:   1;
-    uint8_t read_active:    1;
-    uint8_t extract_valid:  1;
-    uint8_t sensor_valid:   1;
-    uint8_t system_fault:   1;
-    uint8_t intr_active:    1;
-    uint8_t device_reset:   1;
-    uint8_t power_reset:    1;
     uint8_t sensor_bits:    4;
-} system_status_t;
+    uint8_t power_reset:    1;
+    uint8_t device_reset:   1;
+    uint8_t intr_active:    1;
+    uint8_t system_fault:   1;
+    uint8_t sensor_valid:   1;
+    uint8_t extract_valid:  1;
+    uint8_t read_active:    1;
+    uint8_t sensor_fault:   1;
+    uint8_t health_fault:   1;
+    uint8_t device_ready:   1;
+    uint8_t factory_access: 1;
+    uint8_t device_locked : 1;
+} GCC_PACKED system_status_t;
 
 typedef struct {
     uint8_t sensor_count;
@@ -66,22 +77,22 @@ typedef struct {
 
 typedef enum
 {
-    ENABLE_SENSOR_CHANGE_LOG    = 1 << 0,
-    ENABLE_POWER_CHANGE_LOG     = 1 << 1,
-    ENABLE_HEALTH_FAULT_LOG     = 1 << 2,
-    ENABLE_TIME_CHANGE_LOG      = 1 << 3,
-    ENABLE_EVENT_1_READ         = 1 << 4,
-    ENABLE_EVENT_1_LOG          = 1 << 5,
-    ENABLE_EVENT_2_READ         = 1 << 6,
-    ENABLE_EVENT_2_LOG          = 1 << 7,
-    ENABLE_EXTN_READ            = 1 << 8,
-    ENABLE_EXTN_LOG             = 1 << 9,
-    ENABLE_EXTN_RESET_EVENT_1   = 1 << 10,
-    ENABLE_EXTN_RESET_EVENT_2   = 1 << 11,
-    ENABLE_FUNCTION_BLOCK       = 1 << 12,
-    ENABLE_HEALTH_MONITOR       = 1 << 13,
-    ENABLE_LOG_OVERWRITE        = 1 << 14,
-    ENABLE_RTC                  = 1 << 15,
+    ENABLE_SENSOR_CHANGE_LOG    = (1 << 0),
+    ENABLE_POWER_CHANGE_LOG     = (1 << 1),
+    ENABLE_HEALTH_FAULT_LOG     = (1 << 2),
+    ENABLE_TIME_CHANGE_LOG      = (1 << 3),
+    ENABLE_EVENT_1_READ         = (1 << 4),
+    ENABLE_EVENT_1_LOG          = (1 << 5),
+    ENABLE_EVENT_2_READ         = (1 << 6),
+    ENABLE_EVENT_2_LOG          = (1 << 7),
+    ENABLE_EXTN_READ            = (1 << 8),
+    ENABLE_EXTN_LOG             = (1 << 9),
+    ENABLE_EXTN_RESET_EVENT_1   = (1 << 10),
+    ENABLE_EXTN_RESET_EVENT_2   = (1 << 11),
+    ENABLE_FUNCTION_BLOCK       = (1 << 12),
+    ENABLE_HEALTH_MONITOR       = (1 << 13),
+    ENABLE_LOG_OVERWRITE        = (1 << 14),
+    ENABLE_RTC                  = (1 << 15),
 } system_control_t;
 
 typedef enum    TRIGGER_TAG
@@ -144,8 +155,7 @@ typedef enum    MEASUREMENT_TYPE_TAG
     SENSOR_BAROMETRIC_TYPE  = 0x03,
     SENSOR_LIGHT_TYPE       = 0x04,
 
-    // PROCESS TYPES
-            SENSOR_VOLT_TYPE        = 0x10,        // Voltage
+    SENSOR_VOLT_TYPE        = 0x10,        // Voltage
     SENSOR_MILLIVOLT_TYPE   = 0x11,
     SENSOR_AMP_TYPE         = 0x12,        // Current Loops
     SENSOR_MILLIAMP_TYPE    = 0x13,
@@ -177,25 +187,45 @@ typedef enum    MEASUREMENT_TYPE_TAG
     SENSOR_SERIAL_TYPE      = 0x30,
     SENSOR_ADC_COUNTS_TYPE  = 0x31,
 
-} __attribute__ ((__packed__)) Measurement_Type_t;
+} measurement_type_t;
 
+typedef enum {
+    SENSOR_DATA_TYPE_U8     = 0,
+    SENSOR_DATA_TYPE_S8     = 1,
+    SENSOR_DATA_TYPE_U16    = 2,
+    SENSOR_DATA_TYPE_S16    = 3,
+    SENSOR_DATA_TYPE_U32    = 4,
+    SENSOR_DATA_TYPE_S32    = 5,
+    SENSOR_DATA_TYPE_FLOAT  = 6,
+    SENSOR_DATA_TYPE_STR    = 7,
+    SENSOR_DATA_TYPE_BOOL   = 8
+} sensor_datatype_t;
 
 typedef struct Sensor_Descriptor_Format_Tag
 {
-    uint8_t     u8_Data_Type : 4;
-    uint8_t     u8_Reserved : 1;
-    uint8_t     u8_Factory_Calibrate : 1;
-    uint8_t     u8_Configurable_Descriptor : 1;
-    uint8_t     u8_Smartsensor : 1;
-} Sensor_Descriptor_Format_t;
+    sensor_datatype_t       u8_Data_Type : 4;
+    uint8_t                 u8_Reserved : 1;
+    uint8_t                 u8_Factory_Calibrate : 1;
+    uint8_t                 u8_Configurable_Descriptor : 1;
+    uint8_t                 u8_Smartsensor : 1;
+} GCC_PACKED sensor_descriptor_format_t;
+
+typedef struct Sensor_Config_Tag
+{
+    uint8_t     u8_Sensor_Range : 4;
+    uint8_t     u8_Lock: 1;
+    uint8_t     u8_Scaling: 1;
+    uint8_t     u8_Channel: 1;
+    uint8_t     u8_Reserved: 1;
+} GCC_PACKED sensor_config_t;
 
 typedef struct  Sensor_Descriptor_Tag
 {
-    Measurement_Type_t	        e_Measurement_Type : 8;
-    Sensor_Descriptor_Format_t  st_Format;
-    uint8_t     		        u8_Config : 8;
-    uint8_t     		        u8_Device : 8;
-} Sensor_Descriptor_t;
+    measurement_type_t	        e_Measurement_Type: 8;
+    sensor_descriptor_format_t  st_Format;
+    sensor_config_t     		st_Config;
+    uint8_t     		        u8_Device;
+} GCC_PACKED sensor_descriptor_t;
 
 typedef enum {
     /**< System Information */

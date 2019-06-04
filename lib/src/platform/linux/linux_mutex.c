@@ -1,4 +1,5 @@
-#include "pthread.h"
+#include <pthread.h>
+#include <errno.h>
 #include "platform/mutex.h"
 #include "platform/memory.h"
 #include "common/errors.h"
@@ -24,12 +25,14 @@ int s19_mutex_create(s19_mutex_t **mutex)
 
 int s19_mutex_lock(s19_mutex_t *mutex)
 {
-    return pthread_mutex_lock(&mutex->lock);
+    int status;
+    return (status = pthread_mutex_lock(&mutex->lock)) == 0 ? E_OK : status;
 }
 
 int s19_mutex_unlock(s19_mutex_t *mutex)
 {
-    return pthread_mutex_unlock(&mutex->lock);
+    int status;
+    return (status = pthread_mutex_unlock(&mutex->lock)) == 0 ? E_OK : status;
 }
 
 int s19_mutex_destroy(s19_mutex_t *mutex)

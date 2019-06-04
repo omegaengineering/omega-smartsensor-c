@@ -38,4 +38,4 @@ add_library(omega_smartsensor_lib ${SDK_SOURCES})
 target_link_libraries(omega_smartsensor_lib omega_lib)
 
 add_subdirectory(tests)
-add_subdirectory(examples)
+add_subdirectory(examples/linux)

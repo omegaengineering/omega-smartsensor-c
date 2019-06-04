@@ -5,7 +5,10 @@
 #ifndef OMEGA_SMARTSENSOR_C_MUTEX_H
 #define OMEGA_SMARTSENSOR_C_MUTEX_H
 
-struct _s19_mutex;
+/// @brief: provide abstraction over platform mutexes
+
+#define MAX_PLATFORM_MUTEX  3
+
 typedef struct _s19_mutex s19_mutex_t;
 
 int s19_mutex_create(s19_mutex_t **mutex);

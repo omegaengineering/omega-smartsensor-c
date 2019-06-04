@@ -12,10 +12,8 @@ typedef struct {
     I2C_Handle      i2c_handle;
     I2C_Transaction i2c_trans;                  /**< transaction info */
     uint8_t         buffer[I2C_BUFFER_SIZE];    /**< internal buffer */
-    data_buffer_t   i2c_buffer;                 /**< internal data buffer */
 } bus_ti_i2c_t;
 
-s19_log_create("I2C");
 
 static bus_ti_i2c_t instances[I2C_INSTANCE_CNT];
 
@@ -85,7 +83,7 @@ int bus_ti_i2c_read_raw(bus_t *ctx, data_buffer_t *buffer)
     pbus->i2c_trans.writeCount = 0;
 
     ret = I2C_transfer(pbus->i2c_handle, &pbus->i2c_trans);
-    return ret == true ? E_OK : E_BUS_OPERATION;
+    return ret ? E_OK : E_BUS_OPERATION;
 }
 
 /// 1 byte reg addr only
@@ -121,13 +119,14 @@ int bus_ti_i2c_write(bus_t *ctx, uint16_t reg_addr, data_buffer_t *buffer)
     bool ret;
     bus_ti_i2c_t * pbus        = (bus_ti_i2c_t*) ctx;
 
-    if (pbus->i2c_buffer.data_len < buffer->data_len + 1)
+    if (sizeof(pbus->buffer) < buffer->data_len + 1)
         return E_API_ERROR;
-    memcpy(pbus->i2c_buffer.data + 1, buffer->data, buffer->data_len);
-    pbus->i2c_buffer.data[0] = reg_addr & 0xff;
+    pbus->buffer[0] = reg_addr & 0xff;
+    memcpy(pbus->buffer + 1, buffer->data, buffer->data_len);
+    data_buffer_t temp = {.data = pbus->buffer, .data_len = buffer->data_len + 1};
 
-    ret = bus_ti_i2c_write_raw(ctx, &pbus->i2c_buffer);
-    return ret ? E_OK : E_BUS_OPERATION;
+    ret = bus_ti_i2c_write_raw(ctx, &temp);
+    return ret;
 }
 
 int bus_ti_i2c_close(bus_t *ctx)

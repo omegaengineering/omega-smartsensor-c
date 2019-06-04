@@ -18,8 +18,8 @@ void signal_handler(int sig)
 
 void example_callback(api_event_t event, void* ctx)
 {
-    sensor_t *sensor = *(sensor_t**) ctx;
     int ret;
+    sensor_t *sensor = *(sensor_t**) ctx;
 
     if (event & API_SENSOR_CHANGE)
     {

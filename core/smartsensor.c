@@ -32,9 +32,9 @@ int get_sensor_unit(sensor_t *ctx, int sensor_num, sensor_unit_t unit)
     return sensor_read(ctx, reg, &buffer);
 }
 
-int get_sensor_descriptor(sensor_t *ctx, int sensor_num, Sensor_Descriptor_t *descriptor)
+int get_sensor_descriptor(sensor_t *ctx, int sensor_num, sensor_descriptor_t *descriptor)
 {
-    data_buffer_t buffer = {.data = (uint8_t *) descriptor, .data_len = sizeof(Sensor_Descriptor_t)};
+    data_buffer_t buffer = {.data = (uint8_t *) descriptor, .data_len = sizeof(sensor_descriptor_t)};
     if (sensor_num >= MAX_SENSOR_COUNT)
         return E_INVALID_PARAM;
     ss_register_t reg = sensor_num == 0 ? SENSOR_0_DESCRIPTOR :
@@ -55,9 +55,9 @@ int get_operating_stat(sensor_t *ctx, operating_stat_t *stat)
     return sensor_read(ctx, OPERATING_TEMP, &buffer);
 }
 
-int get_sensor_type(sensor_t *ctx, int sensor_num, Measurement_Type_t *sensor_type)
+int get_sensor_type(sensor_t *ctx, int sensor_num, measurement_type_t *sensor_type)
 {
-    Sensor_Descriptor_t descriptor;
+    sensor_descriptor_t descriptor;
     int ret = get_sensor_descriptor(ctx, sensor_num, &descriptor);
     if (ret == E_OK)
         *sensor_type = descriptor.e_Measurement_Type;
@@ -109,10 +109,6 @@ int set_current_time(sensor_t *ctx, data_time_t *time)
 #define		DAYSHIFT		0
 static void convert_to_calendar(uint16_t u16_date, calendar_t * calendar)
 {
-    uint16_t    u16_Year;
-    uint16_t    u16_Month;
-    uint16_t    u16_Day;
-
     calendar->year = (u16_date >> YEARSHIFT) +  2000;
     calendar->month = (u16_date & 0x01e0) >> MONTHSHIFT;
     calendar->day = (u16_date & 0x001f);

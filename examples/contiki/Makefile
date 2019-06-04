@@ -9,7 +9,7 @@ PLATFORMS_ONLY = simplelink
 CONTIKI = /home/dev/Projects/contiki-ng
 SMARTSENSOR_SDK = ../..
 
-CFLAGS += -g -w -O0
+CFLAGS += -g -O1 -Wall
 # Contiki include path
 CFLAGS += -I$(CONTIKI)/arch/platform/simplelink/cc13xx-cc26xx/
 CFLAGS += -I$(CONTIKI)/arch/cpu/simplelink-cc13xx-cc26xx/lib/coresdk_cc13xx_cc26xx/source/
@@ -34,10 +34,6 @@ PROJECT_SOURCEFILES += contiki_mutex.c contiki_memory.c contiki_timer.c
 
 vpath %.c $(SMARTSENSOR_SDK)/port/contiki
 PROJECT_SOURCEFILES += port_contiki.c
-
-# example source
-#vpath %.c $(SMARTSENSOR_SDK)/examples/contiki
-#PROJECT_SOURCEFILES += basic_sensor.c
 
 # setup cpu specifics, such as driverlib ...
 include $(CONTIKI)/Makefile.identify-target

@@ -8,7 +8,7 @@
 #include "platform/memory.h"
 #include "common/log.h"
 
-s19_log_create("Port");
+s19_log_create("PORT", LOG_LEVEL_DEBUG);
 
 
 static const bus_uart_modbus_cfg_t modbus_cfg = {

@@ -13,7 +13,8 @@ typedef enum {
     E_BUFFER_MEM_SIZE,
     E_INVALID_PARAM,
     E_NO_MEM,
-    E_NOT_SUPPORTED
+    E_NOT_SUPPORTED,
+    E_TRY_AGAIN
 } error_t;
 
 #endif //OMEGA_SMARTSENSOR_C_ERRORS_H

@@ -101,6 +101,18 @@ int main()
     assert(mark.days == check.days && mark.hours == check.hours &&
             mark.mins == check.mins && mark.secs < check.secs);
 
+    /// test some struct
+    sensor_descriptor_t desc;
+    ret = get_sensor_descriptor(sensor, 0, &desc);
+    assert(ret == E_OK);
+    assert(desc.e_Measurement_Type == SENSOR_TEMPERATURE_TYPE);
+    assert(desc.st_Format.u8_Data_Type == SENSOR_DATA_TYPE_FLOAT);
+
+    ret = get_sensor_descriptor(sensor, 1, &desc);
+    assert(ret == E_OK);
+    assert(desc.e_Measurement_Type == SENSOR_HUMIDITY_TYPE);
+    assert(desc.st_Format.u8_Data_Type == SENSOR_DATA_TYPE_FLOAT);
+
 
 
     // close the device

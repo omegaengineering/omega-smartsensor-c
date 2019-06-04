@@ -13,7 +13,7 @@
 #include "common/log.h"
 #include "hw/linux/bus_i2c_smbus.h"
 
-s19_log_create("Smbus");
+s19_log_create("Smbus", LOG_LEVEL_DEBUG);
 
 static const bus_driver_t bus_i2c_driver = {
         .bus_open = bus_smbus_open,

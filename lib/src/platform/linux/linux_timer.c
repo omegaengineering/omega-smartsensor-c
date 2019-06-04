@@ -29,7 +29,7 @@ struct _s19_timer {
     uint8_t              shutdown_req;
 };
 
-s19_log_create("Timer");
+s19_log_create("Timer", LOG_LEVEL_INFO);
 
 static uint32_t s19_time_now_sec()
 {
