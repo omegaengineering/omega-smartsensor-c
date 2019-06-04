@@ -55,12 +55,18 @@ typedef struct {
 
 int sensor_new              (sensor_t **ctx, const sensor_init_t *init);
 int sensor_open             (sensor_t *ctx);
-int sensor_read             (sensor_t *ctx, ss_register_t ss_register, data_buffer_t * data_buffer);
-int sensor_write            (sensor_t *ctx, ss_register_t ss_register, data_buffer_t * data_buffer);
+int sensor_read             (sensor_t *ctx, ss_register_t ss_register, data_buffer_t * buffer);
+int sensor_indexed_read     (sensor_t *ctx, ss_register_t ss_register, uint8_t index, data_buffer_t * buffer);
+int sensor_write            (sensor_t *ctx, ss_register_t ss_register, data_buffer_t * buffer);
+int sensor_indexed_read     (sensor_t *ctx, ss_register_t ss_register, uint8_t index, data_buffer_t * buffer);
 int sensor_close            (sensor_t *ctx);
 int sensor_free             (sensor_t *ctx);
 
+int get_max_instance        (ss_register_t ss_register);
+
 int get_sensor_reading      (sensor_t *ctx, int sensor_num, const float *reading);
+int get_sensor_gain         (sensor_t *ctx, int sensor_num, const float *gain);
+int get_sensor_offset       (sensor_t *ctx, int sensor_num, const float *offset);
 int get_device_name         (sensor_t *ctx, device_name_t name);
 int get_sensor_unit         (sensor_t *ctx, int sensor_num, sensor_unit_t unit);
 int get_sensor_descriptor   (sensor_t *ctx, int sensor_num, sensor_descriptor_t *descriptor);

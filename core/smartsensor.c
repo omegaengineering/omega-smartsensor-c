@@ -5,12 +5,19 @@
 int get_sensor_reading(sensor_t *ctx, int sensor_num, const float *reading)
 {
     data_buffer_t buffer = {.data = (uint8_t *) reading, .data_len = sizeof(reading)};
-    if (sensor_num >= MAX_SENSOR_COUNT)
-        return E_INVALID_PARAM;
-    ss_register_t reg = sensor_num == 0 ? SENSOR_0_DATA :
-                        sensor_num == 1 ? SENSOR_1_DATA :
-                        sensor_num == 2 ? SENSOR_2_DATA : SENSOR_3_DATA;
-    return sensor_read(ctx, reg, &buffer);
+    return sensor_indexed_read(ctx, SENSOR_0_DATA, sensor_num, &buffer);
+}
+
+int get_sensor_gain(sensor_t *ctx, int sensor_num, const float *gain)
+{
+    data_buffer_t buffer = {.data = (uint8_t *) gain, .data_len = sizeof(gain)};
+    return sensor_indexed_read(ctx, SENSOR_0_GAIN, sensor_num, &buffer);
+}
+
+int get_sensor_offset(sensor_t *ctx, int sensor_num, const float *gain)
+{
+    data_buffer_t buffer = {.data = (uint8_t *) gain, .data_len = sizeof(gain)};
+    return sensor_indexed_read(ctx, SENSOR_0_OFFSET, sensor_num, &buffer);
 }
 
 int get_device_name(sensor_t *ctx, device_name_t name)
@@ -23,24 +30,13 @@ int get_device_name(sensor_t *ctx, device_name_t name)
 int get_sensor_unit(sensor_t *ctx, int sensor_num, sensor_unit_t unit)
 {
     data_buffer_t buffer = {.data = (uint8_t *) unit, .data_len = sizeof(sensor_unit_t)-1};
-    if (sensor_num >= MAX_SENSOR_COUNT)
-        return E_INVALID_PARAM;
-    ss_register_t reg = sensor_num == 0 ? SENSOR_0_UNIT :
-                        sensor_num == 1 ? SENSOR_1_UNIT :
-                        sensor_num == 2 ? SENSOR_2_UNIT : SENSOR_3_UNIT;
-    memset(unit, 0, sizeof(sensor_unit_t));
-    return sensor_read(ctx, reg, &buffer);
+    return sensor_indexed_read(ctx, SENSOR_0_UNIT, sensor_num, &buffer);
 }
 
 int get_sensor_descriptor(sensor_t *ctx, int sensor_num, sensor_descriptor_t *descriptor)
 {
     data_buffer_t buffer = {.data = (uint8_t *) descriptor, .data_len = sizeof(sensor_descriptor_t)};
-    if (sensor_num >= MAX_SENSOR_COUNT)
-        return E_INVALID_PARAM;
-    ss_register_t reg = sensor_num == 0 ? SENSOR_0_DESCRIPTOR :
-                        sensor_num == 1 ? SENSOR_1_DESCRIPTOR :
-                        sensor_num == 2 ? SENSOR_2_DESCRIPTOR : SENSOR_3_DESCRIPTOR;
-    return sensor_read(ctx, reg, &buffer);
+    return sensor_indexed_read(ctx, SENSOR_0_DESCRIPTOR, sensor_num, &buffer);
 }
 
 int get_io_count(sensor_t *ctx, io_count_t *io_count)
