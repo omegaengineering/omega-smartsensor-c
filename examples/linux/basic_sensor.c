@@ -15,78 +15,46 @@ void signal_handler(int sig)
     do_exit = 1;
 }
 
+void get_readings(sensor_t *sensor)
+{
+    int ret;
+    data_time_t time;
+    ret = get_current_time(sensor, &time);
+    assert(ret == E_OK);
+    printf("Current time %d days %d hours %d mins %d secs\n", time.days, time.hours, time.mins, time.secs);
+
+    printf("Sensor Reading = ");
+    for (int idx = 0; idx < MAX_SENSOR_COUNT; idx++)
+    {
+        float reading;
+        ret = get_sensor_reading(sensor, idx, &reading);
+        if (ret != E_OK)
+            return;
+        sensor_unit_t unit;
+        ret = get_sensor_unit(sensor, idx, unit);
+        if (ret != E_OK)
+            return;
+        printf("%0.2f %s \t", reading, unit);
+    }
+    printf("\n");
+}
+
 
 void example_callback(api_event_t event, void* ctx)
 {
-    int ret;
     sensor_t *sensor = *(sensor_t**) ctx;
 
-    if (event & API_SENSOR_CHANGE)
-    {
-        event &= ~API_SENSOR_CHANGE;
-        printf("API_SENSOR_CHANGE\n");
-    }
-    if (event & API_POWER_CHANGE)
-    {
-        event &= ~API_POWER_CHANGE;
-        printf("API_POWER_CHANGE\n");
-    }
-    if (event & API_HEALTH_CHANGE)
-    {
-        event &= ~API_HEALTH_CHANGE;
-        printf("API_HEALTH_CHANGE\n");
-    }
-    if (event & API_EVENT_0)
-    {
-        event &= ~API_EVENT_0;
-        printf("API_EVENT_0\n");
-    }
-    if (event & API_EVENT_1)
-    {
-        event &= ~API_EVENT_1;
-        printf("API_EVENT_1\n");
-    }
     if (event & API_DATA_READY)
     {
-        event &= ~API_DATA_READY;
-        printf("Sensor Reading = ");
-        for (int idx = 0; idx < MAX_SENSOR_COUNT; idx++)
-        {
-            float reading;
-            ret = get_sensor_reading(sensor, idx, &reading);
-            if (ret != E_OK)
-                return;
-            sensor_unit_t unit;
-            ret = get_sensor_unit(sensor, idx, unit);
-            if (ret != E_OK)
-                return;
-            printf("%0.2f %s \t", reading, unit);
-        }
-        printf("\n");
-    }
-    if (event & API_FUNCTION_BLOCK)
-    {
-        event &= ~API_FUNCTION_BLOCK;
-        printf("API_FUNCTION_BLOCK\n");
-    }
-    if (event & API_LOG_DATA_READY)
-    {
-        event &= ~API_LOG_DATA_READY;
-        printf("API_LOG_DATA_READY\n");
+        get_readings(sensor);
     }
     if (event & API_EVENT_SENSOR_ATTACHED)
     {
-        event &= ~API_EVENT_SENSOR_ATTACHED;
         printf("API_EVENT_SENSOR_ATTACHED\n");
     }
     if (event & API_EVENT_SENSOR_DETACHED)
     {
-        event &= ~API_EVENT_SENSOR_DETACHED;
         printf("API_EVENT_SENSOR_DETACHED\n");
-    }
-    if (event)
-    {
-        printf("Unknown event %d\n", event);
     }
 }
 
@@ -99,10 +67,13 @@ int main()
     signal(SIGINT, signal_handler);
 
     sensor_init_t init = {
-//            .bus_id = "/dev/ttyACM0",
-//            .bus_type = SENSOR_BUS_MODBUS,
+#if USE_MODBUS_INTERFACE
+            .bus_id = "/dev/ttyACM0",
+            .bus_type = SENSOR_BUS_MODBUS,
+#else
             .bus_id = "/dev/i2c-3",
             .bus_type = SENSOR_BUS_I2C,
+#endif
             .interrupt_pin = 16,
             .event_callback = example_callback,
             .event_callback_ctx = &sensor,
@@ -114,8 +85,8 @@ int main()
     ret = sensor_open(sensor);
     assert(ret == E_OK);
 
-    uint8_t data[64];
-    data_buffer_t buffer = {.data = data, .data_len = 64};
+    uint8_t data[32];
+    data_buffer_t buffer = {.data = data, .data_len = 32};
 
     ret = preset_config(sensor);
     assert(ret == E_OK);
@@ -154,23 +125,7 @@ int main()
 
     while (!do_exit)
     {
-        data_time_t time;
-        ret = get_current_time(sensor, &time);
-        assert(ret == E_OK);
-        printf("Current time %d days %d hours %d mins %d secs\n", time.days, time.hours, time.mins, time.secs);
-        printf("Sensor Reading = ");
-        for (int idx = 0; idx < io_count.sensor_count; idx++)
-        {
-            float reading;
-            ret = get_sensor_reading(sensor, idx, &reading);
-            assert(ret == E_OK);
-            sensor_unit_t unit;
-            ret = get_sensor_unit(sensor, idx, unit);
-            assert(ret == E_OK);
-            printf("%0.2f %s \t", reading, unit);
-        }
-        printf("\n");
-        sleep(1);
+        sleep(100);
     }
 
     // close the device

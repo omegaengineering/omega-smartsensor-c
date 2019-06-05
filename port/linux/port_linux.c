@@ -1,6 +1,7 @@
 #include <zconf.h>
 #include <pthread.h>
 #include <string.h>
+#include <stdbool.h>
 #include "smartsensor_private.h"
 #include "hw/linux/bus_i2c_smbus.h"
 #include "hw/linux/bus_uart_modbus.h"
@@ -29,6 +30,7 @@ const bus_new_dr    port_bus_modbus_new = bus_uart_modbus_new;
 const void*         port_bus_modbus_cfg = &modbus_cfg;
 static gpio_sysfs_t ss_intr = {.fd = -1, .pin = -1};
 static pthread_t    sensor_thread;
+static int          shutdown_req;
 static int          errno;
 
 void* port_task(void *ptr)
@@ -44,7 +46,7 @@ void* port_task(void *ptr)
     }
 
     ///TODO install sig handler
-    while (!sensor->shutdown_req)
+    while (!shutdown_req)
     {
         int ret;
         struct timeval tv, *ptv;
@@ -78,6 +80,7 @@ int port_intr_init(sensor_t *sensor)
 {
     int ret;
     ss_intr.pin = sensor->gpio_pin;
+    shutdown_req = false;
     if ((ret = gpio_sysfs_export((gpio_t *) &ss_intr)) != E_OK)
         return ret;
     if ((ret = gpio_sysfs_open((gpio_t *) &ss_intr, NULL)) != E_OK)
@@ -109,6 +112,7 @@ int port_platform_exit(sensor_t * sensor)
 {
     if (sensor_thread)
     {
+        shutdown_req = true;
 //        pthread_cancel(sensor_thread);
         pthread_join(sensor_thread, NULL);
     }

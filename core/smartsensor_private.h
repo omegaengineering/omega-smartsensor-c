@@ -26,7 +26,6 @@ struct _sensor {
     s19_mutex_t*        bus_lock;           /**< bus mutex */
     event_callback_t    event_callback;     /**< user provided event callback */
     event_callback_t    event_callback_ctx; /**< user provided context for event callback */
-    uint8_t             shutdown_req;       /**< flag to signal all threads to close */
     uint8_t             heartbeat_period;   /**< time period in seconds for sensor heartbeat */
     s19_timer_t*        timer;              /**< timer object platform dependent */
     s19_timer_entry_t*  heartbeat;          /**< timer entry for heartbeat */

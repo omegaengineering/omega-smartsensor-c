@@ -479,7 +479,6 @@ int sensor_indexed_write(sensor_t *ctx, ss_register_t ss_register, uint8_t index
 
 int sensor_close(sensor_t *ctx)
 {
-    ctx->shutdown_req = true;
     ctx->ready = false; // yes, again
     if (ctx->data.sensor_attached)
         run_user_callback(ctx, API_EVENT_SENSOR_DETACHED);  // let user know sensor is detached
@@ -652,7 +651,7 @@ static void event_handler_low_level(sensor_t *ctx, event_type_t intr)
         {
             system_status_t status;
             ret = get_system_status(ctx, &status);
-            if (ret == E_OK && status.device_ready)
+            if (ret == E_OK && status.device_ready) // device ready cannot be false
             {
                 do_probe_attach(ctx);
             }
@@ -665,14 +664,14 @@ static void event_handler_low_level(sensor_t *ctx, event_type_t intr)
         {   // was attached, then check if still attached
             system_status_t status;
             ret = get_system_status(ctx, &status);
-            if (ret != E_OK) {  // looks like no response
+            if (ret != E_OK || !status.device_ready) {  // looks like no response
                 miss_heartbeat(ctx);
             }
         } else {
             // wasn't attached, keep checking for device ready
             system_status_t status;
             ret = get_system_status(ctx, &status);
-            if (ret == E_OK && status.device_ready)
+            if (ret == E_OK && status.device_ready) // device ready cannot be false
             {
                 do_probe_attach(ctx);
             }

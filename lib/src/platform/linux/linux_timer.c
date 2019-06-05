@@ -7,7 +7,6 @@
 #include <stdbool.h>
 #include <string.h>
 #include <sys/time.h>
-#include <stdio.h>
 #include "common/errors.h"
 #include "common/log.h"
 #include "platform/timer.h"
@@ -24,12 +23,13 @@ struct _s19_timer_entry{
 };
 
 struct _s19_timer {
-    pthread_t            thread_handle;
-    s19_timer_entry_t    timer_list[MAX_TIMER_TRIGGER];
+    pthread_t           thread_handle;
+    s19_timer_entry_t   timer_list[MAX_TIMER_TRIGGER];
     uint8_t              shutdown_req;
+
 };
 
-s19_log_create("Timer", LOG_LEVEL_INFO);
+s19_log_create("Timer", LOG_LEVEL_DEBUG);
 
 static uint32_t s19_time_now_sec()
 {
@@ -63,6 +63,7 @@ static void timer_check(s19_timer_t * timer)
 static void* timer_thread(void * data)
 {
     s19_timer_t * timer = (s19_timer_t*) data;
+    s19_log_dbg("Timer thread started\n");
     while (!timer->shutdown_req)
     {
         timer_check(timer);

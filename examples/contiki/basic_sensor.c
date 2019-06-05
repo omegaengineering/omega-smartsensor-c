@@ -42,7 +42,7 @@ sensor_t *sensor;
 
 sensor_init_t init = {
         .bus_type = SENSOR_BUS_I2C,
-        .interrupt_pin = 24,
+        .interrupt_pin = 22,
         .event_callback = my_callback,
         .event_callback_ctx = &sensor
 };
@@ -56,9 +56,9 @@ AUTOSTART_PROCESSES(&basic_sensor);
 PROCESS_THREAD(basic_sensor, ev, data)
 {
   static struct etimer timer;
-  int ret;
-  uint8_t data32[32];
-  data_buffer_t buffer32 = {.data = data32, .data_len = 32};
+  static int ret;
+  static uint8_t data32[32];
+  static data_buffer_t buffer32 = {.data = data32, .data_len = 32};
 
   PROCESS_BEGIN();
 
@@ -108,7 +108,7 @@ PROCESS_THREAD(basic_sensor, ev, data)
   {
     PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&timer));
 
-    get_readings(sensor);
+    //get_readings(sensor);
 
     etimer_reset(&timer);
   }

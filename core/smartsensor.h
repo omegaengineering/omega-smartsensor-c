@@ -58,7 +58,7 @@ int sensor_open             (sensor_t *ctx);
 int sensor_read             (sensor_t *ctx, ss_register_t ss_register, data_buffer_t * buffer);
 int sensor_indexed_read     (sensor_t *ctx, ss_register_t ss_register, uint8_t index, data_buffer_t * buffer);
 int sensor_write            (sensor_t *ctx, ss_register_t ss_register, data_buffer_t * buffer);
-int sensor_indexed_read     (sensor_t *ctx, ss_register_t ss_register, uint8_t index, data_buffer_t * buffer);
+int sensor_indexed_write    (sensor_t *ctx, ss_register_t ss_register, uint8_t index, data_buffer_t * buffer);
 int sensor_close            (sensor_t *ctx);
 int sensor_free             (sensor_t *ctx);
 
