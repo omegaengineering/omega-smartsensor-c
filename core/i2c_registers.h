@@ -1,6 +1,40 @@
+/*!********************************************************************************************
+  @file i2c_registers.h
+
+  @copyright
+            Copyright (c) 2019, Omega Engineering Inc.
+
+            Permission is hereby granted, free of charge, to any person obtaining
+            a copy of this software and associated documentation files (the
+            'Software'), to deal in the Software without restriction, including
+            without limitation the rights to use, copy, modify, merge, publish,
+            distribute, sublicense, and/or sell copies of the Software, and to
+            permit persons to whom the Software is furnished to do so, subject to
+            the following conditions:
+
+            The above copyright notice and this permission notice shall be
+            included in all copies or substantial portions of the Software.
+
+            THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+            EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+            MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+            IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+            CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+            TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+            SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+  @author   Binh Dinh
+  @date     June 5th, 2019
+  @details
+            Contains defined I2C registers address for Smartsensor devices.
+            The I2C registes are defined as 16 bit however, only 8 bit register address
+            are transmitted on bus. Therefore, a special routing "i2c_set_index" is used
+            handle addresses > 0xff. Basically it breaks 16 bit addresses into 2 part
+            transactions.
+
+***********************************************************************************************/
 #ifndef I2C_REGISTERS_H
 #define I2C_REGISTERS_H
-
 
 #define R_DEVICE_ID                 0x0000
 #define R_VERSION                   0x0004

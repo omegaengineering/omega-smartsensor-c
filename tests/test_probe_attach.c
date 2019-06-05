@@ -62,7 +62,7 @@ int main()
             .heartbeat_period = 1
     };
 
-    for (int i = 0; i < 100000; i++)
+    for (int i = 0; i < 100000 && !do_exit; i++)
     {
         api_event_probe_attached = 0;
         api_event_probe_detached = 0;

@@ -1,18 +1,48 @@
-//
-// Created by dev on 5/23/19.
-//
+/*!********************************************************************************************
+  @file     linux_timer.c
+
+  @copyright
+            Copyright (c) 2019, Omega Engineering Inc.
+
+            Permission is hereby granted, free of charge, to any person obtaining
+            a copy of this software and associated documentation files (the
+            'Software'), to deal in the Software without restriction, including
+            without limitation the rights to use, copy, modify, merge, publish,
+            distribute, sublicense, and/or sell copies of the Software, and to
+            permit persons to whom the Software is furnished to do so, subject to
+            the following conditions:
+
+            The above copyright notice and this permission notice shall be
+            included in all copies or substantial portions of the Software.
+
+            THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+            EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+            MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+            IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+            CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+            TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+            SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+  @author   Binh Dinh
+  @date     June 5th, 2019
+  @details
+
+
+***********************************************************************************************/
 
 #include <pthread.h>
 #include <zconf.h>
 #include <stdbool.h>
 #include <string.h>
+#include <errno.h>
 #include <sys/time.h>
 #include "common/errors.h"
 #include "common/log.h"
 #include "platform/timer.h"
 #include "platform/memory.h"
 
-#define MAX_TIMER_TRIGGER   1
+#define MAX_TIMER_TRIGGER       1
+#define BASE_CHECK_PERIOD_SEC   1
 
 struct _s19_timer_entry{
     uint32_t period;
@@ -25,8 +55,9 @@ struct _s19_timer_entry{
 struct _s19_timer {
     pthread_t           thread_handle;
     s19_timer_entry_t   timer_list[MAX_TIMER_TRIGGER];
-    uint8_t              shutdown_req;
-
+    bool                do_exit;
+    pthread_mutex_t     do_exit_mtx;
+    pthread_cond_t      do_exit_cond;
 };
 
 s19_log_create("Timer", LOG_LEVEL_DEBUG);
@@ -62,12 +93,24 @@ static void timer_check(s19_timer_t * timer)
 
 static void* timer_thread(void * data)
 {
+    int ret;
     s19_timer_t * timer = (s19_timer_t*) data;
     s19_log_dbg("Timer thread started\n");
-    while (!timer->shutdown_req)
+    while (!timer->do_exit)
     {
-        timer_check(timer);
-        sleep(1);
+        struct timespec ts;
+
+        clock_gettime(CLOCK_REALTIME, &ts);
+        ts.tv_sec += BASE_CHECK_PERIOD_SEC;
+
+        pthread_mutex_lock(&timer->do_exit_mtx);
+        ret = pthread_cond_timedwait(&timer->do_exit_cond, &timer->do_exit_mtx, &ts);
+        pthread_mutex_unlock(&timer->do_exit_mtx);
+
+        if (ret == ETIMEDOUT)
+            timer_check(timer);
+        else
+            break;
     }
     s19_log_dbg("Timer thread exited\n");
 }
@@ -81,16 +124,25 @@ int s19_timer_create(s19_timer_t ** timer)
     if (new_timer == NULL)
         return E_NO_MEM;
 
+    if ((ret = pthread_cond_init(&new_timer->do_exit_cond, NULL)) < 0)
+        goto ERROR;
+    if ((ret = pthread_mutex_init(&new_timer->do_exit_mtx, NULL)) < 0)
+        goto ERROR;
+
     memset(new_timer, 0, sizeof(struct _s19_timer));
     pthread_attr_t attr;
     if ((ret = pthread_attr_init(&attr)) < 0)
-        return ret;
+        goto ERROR;
     if ((ret = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE)) < 0)
-        return ret;
+        goto ERROR;
     if ((ret = pthread_create(&new_timer->thread_handle, &attr, timer_thread, new_timer)) < 0)
-        return ret;
+        goto ERROR;
     *timer = new_timer;
     return E_OK;
+
+ERROR:
+    s19_mem_free(new_timer);
+    return ret;
 }
 
 int s19_timer_entry_add(s19_timer_t *timer, s19_timer_entry_t **trigger)
@@ -132,8 +184,10 @@ int s19_timer_destroy(s19_timer_t * timer)
 {
     if (timer)
     {
-        timer->shutdown_req = true;
-//        pthread_cancel(timer->thread_handle);
+        pthread_mutex_lock(&timer->do_exit_mtx);
+        timer->do_exit = true;
+        pthread_cond_signal(&timer->do_exit_cond);
+        pthread_mutex_unlock(&timer->do_exit_mtx);
         pthread_join(timer->thread_handle, NULL);
         s19_mem_free(timer);
     }

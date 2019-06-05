@@ -1,10 +1,12 @@
-## Dependencies
-libi2c-dev
+### Dependencies
 
+libi2c-dev
 libmodbus-dev
 
-#Objective
+Dependencies can be install by the following commands:
 
-## High consistency with Python SDK
-## User driven SDK
-  ### Opaque ctx
+`sudo apt-get update
+sudo apt install libi2c-dev
+sudo apt install libmodbus-dev`
+
+

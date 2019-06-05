@@ -1,3 +1,35 @@
+/*!********************************************************************************************
+  @file     port_linux.c
+
+  @copyright
+            Copyright (c) 2019, Omega Engineering Inc.
+
+            Permission is hereby granted, free of charge, to any person obtaining
+            a copy of this software and associated documentation files (the
+            'Software'), to deal in the Software without restriction, including
+            without limitation the rights to use, copy, modify, merge, publish,
+            distribute, sublicense, and/or sell copies of the Software, and to
+            permit persons to whom the Software is furnished to do so, subject to
+            the following conditions:
+
+            The above copyright notice and this permission notice shall be
+            included in all copies or substantial portions of the Software.
+
+            THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+            EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+            MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+            IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+            CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+            TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+            SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+  @author   Binh Dinh
+  @date     June 5th, 2019
+  @details
+            Implementation for interrupt processing on linux platform
+
+***********************************************************************************************/
+
 #include <zconf.h>
 #include <pthread.h>
 #include <string.h>
@@ -30,7 +62,6 @@ const bus_new_dr    port_bus_modbus_new = bus_uart_modbus_new;
 const void*         port_bus_modbus_cfg = &modbus_cfg;
 static gpio_sysfs_t ss_intr = {.fd = -1, .pin = -1};
 static pthread_t    sensor_thread;
-static int          shutdown_req;
 static int          errno;
 
 void* port_task(void *ptr)
@@ -45,8 +76,7 @@ void* port_task(void *ptr)
         return &errno;
     }
 
-    ///TODO install sig handler
-    while (!shutdown_req)
+    while (1)
     {
         int ret;
         struct timeval tv, *ptv;
@@ -80,7 +110,6 @@ int port_intr_init(sensor_t *sensor)
 {
     int ret;
     ss_intr.pin = sensor->gpio_pin;
-    shutdown_req = false;
     if ((ret = gpio_sysfs_export((gpio_t *) &ss_intr)) != E_OK)
         return ret;
     if ((ret = gpio_sysfs_open((gpio_t *) &ss_intr, NULL)) != E_OK)
@@ -112,10 +141,10 @@ int port_platform_exit(sensor_t * sensor)
 {
     if (sensor_thread)
     {
-        shutdown_req = true;
-//        pthread_cancel(sensor_thread);
+        pthread_cancel(sensor_thread);
         pthread_join(sensor_thread, NULL);
     }
+    return E_OK;
 }
 
 
