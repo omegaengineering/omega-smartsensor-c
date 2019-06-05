@@ -1,4 +1,4 @@
-Build basic_sensor without CCS
+### Build basic_sensor without CCS
 
 
 ```
@@ -11,7 +11,7 @@ To clean build artifacts:
 make clean
 ```
 
-Creating a build project with CCS
+### Creating a build project with CCS
 
 1. In CCS, File > New > CCS Project
     Enter Project name
@@ -31,7 +31,7 @@ Creating a build project with CCS
     Project should build successfully
 
 
-Creating debug configuration with CCS
+### Creating debug configuration with CCS
 
 1. Right click Project, Debug, Debug Configurations
 2.  Create new configuration with CCS Device Debugging template
