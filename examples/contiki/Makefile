@@ -6,7 +6,7 @@ BOARD = launchpad/cc1352r1
 PLATFORMS_ONLY = simplelink
 
 # Path configurations
-CONTIKI = /home/dev/Projects/contiki-ng
+CONTIKI = ../../../contiki-ng
 SMARTSENSOR_SDK = ../..
 
 CFLAGS += -g -O1 -Wall

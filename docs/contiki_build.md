@@ -1,3 +1,20 @@
+### Clone Contki source code
+
+Contiki source code should be cloned to the same directory level with the SDK
+```
+git clone https://github.com/contiki-ng/contiki-ng.git
+```
+
+If Contiki source code is at a different directory level, the following flag must be modified in `examples/contiki/Makefile`
+to reflect the new location:
+
+```
+# Path configurations
+CONTIKI = ../../../contiki-ng
+```
+
+
+
 ### Build basic_sensor without CCS
 
 
