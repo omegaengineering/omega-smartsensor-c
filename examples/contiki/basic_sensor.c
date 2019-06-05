@@ -42,7 +42,7 @@ sensor_t *sensor;
 
 sensor_init_t init = {
         .bus_type = SENSOR_BUS_I2C,
-        .gpio_id = 24,
+        .interrupt_pin = 24,
         .event_callback = my_callback,
         .event_callback_ctx = &sensor
 };
@@ -95,11 +95,12 @@ PROCESS_THREAD(basic_sensor, ev, data)
   assert(ret == E_OK);
   printf("Sensor Temperature = %d.\n"
          "Sensor Voltage = %d.\n", stat.operating_temp, stat.operating_voltage);
-  io_count_t io_count;
-  ret = get_io_count(sensor, &io_count);
-  assert(ret == E_OK);
-  printf("On-board %d sensors.\n", io_count.sensor_count);
-  printf("On-board %d outputs.\n", io_count.output_count);
+
+//  io_count_t io_count;
+//  ret = get_io_count(sensor, &io_count);
+//  assert(ret == E_OK);
+//  printf("On-board %d sensors.\n", io_count.sensor_count);
+//  printf("On-board %d outputs.\n", io_count.output_count);
 
   etimer_set(&timer, CLOCK_SECOND * 1);
 

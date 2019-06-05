@@ -12,8 +12,8 @@ typedef struct {
     PIN_Id                  pin_id;
 } ti_gpio_t;
 
-ti_gpio_t gpio_intr;
-ti_gpio_t * intr = &gpio_intr;
+static ti_gpio_t gpio_intr;
+static ti_gpio_t * intr = &gpio_intr;
 
 bus_ti_i2c_cfg_t my_config = {
         .periph_idx = 0,
@@ -72,7 +72,8 @@ static void ti_gpio_intr_cb (PIN_Handle handle, PIN_Id pinId)
         /// Defer interrupt event to be handled by port task
         /// Do not post synch event in this cooperative scheduling env
         status = process_post(&port_task, interrupt_os_evt, NULL);
-        assert(status == PROCESS_ERR_OK);
+        if (status == PROCESS_ERR_OK)
+            s19_log_warn("Failed to send event to port task, code %d\n", status);
     }
 }
 
@@ -80,7 +81,6 @@ int port_intr_init(sensor_t *sensor)
 {
     PIN_Status status;
     intr->pin_id = sensor->gpio_pin;
-    assert(intr->pin_id == 24);
     PIN_Config pin_config_list[] = {intr->pin_id , PIN_TERMINATE};
 
     intr->pin_handle = PIN_open(&intr->pin_state, pin_config_list);

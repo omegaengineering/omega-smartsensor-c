@@ -46,7 +46,7 @@ typedef enum {
 typedef struct {
     char                bus_id[128];
     sensor_bus_type_t   bus_type;
-    int                 gpio_id;
+    int                 interrupt_pin;
     event_callback_t    event_callback;
     void*               event_callback_ctx;
     int                 heartbeat_period;

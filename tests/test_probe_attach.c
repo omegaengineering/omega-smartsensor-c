@@ -56,7 +56,7 @@ int main()
 //            .bus_type = SENSOR_BUS_MODBUS,
             .bus_id = "/dev/i2c-3",
             .bus_type = SENSOR_BUS_I2C,
-            .gpio_id = 16,
+            .interrupt_pin = 16,
             .event_callback = example_callback,
             .event_callback_ctx = &sensor,
             .heartbeat_period = 1

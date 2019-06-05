@@ -20,7 +20,7 @@ int main()
 //            .bus_type = SENSOR_BUS_MODBUS,
             .bus_id = "/dev/i2c-3",
             .bus_type = SENSOR_BUS_I2C,
-            .gpio_id = 16,
+            .interrupt_pin = 16,
             .event_callback = NULL,
             .heartbeat_period = 0
     };

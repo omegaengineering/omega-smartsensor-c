@@ -239,7 +239,7 @@ int sensor_new(sensor_t **ctx, const sensor_init_t *init)
 
     memset(new_sensor, 0, sizeof(sensor_t));
     new_sensor->bus_type = init->bus_type;
-    new_sensor->gpio_pin = init->gpio_id;
+    new_sensor->gpio_pin = init->interrupt_pin;
     new_sensor->event_callback = init->event_callback;
     new_sensor->event_callback_ctx = init->event_callback_ctx;
     new_sensor->heartbeat_period = init->heartbeat_period;
@@ -386,8 +386,7 @@ int sensor_read(sensor_t *ctx, ss_register_t ss_register, data_buffer_t *data_bu
     const _register_t *reg = get_register_entry(ss_register);
     if (reg == NULL)
         return E_INVALID_PARAM;
-
-    if(ctx == NULL)
+    if (ctx == NULL)
         return E_INVALID_PARAM;
     if (data_buffer->data_len < reg->size)
         return E_BUFFER_MEM_SIZE;
@@ -436,8 +435,7 @@ int sensor_write(sensor_t *ctx, ss_register_t ss_register, data_buffer_t *data_b
     const _register_t *reg = get_register_entry(ss_register);
     if (reg == NULL)
         return E_INVALID_PARAM;
-
-    if(ctx == NULL)
+    if (ctx == NULL)
         return E_INVALID_PARAM;
     if (data_buffer->data_len < reg->size)
         return E_BUFFER_MEM_SIZE;
