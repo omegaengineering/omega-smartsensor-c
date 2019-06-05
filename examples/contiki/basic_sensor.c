@@ -96,11 +96,11 @@ PROCESS_THREAD(basic_sensor, ev, data)
   printf("Sensor Temperature = %d.\n"
          "Sensor Voltage = %d.\n", stat.operating_temp, stat.operating_voltage);
 
-//  io_count_t io_count;
-//  ret = get_io_count(sensor, &io_count);
-//  assert(ret == E_OK);
-//  printf("On-board %d sensors.\n", io_count.sensor_count);
-//  printf("On-board %d outputs.\n", io_count.output_count);
+  io_count_t io_count;
+  ret = get_io_count(sensor, &io_count);
+  assert(ret == E_OK);
+  printf("On-board %d sensors.\n", io_count.sensor_count);
+  printf("On-board %d outputs.\n", io_count.output_count);
 
   etimer_set(&timer, CLOCK_SECOND * 1);
 
@@ -108,22 +108,7 @@ PROCESS_THREAD(basic_sensor, ev, data)
   {
     PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&timer));
 
-//    get_readings(sensor);
-    sensor_descriptor_t desc;
-    int ret = get_sensor_descriptor(sensor, 2, &desc);
-    if (ret == 0)
-    {
-        printf("e_Measurement_Type %d\n", desc.e_Measurement_Type);
-        printf("u8_Data_Type %d\n", desc.st_Format.u8_Data_Type);
-        printf("u8_Factory_Calibrate %d\n", desc.st_Format.u8_Factory_Calibrate);
-        printf("u8_Configurable_Descriptor %d\n", desc.st_Format.u8_Configurable_Descriptor);
-        printf("u8_Sensor_Range %d\n", desc.st_Config.u8_Sensor_Range);
-        printf("u8_Lock %d\n", desc.st_Config.u8_Lock);
-        printf("u8_Scaling %d\n", desc.st_Config.u8_Scaling);
-        printf("u8_Channel %d\n", desc.st_Config.u8_Channel);
-        printf("u8_Device %d\n", desc.u8_Device);
-    }
-
+    get_readings(sensor);
 
     etimer_reset(&timer);
   }

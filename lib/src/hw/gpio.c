@@ -24,8 +24,3 @@ int gpio_set_direction(gpio_t * ctx, gpio_direction_t direction)
 {
     return ctx->driver->gpio_set_direction(ctx, direction);
 }
-
-int gpio_get_handle(gpio_t * ctx)
-{
-
-}

@@ -72,8 +72,7 @@ static void ti_gpio_intr_cb (PIN_Handle handle, PIN_Id pinId)
         /// Defer interrupt event to be handled by port task
         /// Do not post synch event in this cooperative scheduling env
         status = process_post(&port_task, interrupt_os_evt, NULL);
-        if (status == PROCESS_ERR_OK)
-            s19_log_warn("Failed to send event to port task, code %d\n", status);
+        (void) status;
     }
 }
 

@@ -30,6 +30,7 @@ int get_device_name(sensor_t *ctx, device_name_t name)
 int get_sensor_unit(sensor_t *ctx, int sensor_num, sensor_unit_t unit)
 {
     data_buffer_t buffer = {.data = (uint8_t *) unit, .data_len = sizeof(sensor_unit_t)-1};
+    memset(unit, 0, sizeof(sensor_unit_t));
     return sensor_indexed_read(ctx, SENSOR_0_UNIT, sensor_num, &buffer);
 }
 

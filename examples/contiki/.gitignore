@@ -1,3 +1,4 @@
 build
 *.configurations
 *.simplelink
+/basic_sensor.simplelink
