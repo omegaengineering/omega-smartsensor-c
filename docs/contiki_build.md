@@ -1,7 +1,15 @@
 Build basic_sensor without CCS
-    Goto examples/contiki, type "make"
-    
-    To clean, type "make clean"
+
+
+```
+cd examples/contiki
+make
+```
+
+To clean build artifacts:
+```
+make clean
+```
 
 Creating a build project with CCS
 
@@ -26,9 +34,10 @@ Creating a build project with CCS
 Creating debug configuration with CCS
 
 1. Right click Project, Debug, Debug Configurations
-    Create new configuration with CCS Device Debugging template
+2.  Create new configuration with CCS Device Debugging template
     Set basic_sensor for name of the debug configuration
     Ensure, Main, Target configuration is ${target_config_active_default:demo}
     Program, Project, click Workspace, select your project name
     Program, Program, give path to basic_sensor.elf (drill down in build subdirectory)
-    Apply, OK. Project should now debug. Breakpoint stopped at main().
+    Apply, OK.
+3. Project should now debug. Breakpoint stopped at main().
