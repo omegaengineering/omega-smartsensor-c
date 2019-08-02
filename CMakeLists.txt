@@ -35,7 +35,12 @@ add_library(omega_lib
 
 
 add_library(omega_smartsensor_lib ${SDK_SOURCES})
-target_link_libraries(omega_smartsensor_lib omega_lib)
+target_link_libraries(omega_smartsensor_lib omega_lib pthread modbus)
 
-add_subdirectory(tests)
-add_subdirectory(examples/linux)
+if (SDK_WITH_TESTS)
+    add_subdirectory(tests)
+endif()
+
+if (NOT SDK_WITHOUT_EXAMPLES)
+    add_subdirectory(examples/linux)
+endif()
