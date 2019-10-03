@@ -1,5 +1,5 @@
 /*!********************************************************************************************
-  @file     port.h
+  @file     freertos_memory.c
 
   @copyright
             Copyright (c) 2019, Omega Engineering Inc.
@@ -24,23 +24,20 @@
             SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
   @author   Binh Dinh
-  @date     June 5th, 2019
+  @date     August 5th, 2019
   @details
-            Example for using smartsensor device in interrupt mode
+
 
 ***********************************************************************************************/
 
-#ifndef OMEGA_SMARTSENSOR_C_PORT_H
-#define OMEGA_SMARTSENSOR_C_PORT_H
+#include "platform/memory.h"
 
-#include "core/smartsensor_private.h"
+void* s19_mem_malloc(size_t size)
+{
+    return malloc(size);
+}
 
-extern bus_new_dr   port_bus_i2c_new;
-extern void*        port_bus_i2c_cfg;
-extern bus_new_dr   port_bus_modbus_new;
-extern void*        port_bus_modbus_cfg;
-extern int          port_intr_init(sensor_t *sensor);
-extern int          port_platform_init(sensor_t *sensor);
-extern int          port_platform_exit(sensor_t *sensor);
-
-#endif //OMEGA_SMARTSENSOR_C_PORT_H
+void s19_mem_free(void *ptr)
+{
+    free(ptr);
+}

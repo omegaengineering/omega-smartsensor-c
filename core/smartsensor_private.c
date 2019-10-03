@@ -305,8 +305,10 @@ ERROR:
     if (new_sensor) {
         if (new_sensor->bus)
             bus_free(new_sensor->bus);
+#if HEARTBEAT
         if (new_sensor->timer)
             s19_timer_destroy(new_sensor->timer);
+#endif
         if (new_sensor->bus_lock)
             s19_mutex_destroy(new_sensor->bus_lock);
         if (new_sensor->data_lock)

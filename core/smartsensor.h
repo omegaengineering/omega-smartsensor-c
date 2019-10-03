@@ -43,7 +43,7 @@
 #define SMARTSENSOR_MODBUS_ADDR         0x01
 #define SMARTSENSOR_MODBUS_BAUDRATE     38400
 #define DEFAULT_SAMPLE_TIME             1
-#define HEARTBEAT                       1
+#define HEARTBEAT                       0
 #define HEARTBEAT_MAX_MISS              3
 
 struct _sensor;

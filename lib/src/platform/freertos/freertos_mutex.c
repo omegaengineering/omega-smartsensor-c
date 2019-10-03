@@ -1,5 +1,5 @@
 /*!********************************************************************************************
-  @file     port.h
+  @file     freertos_mutex.c
 
   @copyright
             Copyright (c) 2019, Omega Engineering Inc.
@@ -24,23 +24,48 @@
             SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
   @author   Binh Dinh
-  @date     June 5th, 2019
+  @date     August 5th, 2019
   @details
-            Example for using smartsensor device in interrupt mode
+
 
 ***********************************************************************************************/
+#include <stdint.h>
+#include <FreeRTOS.h>
+#include <semphr.h>
+#include "common/errors.h"
+#include "platform/mutex.h"
+#include "platform/memory.h"
 
-#ifndef OMEGA_SMARTSENSOR_C_PORT_H
-#define OMEGA_SMARTSENSOR_C_PORT_H
+struct _s19_mutex {
+    SemaphoreHandle_t mutex;
+};
 
-#include "core/smartsensor_private.h"
+int s19_mutex_create(s19_mutex_t **mutex)
+{
+    *mutex = s19_mem_malloc(sizeof(struct _s19_mutex));
+    if (*mutex)
+    {
+        (*mutex)->mutex = (s19_mutex_t*) xSemaphoreCreateMutex();
+    }
+    return E_OK;
+}
 
-extern bus_new_dr   port_bus_i2c_new;
-extern void*        port_bus_i2c_cfg;
-extern bus_new_dr   port_bus_modbus_new;
-extern void*        port_bus_modbus_cfg;
-extern int          port_intr_init(sensor_t *sensor);
-extern int          port_platform_init(sensor_t *sensor);
-extern int          port_platform_exit(sensor_t *sensor);
+int s19_mutex_lock(s19_mutex_t *mutex)
+{
+//    return xSemaphoreTakeFromISR( mutex->mutex, NULL ) ?
+//           E_OK : E_TRY_AGAIN;
+	  return xSemaphoreTake( mutex->mutex,  portMAX_DELAY) ?
+	           E_OK : E_TRY_AGAIN;
+}
 
-#endif //OMEGA_SMARTSENSOR_C_PORT_H
+int s19_mutex_unlock(s19_mutex_t *mutex)
+{
+//    return xSemaphoreGiveFromISR( mutex->mutex, NULL ) ? E_OK : E_TRY_AGAIN;
+    return xSemaphoreGive( mutex->mutex ) ? E_OK : E_TRY_AGAIN;
+}
+
+int s19_mutex_destroy(s19_mutex_t *mutex)
+{
+    vSemaphoreDelete(mutex->mutex);
+    return E_OK;
+}
