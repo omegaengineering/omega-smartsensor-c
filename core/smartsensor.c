@@ -220,3 +220,8 @@ int set_interrupt_control(sensor_t *ctx, interrupt_control_t control)
     data_buffer_t buffer = {.data = (uint8_t*) &data, .data_len = sizeof(data)};
     return sensor_write(ctx, INTERRUPT_CONTROL, &buffer);
 }
+
+unsigned int sdk_version()
+{
+    return SMARTSENSOR_SDK_VERSION;
+}

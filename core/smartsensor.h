@@ -38,7 +38,7 @@
 #include "common/errors.h"
 #include "registers.h"
 
-
+#define SMARTSENSOR_SDK_VERSION         0x00000001
 #define SMARTSENSOR_I2C_ADDR            0x68
 #define SMARTSENSOR_MODBUS_ADDR         0x01
 #define SMARTSENSOR_MODBUS_BAUDRATE     38400
@@ -317,5 +317,11 @@ int soft_reset              (sensor_t *ctx);
  * @return see @error_t
  */
 int preset_config           (sensor_t *ctx);
+
+/**
+ * Return SDK version
+ * @return version number
+ */
+unsigned int sdk_version();
 
 #endif //OMEGA_SMARTSENSOR_C_SMARTSENSOR_H
