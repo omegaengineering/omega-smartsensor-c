@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.7)
 project(smartsensor C)
-
 set(CMAKE_C_STANDARD 99)
+
+add_definitions(-DNDEBUG=${NDEBUG})
 
 set(SDK_SOURCES
         core/smartsensor_private.c

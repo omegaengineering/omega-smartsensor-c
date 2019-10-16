@@ -47,7 +47,7 @@
 #define s19_log_warn(fmt,...)   do { if (1) {printf("[%5s][WARN]: " fmt,log_module, ##__VA_ARGS__); fflush(stdout);} } while(0)
 
 #else
-#define s19_log_create(name)
+#define s19_log_create(name, level)
 #define s19_log_info(fmt,...)
 #define s19_log_dbg(fmt,...)
 #define s19_log_warn(fmt,...)
