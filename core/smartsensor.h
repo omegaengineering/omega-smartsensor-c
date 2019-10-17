@@ -38,13 +38,20 @@
 #include "common/errors.h"
 #include "registers.h"
 
-#define SMARTSENSOR_SDK_VERSION         0x00000001
+#define SMARTSENSOR_SDK_VERSION         0x00010002
 #define SMARTSENSOR_I2C_ADDR            0x68
 #define SMARTSENSOR_MODBUS_ADDR         0x01
 #define SMARTSENSOR_MODBUS_BAUDRATE     38400
+
+#ifndef DEFAULT_SAMPLE_TIME
 #define DEFAULT_SAMPLE_TIME             1
-#define HEARTBEAT                       0
+#endif
+#ifndef HEARTBEAT
+#define HEARTBEAT                       1
+#endif
+#ifndef HEARTBEAT_MAX_MISS
 #define HEARTBEAT_MAX_MISS              3
+#endif
 
 struct _sensor;
 

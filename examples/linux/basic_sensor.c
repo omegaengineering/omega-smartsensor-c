@@ -102,10 +102,10 @@ int main()
             .bus_id = "/dev/ttyACM0",
             .bus_type = SENSOR_BUS_MODBUS,
 #else
-            .bus_id = "/dev/i2c-3",
+            .bus_id = "/dev/i2c-2",
             .bus_type = SENSOR_BUS_I2C,
 #endif
-            .interrupt_pin = 16,
+            .interrupt_pin = 60,
             .event_callback = example_callback,
             .event_callback_ctx = &sensor,
             .heartbeat_period = 1

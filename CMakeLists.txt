@@ -2,7 +2,22 @@ cmake_minimum_required(VERSION 3.7)
 project(smartsensor C)
 set(CMAKE_C_STANDARD 99)
 
-add_definitions(-DNDEBUG=${NDEBUG})
+option(NDEBUG "" OFF)
+if(NDEBUG)
+    add_definitions(-DNDEBUG)
+endif()
+option(DEFAULT_SAMPLE_TIME "" OFF)
+if(DEFAULT_SAMPLE_TIME)
+    add_definitions(-DDEFAULT_SAMPLE_TIME=${DEFAULT_SAMPLE_TIME})
+endif()
+option(HEARTBEAT "" OFF)
+if(HEARTBEAT)
+    add_definitions(-DHEARTBEAT=${HEARTBEAT})
+endif()
+option(HEARTBEAT_MAX_MISS "" OFF)
+if(HEARTBEAT_MAX_MISS)
+    add_definitions(-DHEARTBEAT_MAX_MISS=${HEARTBEAT_MAX_MISS})
+endif()
 
 set(SDK_SOURCES
         core/smartsensor_private.c

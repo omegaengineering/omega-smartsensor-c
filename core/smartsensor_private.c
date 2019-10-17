@@ -293,7 +293,7 @@ int sensor_new(sensor_t **ctx, const sensor_init_t *init)
     if ((ret = s19_mutex_create(&new_sensor->data_lock)) != E_OK)
         goto ERROR;
 
-#if HEARTBEAT
+#ifdef HEARTBEAT
     if (new_sensor->heartbeat_period)
         if ((ret = s19_timer_create(&new_sensor->timer) != E_OK))
             goto ERROR;
@@ -305,7 +305,7 @@ ERROR:
     if (new_sensor) {
         if (new_sensor->bus)
             bus_free(new_sensor->bus);
-#if HEARTBEAT
+#ifdef HEARTBEAT
         if (new_sensor->timer)
             s19_timer_destroy(new_sensor->timer);
 #endif
@@ -334,7 +334,7 @@ int sensor_open(sensor_t *ctx)
         if ((ret = port_platform_init(ctx)) != E_OK)
             return ret;
     }
-#if HEARTBEAT
+#ifdef HEARTBEAT
     if (ctx->heartbeat_period)
     {
         if ((ret = s19_timer_entry_add(ctx->timer, &ctx->heartbeat) != E_OK))
