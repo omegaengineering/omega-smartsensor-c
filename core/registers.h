@@ -189,7 +189,7 @@ typedef enum    MEASUREMENT_TYPE_TAG
     SENSOR_AMP_TYPE         = 0x12,        // Current Loops
     SENSOR_MILLIAMP_TYPE    = 0x13,
 
-    SENSOR_DIGITAL_TYPE     = 0x18,        // Any Digital Type
+    SENSOR_DIGITAL_TYPE     = 0x17,        // Any Digital Type
     SENSOR_DIGITAL_DIN_TYPE = 0x18,        // Digital Inputs
     SENSOR_RATE_TYPE        = 0x19,        // Rate (Hz)
     SENSOR_PULSE_WIDTH_TYPE = 0x1a,        // Width (usec) of pulse input

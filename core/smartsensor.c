@@ -240,6 +240,7 @@ const char* str_meas(measurement_type_t meas)
         case SENSOR_AMP_TYPE            :   return "ampere";
         case SENSOR_MILLIAMP_TYPE       :   return "miliampere";
         case SENSOR_DIGITAL_TYPE        :   return "digital";
+        case SENSOR_DIGITAL_DIN_TYPE    :   return "digital";
         case SENSOR_RATE_TYPE           :   return "rate";
         case SENSOR_PULSE_WIDTH_TYPE    :   return "pulse width";
         case SENSOR_PULSE_DELAY_TYPE    :   return "pulse delay";
