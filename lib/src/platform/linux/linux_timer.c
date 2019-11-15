@@ -31,7 +31,7 @@
 ***********************************************************************************************/
 
 #include <pthread.h>
-#include <zconf.h>
+#include <unistd.h>
 #include <stdbool.h>
 #include <string.h>
 #include <errno.h>
