@@ -331,4 +331,11 @@ int preset_config           (sensor_t *ctx);
  */
 unsigned int sdk_version();
 
+/**
+ * Convert measurement type to string.
+ * @param meas
+ * @return static string array.
+ */
+const char* str_meas(measurement_type_t meas);
+
 #endif //OMEGA_SMARTSENSOR_C_SMARTSENSOR_H

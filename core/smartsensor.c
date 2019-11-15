@@ -225,3 +225,42 @@ unsigned int sdk_version()
 {
     return SMARTSENSOR_SDK_VERSION;
 }
+
+const char* str_meas(measurement_type_t meas)
+{
+    switch (meas)
+    {
+        case SENSOR_NULL_TYPE           :   return "null";
+        case SENSOR_TEMPERATURE_TYPE    :   return "temperature";
+        case SENSOR_HUMIDITY_TYPE       :   return "humidity";
+        case SENSOR_BAROMETRIC_TYPE     :   return "barometric";
+        case SENSOR_LIGHT_TYPE          :   return "light";
+        case SENSOR_VOLT_TYPE           :   return "volt";
+        case SENSOR_MILLIVOLT_TYPE      :   return "milivolt";
+        case SENSOR_AMP_TYPE            :   return "ampere";
+        case SENSOR_MILLIAMP_TYPE       :   return "miliampere";
+        case SENSOR_DIGITAL_TYPE        :   return "digital";
+        case SENSOR_RATE_TYPE           :   return "rate";
+        case SENSOR_PULSE_WIDTH_TYPE    :   return "pulse width";
+        case SENSOR_PULSE_DELAY_TYPE    :   return "pulse delay";
+        case SENSOR_DUTY_CYCLE_TYPE     :   return "duty cycle";
+        case SENSOR_COUNT_TYPE          :   return "count";
+        case SENSOR_UP_DOWN_COUNT_TYPE  :   return "up down count";
+        case SENSOR_QUAD_COUNT_TYPE     :   return "quad count";
+        case SENSOR_TC_TYPE             :   return "temperature";
+        case SENSOR_RTD_TYPE            :   return "rtd";
+        case SENSOR_THERMISTOR_TYPE     :   return "thermistor";
+        case SENSOR_IR_TYPE             :   return "infrared";
+        case SENSOR_CJC_TYPE            :   return "cold junction";
+        case SENSOR_PH_TYPE             :   return "ph";
+        case SENSOR_CO2_TYPE            :   return "co2";
+        case SENSOR_PRESSURE_TYPE       :   return "pressure";
+        case SENSOR_ACCELERATION_TYPE   :   return "acceleration";
+        case SENSOR_INCLINATION_TYPE    :   return "inclination";
+        case SENSOR_SERIAL_TYPE         :   return "serial";
+        case SENSOR_ADC_COUNTS_TYPE     :   return "adc count";
+
+        case SENSOR_DIGITAL_MASK        :
+        default: return "unknown";
+    }
+}
