@@ -226,7 +226,7 @@ unsigned int sdk_version()
     return SMARTSENSOR_SDK_VERSION;
 }
 
-const char* str_meas(measurement_type_t meas)
+const char* measurement_str(measurement_type_t meas)
 {
     switch (meas)
     {

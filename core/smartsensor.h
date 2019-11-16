@@ -336,6 +336,6 @@ unsigned int sdk_version();
  * @param meas
  * @return static string array.
  */
-const char* str_meas(measurement_type_t meas);
+const char* measurement_str(measurement_type_t meas);
 
 #endif //OMEGA_SMARTSENSOR_C_SMARTSENSOR_H
