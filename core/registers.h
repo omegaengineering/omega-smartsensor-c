@@ -448,4 +448,21 @@ typedef enum {
     LAST_REGISTER
 } ss_register_t;
 
+typedef struct {
+    uint16_t    modbus_addr;
+    uint16_t    i2c_addr;
+    uint8_t     nInstance;
+    uint8_t     access;
+    uint16_t    size;
+} _register_t;
+
+typedef enum {
+    RD      = (1U << 0U),
+    WR      = (1U << 1U),
+    EXE     = (1U << 2U),
+    BYTES   = (1U << 3U)  // LSB format
+} control_t;
+
+extern const _register_t* get_register_entry(ss_register_t ss_register);
+
 #endif //OMEGA_SMARTSENSOR_C_REGISTERS_H

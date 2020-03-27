@@ -34,86 +34,86 @@
 #include "smartsensor_private.h"
 
 
-int get_sensor_reading(sensor_t *ctx, int sensor_num, const float *reading)
+int get_sensor_reading(int instance, int sensor_num, const float *reading)
 {
     data_buffer_t buffer = {.data = (uint8_t *) reading, .data_len = sizeof(reading)};
-    return sensor_indexed_read(ctx, SENSOR_0_DATA, sensor_num, &buffer);
+    return sensor_indexed_read(instance, SENSOR_0_DATA, sensor_num, &buffer);
 }
 
-int get_sensor_gain(sensor_t *ctx, int sensor_num, const float *gain)
+int get_sensor_gain(int instance, int sensor_num, const float *gain)
 {
     data_buffer_t buffer = {.data = (uint8_t *) gain, .data_len = sizeof(gain)};
-    return sensor_indexed_read(ctx, SENSOR_0_GAIN, sensor_num, &buffer);
+    return sensor_indexed_read(instance, SENSOR_0_GAIN, sensor_num, &buffer);
 }
 
-int get_sensor_offset(sensor_t *ctx, int sensor_num, const float *gain)
+int get_sensor_offset(int instance, int sensor_num, const float *gain)
 {
     data_buffer_t buffer = {.data = (uint8_t *) gain, .data_len = sizeof(gain)};
-    return sensor_indexed_read(ctx, SENSOR_0_OFFSET, sensor_num, &buffer);
+    return sensor_indexed_read(instance, SENSOR_0_OFFSET, sensor_num, &buffer);
 }
 
-int get_device_name(sensor_t *ctx, device_name_t name)
+int get_device_name(int instance, device_name_t name)
 {
     data_buffer_t buffer = {.data = (uint8_t *) name, .data_len = sizeof(device_name_t)-1};
     memset(name, 0, sizeof(device_name_t));
-    return sensor_read(ctx, DEVICE_NAME, &buffer);
+    return sensor_read(instance, DEVICE_NAME, &buffer);
 }
 
-int get_sensor_unit(sensor_t *ctx, int sensor_num, sensor_unit_t unit)
+int get_sensor_unit(int instance, int sensor_num, sensor_unit_t unit)
 {
     data_buffer_t buffer = {.data = (uint8_t *) unit, .data_len = sizeof(sensor_unit_t)-1};
     memset(unit, 0, sizeof(sensor_unit_t));
-    return sensor_indexed_read(ctx, SENSOR_0_UNIT, sensor_num, &buffer);
+    return sensor_indexed_read(instance, SENSOR_0_UNIT, sensor_num, &buffer);
 }
 
-int get_sensor_descriptor(sensor_t *ctx, int sensor_num, sensor_descriptor_t *descriptor)
+int get_sensor_descriptor(int instance, int sensor_num, sensor_descriptor_t *descriptor)
 {
     data_buffer_t buffer = {.data = (uint8_t *) descriptor, .data_len = sizeof(sensor_descriptor_t)};
-    return sensor_indexed_read(ctx, SENSOR_0_DESCRIPTOR, sensor_num, &buffer);
+    return sensor_indexed_read(instance, SENSOR_0_DESCRIPTOR, sensor_num, &buffer);
 }
 
-int get_io_count(sensor_t *ctx, io_count_t *io_count)
+int get_io_count(int instance, io_count_t *io_count)
 {
     data_buffer_t buffer = {.data = (uint8_t *) io_count, .data_len = sizeof(io_count_t)};
-    return sensor_read(ctx, NUMBER_OF_SENSORS, &buffer);
+    return sensor_read(instance, NUMBER_OF_SENSORS, &buffer);
 }
 
-int get_operating_stat(sensor_t *ctx, operating_stat_t *stat)
+int get_operating_stat(int instance, operating_stat_t *stat)
 {
     data_buffer_t buffer = {.data = (uint8_t *) stat, .data_len = sizeof(operating_stat_t)};
-    return sensor_read(ctx, OPERATING_TEMP, &buffer);
+    return sensor_read(instance, OPERATING_TEMP, &buffer);
 }
 
-int get_sensor_type(sensor_t *ctx, int sensor_num, measurement_type_t *sensor_type)
+int get_sensor_type(int instance, int sensor_num, measurement_type_t *sensor_type)
 {
     sensor_descriptor_t descriptor;
-    int ret = get_sensor_descriptor(ctx, sensor_num, &descriptor);
+    int ret = get_sensor_descriptor(instance, sensor_num, &descriptor);
     if (ret == E_OK)
         *sensor_type = descriptor.e_Measurement_Type;
     return ret;
 }
 
-int get_system_status(sensor_t *ctx, system_status_t *status)
+int get_system_status(int instance, system_status_t *status)
 {
     data_buffer_t buffer = {.data = (uint8_t *) status, .data_len = sizeof(system_status_t)};
-    return sensor_read(ctx, SYSTEM_STATUS, &buffer);
+    return sensor_read(instance, SYSTEM_STATUS, &buffer);
 }
 
-int get_interrupt_status(sensor_t *ctx, interrupt_status_t *status)
+int get_interrupt_status(int instance, interrupt_status_t *status)
 {
     uint16_t interrupt_status;
     data_buffer_t buffer = {.data = (uint8_t *) &interrupt_status, .data_len = sizeof(interrupt_status)};
-    int ret = sensor_read(ctx, INTERRUPT_STATUS, &buffer);
+    int ret = sensor_read(instance, INTERRUPT_STATUS, &buffer);
     if (ret == E_OK)
         *status = (interrupt_status_t) interrupt_status;
     return ret;
 }
 
 
-int get_current_time(sensor_t *ctx, data_time_t *time)
+int get_current_time(int instance, data_time_t *time)
 {
     data_buffer_t buffer = {.data = (uint8_t *) time, .data_len = sizeof(uint32_t)};
-    int ret = sensor_read(ctx, CURRENT_TIME, &buffer);
+    int ret = sensor_read(instance, CURRENT_TIME, &buffer);
     if (ret != E_OK)
         return ret;
     uint32_t u32 = *(uint32_t*)buffer.data;
@@ -126,11 +126,11 @@ int get_current_time(sensor_t *ctx, data_time_t *time)
     return ret;
 }
 
-int set_current_time(sensor_t *ctx, data_time_t *time)
+int set_current_time(int instance, data_time_t *time)
 {
     uint32_t data = time->days * 24 * 3600 + time->hours * 3600 + time->mins * 60 + time->secs;
     data_buffer_t buffer = {.data = (uint8_t *) &data, .data_len = sizeof(uint32_t)};
-    return sensor_write(ctx, CURRENT_TIME, &buffer);
+    return sensor_write(instance, CURRENT_TIME, &buffer);
 }
 
 #define		YEARSHIFT		9
@@ -143,82 +143,82 @@ static void convert_to_calendar(uint16_t u16_date, calendar_t * calendar)
     calendar->day = (u16_date & 0x001f);
 }
 
-int get_calibration_date(sensor_t *ctx, calendar_t *calendar)
+int get_calibration_date(int instance, calendar_t *calendar)
 {
     uint16_t data;
     data_buffer_t buffer = {.data = (uint8_t *) &data, .data_len = sizeof(data)};
-    int ret = sensor_read(ctx, CALIBRATION_DATE, &buffer);
+    int ret = sensor_read(instance, CALIBRATION_DATE, &buffer);
     if (ret == E_OK)
         convert_to_calendar(data, calendar);
     return ret;
 }
 
-int get_manufacturing_date(sensor_t *ctx, calendar_t *calendar)
+int get_manufacturing_date(int instance, calendar_t *calendar)
 {
     uint16_t data;
     data_buffer_t buffer = {.data = (uint8_t *) &data, .data_len = sizeof(data)};
-    int ret = sensor_read(ctx, MANUFACTURED_DATE, &buffer);
+    int ret = sensor_read(instance, MANUFACTURED_DATE, &buffer);
     if (ret == E_OK)
         convert_to_calendar(data, calendar);
     return ret;
 }
 
-int set_device_name(sensor_t *ctx, device_name_t name)
+int set_device_name(int instance, device_name_t name)
 {
     data_buffer_t buffer = {.data = (uint8_t *) name, .data_len = sizeof(device_name_t)};
-    return sensor_write(ctx, DEVICE_NAME, &buffer);
+    return sensor_write(instance, DEVICE_NAME, &buffer);
 }
 
-int wait_for_device_ready(sensor_t *ctx, int max_wait_msec)
+int wait_for_device_ready(int instance, int max_wait_msec)
 {
     int ret = E_OK;
     system_status_t s;
     while (max_wait_msec > 0)
     {
-        ret = get_system_status(ctx, &s);
+        ret = get_system_status(instance, &s);
         if (ret == E_OK && s.device_ready)
             break;
-        s19_sleep_msec(200);
+        port_sleep_ms(200);
         max_wait_msec -= 200;
     }
    return ret;
 }
 
-int soft_reset(sensor_t *ctx)
+int soft_reset(int instance)
 {
     uint32_t trigger = TRIGGER_DEVICE_RESET;
     data_buffer_t buffer = {.data = (uint8_t *) &trigger, .data_len = sizeof(trigger)};
-    int ret = sensor_write(ctx, TRIGGER_REQUESTS, &buffer);
+    int ret = sensor_write(instance, TRIGGER_REQUESTS, &buffer);
     if (ret == E_OK)
-        wait_for_device_ready(ctx, 1000);
+        wait_for_device_ready(instance, 1000);
     return ret;
 }
 
-int preset_config(sensor_t *ctx)
+int preset_config(int instance)
 {
     int ret;
     uint16_t u16 = 1;
     data_buffer_t buffer16 = {.data = (uint8_t *) &u16, .data_len = sizeof(u16)};
-    if ((ret = sensor_write(ctx, EVENT_0_TIME_BASE, &buffer16)) != E_OK)
+    if ((ret = sensor_write(instance, EVENT_0_TIME_BASE, &buffer16)) != E_OK)
         return ret;
 
     uint32_t u32 = ENABLE_DATA_READY_INTR;
     data_buffer_t buffer32 = {.data = (uint8_t *) &u32, .data_len = sizeof(u32)};
-    if ((ret = sensor_write(ctx, INTERRUPT_CONTROL, &buffer32)) != E_OK)
+    if ((ret = sensor_write(instance, INTERRUPT_CONTROL, &buffer32)) != E_OK)
         return ret;
 
     u16 = ENABLE_EVENT_1_READ;
-    ret = sensor_write(ctx, SYSTEM_CONTROL, &buffer16);
+    ret = sensor_write(instance, SYSTEM_CONTROL, &buffer16);
     if (ret == E_OK)
-        wait_for_device_ready(ctx, 1000);
+        wait_for_device_ready(instance, 1000);
     return ret;
 }
 
-int set_interrupt_control(sensor_t *ctx, interrupt_control_t control)
+int set_interrupt_control(int instance, interrupt_control_t control)
 {
     uint16_t data = (uint16_t) control;
     data_buffer_t buffer = {.data = (uint8_t*) &data, .data_len = sizeof(data)};
-    return sensor_write(ctx, INTERRUPT_CONTROL, &buffer);
+    return sensor_write(instance, INTERRUPT_CONTROL, &buffer);
 }
 
 unsigned int sdk_version()
@@ -264,4 +264,79 @@ const char* measurement_str(measurement_type_t meas)
         case SENSOR_DIGITAL_MASK        :
         default: return "unknown";
     }
+}
+
+ int probe_default_init(int instance)
+{
+    int ret;
+    uint16_t    data16;
+    uint32_t    data32;
+    data_buffer_t buffer16 = {.data = (uint8_t*) &data16, .data_len = sizeof(data16)};
+    data_buffer_t buffer32 = {.data = (uint8_t*) &data32, .data_len = sizeof(data32)};
+
+    // Ensure Interrupt Control register set correctly
+    if ((ret = sensor_read(instance, INTERRUPT_CONTROL, &buffer16)))
+        return ret;
+
+    data16 |=  (ENABLE_SENSOR_CHANGE_INTR |
+                ENABLE_POWER_CHANGE_INTR |
+                ENABLE_HEALTH_CHANGE_INTR |
+                ENABLE_DATA_READY_INTR |
+                ENABLE_FUNCTION_BLOCK_INTR |
+                ENABLE_LOG_DATA_READY_INTR);
+
+    if ((ret = sensor_write(instance, INTERRUPT_CONTROL, &buffer16)))
+        return ret;
+
+    if ((ret = sensor_read(instance, SYSTEM_CONTROL, &buffer16)))
+        return ret;
+
+    // set the CONTROL for the Device
+    data16 |= ( ENABLE_SENSOR_CHANGE_LOG |
+                ENABLE_POWER_CHANGE_LOG |
+                ENABLE_HEALTH_FAULT_LOG |
+                ENABLE_TIME_CHANGE_LOG |
+                ENABLE_EVENT_1_READ |
+                ENABLE_EVENT_1_LOG |
+                ENABLE_FUNCTION_BLOCK |
+                ENABLE_HEALTH_MONITOR |
+                ENABLE_LOG_OVERWRITE |
+                ENABLE_RTC);
+
+    if ((ret = sensor_write(instance, SYSTEM_CONTROL, &buffer16)))
+        return ret;
+
+    // Extract full span of data available
+    data32 = 0;
+    if ((ret = sensor_write(instance, EXTRACT_START_TIME, &buffer32)))
+        return ret;
+
+    data32 = 0xffffffff;
+    if ((ret = sensor_write(instance, EXTRACT_END_TIME, &buffer32)))
+        return ret;
+
+    // crashes smartsensor ?
+//    data16 = TRIGGER_CLEAR_LOG;
+//    if ((ret = sensor_write(sensor->sensor_id, TRIGGER_REQUESTS, &buffer16)))
+//        return ret;
+
+#ifdef FORCE_SAMPLE_TIME
+    data16 = DEFAULT_SAMPLE_TIME;
+    if ((ret = sensor_write(sensor->sensor_id, EVENT_0_TIME_BASE, &buffer16)))
+        return ret;
+    if ((ret = sensor_write(sensor->sensor_id, EVENT_1_TIME_BASE, &buffer16)))
+        return ret;
+
+#else
+    if ((ret = sensor_read(instance, EVENT_0_TIME_BASE, &buffer16)))
+        return ret;
+
+    if (data16 < DEFAULT_SAMPLE_TIME)
+    {
+        data16 = DEFAULT_SAMPLE_TIME;
+        if ((ret = sensor_write(instance, EVENT_0_TIME_BASE, &buffer16)))
+            return ret;
+    }
+#endif
+    return E_OK;
 }

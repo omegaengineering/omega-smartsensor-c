@@ -33,14 +33,27 @@
 #ifndef OMEGA_SMARTSENSOR_C_PORT_H
 #define OMEGA_SMARTSENSOR_C_PORT_H
 
-#include "core/smartsensor_private.h"
+#include "smartsensor.h"
+#include "smartsensor_private.h"
 
-extern bus_new_dr   port_bus_i2c_new;
-extern void*        port_bus_i2c_cfg;
-extern bus_new_dr   port_bus_modbus_new;
-extern void*        port_bus_modbus_cfg;
-extern int          port_intr_init(sensor_t *sensor);
-extern int          port_platform_init(sensor_t *sensor);
-extern int          port_platform_exit(sensor_t *sensor);
+
+extern int      port_platform_init(int instance);
+extern int      port_platform_deinit(int instance);
+
+int             port_bus_write(int bus_id, data_buffer_t *buffer);
+int             port_bus_read(int bus_id, data_buffer_t *buffer);
+
+typedef void    (*port_timer_callback)(int instance);
+extern int      port_timer_register(int instance, int period, port_timer_callback callback);
+extern int      port_timer_deregister(int instance, port_timer_callback callback);
+
+
+void            port_sleep_ms(uint32_t ms);
+
+void            sensor_interrupt_triggered(int instance);
+void            sensor_timeout_triggered(int instance);
+
+#define         port_ENTER_CRITICAL_SECTION()
+#define         port_EXIT_CRITICAL_SECTION()
 
 #endif //OMEGA_SMARTSENSOR_C_PORT_H
