@@ -5,7 +5,7 @@ typedef enum {
     E_UNAVAILABLE = -1,
     E_OK                = 0,
     E_BUS_OPERATION,
-    E_API_ERROR,
+    E_BUS_TYPE,
     E_BUFFER_MEM_SIZE,
     E_INVALID_PARAM,
     E_NO_MEM,

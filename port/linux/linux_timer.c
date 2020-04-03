@@ -113,8 +113,8 @@ void port_timer_close(int instance)
     timer_thread_stop();
 }
 
-
-int port_timer_register(int instance, int period, port_timer_callback callback)
+//
+int linux_timer_register(hal_t* hal, int period, port_timer_callback callback)
 {
     for (int i = 0; i < N_TIMERS; i++) {
         if (!timers[i].set) {
@@ -128,7 +128,7 @@ int port_timer_register(int instance, int period, port_timer_callback callback)
     return 0;
 }
 
-int port_timer_deregister(int instance, port_timer_callback callback)
+int linux_timer_cancel(hal_t* hal, port_timer_callback callback)
 {
     for (int i = 0; i < N_TIMERS; i++) {
         if (!timers[i].set && timers[i].callback == callback) {
@@ -143,8 +143,4 @@ int port_timer_deregister(int instance, port_timer_callback callback)
     return 0;
 }
 
-void port_sleep_ms(uint32_t msec)
-{
-    usleep(msec);
-}
 

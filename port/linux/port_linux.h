@@ -3,10 +3,20 @@
 
 #include "port.h"
 
-#define SMARTSENSOR_0_I2C       17       // found at /dev/i2c-X
+struct _port_cfg {
+    sensor_bus_type_t   bus_type;
+    const char*         bus_res;
+};
 
-int  port_bus_open(int bus_id);
-int  port_bus_close(int bus_id);
+
+typedef struct _bus_i2c {
+    int         fd;
+} linux_i2c_t;
+
+int  linux_i2c_open(linux_i2c_t* i2c, const char* resource);
+int  linux_i2c_close(linux_i2c_t* i2c);
+int  linux_i2c_read(linux_i2c_t* i2c, uint8_t* buffer, uint16_t buffer_size);
+int  linux_i2c_write(linux_i2c_t* i2c, const uint8_t* buffer, uint16_t buffer_size);
 
 int  port_interrupt_open(int instance);
 int  port_interrupt_close(int instance);

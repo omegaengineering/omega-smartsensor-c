@@ -38,9 +38,18 @@
 #include <string.h>
 #include <signal.h>
 #include "smartsensor.h"
+#include "../port/linux/port_linux.h"
 
 
 static int do_exit = 0;
+static sensor_t g_sensor;
+sensor_t* sensor = &g_sensor;
+
+static port_cfg_t port_cfg = {
+        .bus_res = "/dev/i2c-17",
+        .bus_type = SENSOR_BUS_I2C,
+};
+
 
 void signal_handler(int sig)
 {
@@ -51,7 +60,7 @@ void get_readings(int instance)
 {
     int ret;
     data_time_t time;
-    ret = get_current_time(instance, &time);
+    ret = get_current_time(sensor, &time);
     assert(ret == E_OK);
     printf("Current time %d days %d hours %d mins %d secs\n", time.days, time.hours, time.mins, time.secs);
 
@@ -59,11 +68,11 @@ void get_readings(int instance)
     for (int idx = 0; idx < MAX_SENSOR_COUNT; idx++)
     {
         float reading;
-        ret = get_sensor_reading(instance, idx, &reading);
+        ret = get_sensor_reading(sensor, idx, &reading);
         if (ret != E_OK)
             return;
         sensor_unit_t unit;
-        ret = get_sensor_unit(instance, idx, unit);
+        ret = get_sensor_unit(sensor, idx, unit);
         if (ret != E_OK)
             return;
         printf("%0.2f %s \t", reading, unit);
@@ -102,40 +111,43 @@ int main()
         .event_callback_ctx = NULL,
     };
 
-    ret = sensor_init(SMARTSENSOR_0, &init);
+    ret = sensor_init(sensor, &init);
+    assert(ret == E_OK);
+
+    ret = sensor_open(sensor, &port_cfg);
     assert(ret == E_OK);
 
     uint8_t data[32];
     data_buffer_t buffer = {.data = data, .data_len = 32};
 
-    ret = sensor_read(SMARTSENSOR_0, DEVICE_ID, &buffer);
+    ret = sensor_read(sensor, DEVICE_ID, &buffer);
     assert(ret == E_OK);
     printf("Device Id: 0x%08X\n", *(uint32_t*)buffer.data );
 
-    ret = sensor_read(SMARTSENSOR_0, FIRMARE_VERSION, &buffer);
+    ret = sensor_read(sensor, FIRMARE_VERSION, &buffer);
     assert(ret == E_OK);
     printf("Firmware: 0x%08X\n", *(uint32_t*)buffer.data);
 
     device_name_t device_name;
-    ret = get_device_name(SMARTSENSOR_0, device_name);
+    ret = get_device_name(sensor, device_name);
     assert(ret == E_OK);
     printf("Device name: %s\n", device_name);
 
     calendar_t calendar;
-    ret = get_calibration_date(SMARTSENSOR_0, &calendar);
+    ret = get_calibration_date(sensor, &calendar);
     assert(ret == E_OK);
     printf("Calibration date: %02d/%02d/%04d\n", calendar.month, calendar.day, calendar.year);
-    ret = get_manufacturing_date(SMARTSENSOR_0, &calendar);
+    ret = get_manufacturing_date(sensor, &calendar);
     assert(ret == E_OK);
     printf("MFR date: %02d/%02d/%04d\n", calendar.month, calendar.day, calendar.year);
 
     operating_stat_t stat;
-    ret = get_operating_stat(SMARTSENSOR_0, &stat);
+    ret = get_operating_stat(sensor, &stat);
     assert(ret == E_OK);
     printf("Sensor Temperature = %d.\n"
            "Sensor Voltage = %d.\n", stat.operating_temp, stat.operating_voltage);
     io_count_t io_count;
-    ret = get_io_count(SMARTSENSOR_0, &io_count);
+    ret = get_io_count(sensor, &io_count);
     assert(ret == E_OK);
     printf("On-board %d sensors.\n", io_count.sensor_count);
     printf("On-board %d outputs.\n", io_count.output_count);
@@ -144,12 +156,12 @@ int main()
     {
         sleep(1);
         float value;
-        if (get_sensor_reading(SMARTSENSOR_0, 0, &value) == 0)
+        if (get_sensor_reading(sensor, 0, &value) == 0)
             printf("Sensor value: %.2f\n", value);
     }
 
     // close the device
-    ret = sensor_deinit(SMARTSENSOR_0);
+    ret = sensor_close(sensor);
     assert(ret == E_OK);
     printf("Device closed with status %d\n", ret);
 }

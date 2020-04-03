@@ -32,6 +32,7 @@ include_directories(
 
 
 add_library(${PROJECT_NAME}
+        core/op.c
         core/registers.c
         core/smartsensor_private.c
         core/smartsensor.c)

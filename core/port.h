@@ -36,22 +36,32 @@
 #include "smartsensor.h"
 #include "smartsensor_private.h"
 
-
-extern int      port_platform_init(int instance);
-extern int      port_platform_deinit(int instance);
-
-int             port_bus_write(int bus_id, data_buffer_t *buffer);
-int             port_bus_read(int bus_id, data_buffer_t *buffer);
-
+typedef struct _hal hal_t;
 typedef void    (*port_timer_callback)(int instance);
-extern int      port_timer_register(int instance, int period, port_timer_callback callback);
-extern int      port_timer_deregister(int instance, port_timer_callback callback);
+
+typedef enum {
+    EV_SEND_DONE,
+    EV_RECV_DONE,
+    EV_TIMEOUT,
+    EV_HEARTBEAT,
+    EV_INTR,
+} port_event_t;
 
 
-void            port_sleep_ms(uint32_t ms);
+int      port_platform_init(void** hal, const port_cfg_t* config);
+int      port_platform_deinit(hal_t* hal);
 
-void            sensor_interrupt_triggered(int instance);
-void            sensor_timeout_triggered(int instance);
+int      port_comm_write(hal_t* hal, const uint8_t* buffer, uint16_t buffer_size);
+int      port_comm_read (hal_t* hal, uint8_t* buffer, uint16_t buffer_size);
+
+int      port_timer_register  (hal_t* hal, int period, port_timer_callback callback);
+int      port_timer_cancel(hal_t* hal, port_timer_callback callback);
+
+
+void     port_sleep_ms(uint32_t ms);
+
+void     sensor_interrupt_triggered(int instance);
+void     sensor_timeout_triggered(int instance);
 
 #define         port_ENTER_CRITICAL_SECTION()
 #define         port_EXIT_CRITICAL_SECTION()
