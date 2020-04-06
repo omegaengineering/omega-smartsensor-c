@@ -37,31 +37,30 @@
 #include "smartsensor_private.h"
 
 typedef struct _hal hal_t;
-typedef void    (*port_timer_callback)(int instance);
 
 typedef enum {
-    EV_SEND_DONE,
-    EV_RECV_DONE,
-    EV_TIMEOUT,
+    EV_COMM_SEND_DONE,
+    EV_COMM_RECV_DONE,
+    EV_COMM_TIMEOUT,
     EV_HEARTBEAT,
-    EV_INTR,
+    EV_DAT_INTR,
 } port_event_t;
 
 
-int      port_platform_init(void** hal, const port_cfg_t* config);
-int      port_platform_deinit(hal_t* hal);
+int     port_platform_init(void** hal, const port_cfg_t* config, uint16_t config_sz, sensor_t* sensor);
+int     port_platform_deinit(hal_t* hal, sensor_t* sensor);
 
-int      port_comm_write(hal_t* hal, const uint8_t* buffer, uint16_t buffer_size);
-int      port_comm_read (hal_t* hal, uint8_t* buffer, uint16_t buffer_size);
+int     port_comm_write(hal_t* hal, const uint8_t* buffer, uint16_t buffer_size);
+int     port_comm_read (hal_t* hal, uint8_t* buffer, uint16_t buffer_size);
 
-int      port_timer_register  (hal_t* hal, int period, port_timer_callback callback);
-int      port_timer_cancel(hal_t* hal, port_timer_callback callback);
+int     port_heartbeat_start(hal_t* hal, int period_ms);
+int     port_heartbeat_stop(hal_t* hal);
 
+int     port_event_get(hal_t* hal, port_event_t* event);
+int     port_event_put(hal_t* hal, port_event_t event);
 
-void     port_sleep_ms(uint32_t ms);
+void    port_sleep_ms(uint32_t ms);
 
-void     sensor_interrupt_triggered(int instance);
-void     sensor_timeout_triggered(int instance);
 
 #define         port_ENTER_CRITICAL_SECTION()
 #define         port_EXIT_CRITICAL_SECTION()

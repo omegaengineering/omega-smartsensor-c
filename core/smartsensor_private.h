@@ -57,11 +57,9 @@ typedef enum {
 
 uint16_t    get_register_data_size(ss_register_t ss_register);
 
-int sensor_poll();
+int sensor_poll(sensor_t* sensor);
+int sensor_is_opened(sensor_t* sensor);
 
 
-#define s19_log_info    printf
-#define s19_log_warn    printf
-#define s19_log_dbg     printf
 
 #endif //OMEGA_SMARTSENSOR_C_SMARTSENSOR_PRIVATE_H

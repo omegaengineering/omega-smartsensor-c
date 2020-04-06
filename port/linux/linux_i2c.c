@@ -107,14 +107,4 @@ int linux_i2c_close(linux_i2c_t* i2c)
 //    return E_UNAVAILABLE;
 //}
 
-int port_interrupt_open(int instance)
-{
-
-}
-
-int port_interrupt_close(int instance)
-{
-
-}
-
 

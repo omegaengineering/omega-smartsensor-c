@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.7)
 include_directories(../../port)
 
 add_library(linux_i2c
-        ../../port/linux/queue.c
+        ../../port/linux/event.c
         ../../port/linux/port_platform.c
         ../../port/linux/linux_i2c.c
         ../../port/linux/port_dio.c

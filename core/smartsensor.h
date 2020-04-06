@@ -54,7 +54,10 @@ enum {
 #define HEARTBEAT                       1
 #endif
 #ifndef HEARTBEAT_MAX_MISS
-#define HEARTBEAT_MAX_MISS              3
+#define HEARTBEAT_MAX_MISS              1
+#endif
+#ifndef FORCE_SAMPLE_TIME
+#define FORCE_SAMPLE_TIME               1
 #endif
 
 
@@ -72,8 +75,9 @@ typedef enum {
     API_DATA_READY              = DATA_READY_INTR,
     API_FUNCTION_BLOCK          = FUNCTION_BLOCK_INTR,
     API_LOG_DATA_READY          = LOG_DATA_READY_INTR,
-    API_EVENT_SENSOR_ATTACHED   = 0x00010000,
-    API_EVENT_SENSOR_DETACHED   = 0x00020000
+    API_EVENT_CONTINUE          = 0x00010000,
+    API_EVENT_SENSOR_ATTACHED   = 0x00020000,
+    API_EVENT_SENSOR_DETACHED   = 0x00040000,
 } api_event_t;
 
 typedef void (*event_callback_t)(api_event_t event, void *);
@@ -84,12 +88,9 @@ typedef enum {
 } sensor_bus_type_t;
 
 typedef struct {
-//    uint8_t             instance;
     sensor_bus_type_t   bus_type;               /**< bus type @sensor_bus_type_t */
-//    const char*         bus_res;                /**< bus resource */
     event_callback_t    event_callback;         /**< user callback, pass NULL to disable interrupt processing */
     void*               event_callback_ctx;     /**< user provided data pointer to be passed into callback, pass NULL to disable */
-
 } sensor_init_t;
 
 
@@ -101,19 +102,13 @@ typedef struct {
 
 typedef struct _sensor {
     sensor_bus_type_t   bus_type;           /**< type of bus that is being used */
-//    int                 gpio_pin;           /**< interrupt pin number */
-//    bus_t*              bus;                /**< bus object */
-//    void*               bus_cfg;            /**< initial config for the bus, hw specific */
-//    s19_mutex_t*        bus_lock;           /**< bus mutex */
     event_callback_t    event_callback;     /**< user provided event callback */
     event_callback_t    event_callback_ctx; /**< user provided context for event callback */
-    uint8_t             heartbeat_period;   /**< time period in seconds for sensor heartbeat */
-//    s19_timer_t*        timer;              /**< timer object platform dependent */
-//    s19_timer_entry_t*  heartbeat;          /**< timer entry for heartbeat */
     data_t              data;               /**< internal data */
 //    s19_mutex_t*        data_lock;          /**< data mutex */
     uint8_t             ready;              /**< flag to prevent interrupts from using the SDK if sensor has not been opened */
     void*               platform;
+    uint8_t             opened;
 } sensor_t;
 
 typedef struct _port_cfg port_cfg_t;
@@ -126,11 +121,11 @@ int sensor_init             (sensor_t* sensor, sensor_init_t* init);
  * @param ctx sensor instance
  * @return see @error_t
  */
-int sensor_open             (sensor_t* sensor, const port_cfg_t* config);
+int sensor_open             (sensor_t* sensor, const port_cfg_t* config, uint16_t config_sz);
 
 int sensor_close            (sensor_t* sensor);
 
-int sensor_heartbeat_enable (sensor_t* sensor, int period);
+int sensor_heartbeat_enable (sensor_t* sensor, int period_ms);
 
 int sensor_heartbeat_disable(sensor_t* sensor);
 

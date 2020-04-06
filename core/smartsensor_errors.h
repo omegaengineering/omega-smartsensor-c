@@ -10,7 +10,10 @@ typedef enum {
     E_INVALID_PARAM,
     E_NO_MEM,
     E_NOT_SUPPORTED,
-    E_TRY_AGAIN
+    E_TRY_AGAIN,
+    E_FULL,
+    E_EMPTY,
+    E_CONTINUE,
 } error_t;
 
 #endif //SMARTSENSOR_SMARTSENSOR_ERRORS_H

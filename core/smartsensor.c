@@ -322,9 +322,9 @@ const char* measurement_str(measurement_type_t meas)
 
 #ifdef FORCE_SAMPLE_TIME
     data16 = DEFAULT_SAMPLE_TIME;
-    if ((ret = sensor_write(sensor->sensor_id, EVENT_0_TIME_BASE, &buffer16)))
+    if ((ret = sensor_write(sensor, EVENT_0_TIME_BASE, &buffer16)))
         return ret;
-    if ((ret = sensor_write(sensor->sensor_id, EVENT_1_TIME_BASE, &buffer16)))
+    if ((ret = sensor_write(sensor, EVENT_1_TIME_BASE, &buffer16)))
         return ret;
 
 #else
