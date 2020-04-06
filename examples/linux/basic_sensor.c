@@ -39,7 +39,7 @@
 #include <signal.h>
 #include <pthread.h>
 #include "smartsensor.h"
-#include "../port/linux/port_linux.h"
+#include "port/linux/linux_platform.h"
 #include "log.h"
 
 
@@ -152,22 +152,21 @@ int main()
     assert(ret == E_OK);
 
     uint8_t data[32];
-    data_buffer_t buffer = {.data = data, .data_len = 32};
 
-    ret = sensor_read(sensor, DEVICE_ID, &buffer);
+    ret = sensor_read(sensor, DEVICE_ID, data, sizeof(data));
     assert(ret == E_OK);
-    s_log("Device Id: 0x%08X\n", *(uint32_t*)buffer.data );
+    s_log("Device Id: 0x%08X\n", *(uint32_t*)data );
 
-    ret = sensor_read(sensor, FIRMARE_VERSION, &buffer);
+    ret = sensor_read(sensor, FIRMARE_VERSION, data, sizeof(data));
     assert(ret == E_OK);
-    s_log("Firmware: 0x%08X\n", *(uint32_t*)buffer.data);
+    s_log("Firmware: 0x%08X\n", *(uint32_t*)data);
 
     device_name_t device_name;
     ret = get_device_name(sensor, device_name);
     assert(ret == E_OK);
     s_log("Device name: %s\n", device_name);
 
-    calendar_t calendar;
+    data_date_t calendar;
     ret = get_calibration_date(sensor, &calendar);
     assert(ret == E_OK);
     s_log("Calibration date: %02d/%02d/%04d\n", calendar.month, calendar.day, calendar.year);
@@ -186,21 +185,19 @@ int main()
     s_log("On-board %d sensors.\n", io_count.sensor_count);
     s_log("On-board %d outputs.\n", io_count.output_count);
 
-    ret = sensor_heartbeat_enable(sensor, 2000);
+    ret = sensor_heartbeat_enable(sensor, 500);
     assert(ret == E_OK);
 
-    uint16_t sample_time = 1;
-    data_buffer_t buffer2 = {.data = &sample_time, .data_len = sizeof(sample_time)};
 
     probe_default_init(sensor);
 
     int i = 0;
     while (!do_exit)
     {
-        sleep(1);
+//        sleep(1);
         float value;
-//        if (get_sensor_reading(sensor, 0, &value) == 0)
-//            s_log("Sensor value: %.2f\n", value);
+        if (get_sensor_reading(sensor, 0, &value) == 0)
+            s_log("Sensor value: %.2f\n", value);
 
         i++;
 //        if (i == 5)

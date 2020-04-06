@@ -42,7 +42,7 @@ enum {
     SMARTSENSOR_MAX,
 };
 
-#define SMARTSENSOR_SDK_VERSION         0x00010002
+#define SMARTSENSOR_SDK_VERSION         0x00010005
 #define SMARTSENSOR_I2C_ADDR            0x68
 #define SMARTSENSOR_MODBUS_ADDR         0x01
 #define SMARTSENSOR_MODBUS_BAUDRATE     38400
@@ -60,11 +60,6 @@ enum {
 #define FORCE_SAMPLE_TIME               1
 #endif
 
-
-typedef struct {
-    uint8_t * const data;
-    const uint16_t data_len;
-} data_buffer_t;
 
 typedef enum {
     API_SENSOR_CHANGE           = SENSOR_CHANGE_INTR,
@@ -139,7 +134,7 @@ int sensor_heartbeat_disable(sensor_t* sensor);
  * @param buffer data to read into
  * @return see @error_t
  */
-int sensor_read             (sensor_t* sensor, ss_register_t ss_register, data_buffer_t * buffer);
+int sensor_read             (sensor_t* sensor, ss_register_t ss_register, void* buffer, uint16_t buffer_sz);
 
 /**
  * Read register with the specified instance index into provided data buffer
@@ -155,7 +150,7 @@ int sensor_read             (sensor_t* sensor, ss_register_t ss_register, data_b
  * @param buffer buffer data to read into
  * @return see @error_t
  */
-int sensor_indexed_read     (sensor_t* sensor, ss_register_t ss_register, uint8_t index, data_buffer_t * buffer);
+int sensor_indexed_read     (sensor_t* sensor, ss_register_t ss_register, uint8_t index, void* buffer, uint16_t buffer_sz);
 
 /**
  * Write data provided from data buffer to register
@@ -168,7 +163,7 @@ int sensor_indexed_read     (sensor_t* sensor, ss_register_t ss_register, uint8_
  * @param buffer buffer to write from
  * @return see @error_t
  */
-int sensor_write            (sensor_t* sensor, ss_register_t ss_register, data_buffer_t * buffer);
+int sensor_write            (sensor_t* sensor, ss_register_t ss_register, void* buffer, uint16_t buffer_sz);
 
 /**
  * Write register with the specified instance index from provided data buffer
@@ -184,7 +179,7 @@ int sensor_write            (sensor_t* sensor, ss_register_t ss_register, data_b
  * @param buffer buffer to write from
  * @return see @error_t
  */
-int sensor_indexed_write    (sensor_t* sensor, ss_register_t ss_register, uint8_t index, data_buffer_t * buffer);
+int sensor_indexed_write    (sensor_t* sensor, ss_register_t ss_register, uint8_t index, uint8_t* buffer, uint16_t buffer_sz);
 
 
 /**
@@ -196,160 +191,32 @@ int sensor_indexed_write    (sensor_t* sensor, ss_register_t ss_register, uint8_
  */
 int get_max_instance        (ss_register_t ss_register);
 
-/**
- * Get sensor reading
- * @param ctx sensor instance
- * @param sensor_num
- * @return see @error_t
- */
-int get_sensor_reading      (sensor_t* sensor, int sensor_num, const float *reading);
 
-/**
- * Get sensor gain
- * @param ctx sensor instance
- * @param sensor_num
- * @return see @error_t
- */
-int get_sensor_gain         (sensor_t* sensor, int sensor_num, const float *gain);
-
-/**
- * Get sensor offset
- * @param ctx sensor instance
- * @param sensor_num
- * @return see @error_t
- */
-int get_sensor_offset       (sensor_t* sensor, int sensor_num, const float *offset);
-
-/**
- * Get sensor name
- * @param ctx sensor instance
- * @return see @error_t
- */
-int get_device_name         (sensor_t* sensor, device_name_t name);
-
-/**
- * Get sensor unit
- * @param ctx sensor instance
- * @return see @error_t
- */
+int get_sensor_reading      (sensor_t* sensor, int sensor_num, float *reading);
+int get_sensor_gain         (sensor_t* sensor, int sensor_num, float *gain);
+int get_sensor_offset       (sensor_t* sensor, int sensor_num, float *offset);
 int get_sensor_unit         (sensor_t* sensor, int sensor_num, sensor_unit_t unit);
-
-/**
- * Get sensor descriptor
- * @param ctx sensor instance
- * @return see @error_t
- */
 int get_sensor_descriptor   (sensor_t* sensor, int sensor_num, sensor_descriptor_t *descriptor);
-
-/**
- * Get sensor type
- * @param ctx sensor instance
- * @return see @error_t
- */
 int get_sensor_type         (sensor_t* sensor, int sensor_num, measurement_type_t *sensor_type);
-
-/**
- * Get system status
- * @param ctx sensor instance
- * @return see @error_t
- */
+int get_device_name         (sensor_t* sensor, device_name_t name);
 int get_system_status       (sensor_t* sensor, system_status_t *status);
-
-/**
- * Get interrupt status
- * @param ctx sensor instance
- * @return see @error_t
- */
 int get_interrupt_status    (sensor_t* sensor, interrupt_status_t *status);
-
-/**
- * Get sensor time
- * @param ctx sensor instance
- * @return see @error_t
- */
 int get_current_time        (sensor_t* sensor, data_time_t *time);
-
-/**
- * Get input/output count
- * @param ctx sensor instance
- * @return see @error_t
- */
 int get_io_count            (sensor_t* sensor, io_count_t *io_count);
-
-/**
- * Get operating stat
- * @param ctx sensor instance
- * @return see @error_t
- */
 int get_operating_stat      (sensor_t* sensor, operating_stat_t *stat);
+int get_calibration_date    (sensor_t* sensor, data_date_t *date);
+int get_manufacturing_date  (sensor_t* sensor, data_date_t *date);
 
-/**
- * Get calibration date
- * @param ctx sensor instance
- * @return see @error_t
- */
-int get_calibration_date    (sensor_t* sensor, calendar_t *calendar);
 
-/**
- * Get manufacturing date
- * @param ctx sensor instance
- * @return see @error_t
- */
-int get_manufacturing_date  (sensor_t* sensor, calendar_t *calendar);
-
-/**
- * Set device name
- * @param ctx sensor instance
- * @return see @error_t
- */
-int set_device_name         (sensor_t* sensor, device_name_t name);
-
-/**
- * Set current time
- * @param ctx sensor instance
- * @return see @error_t
- */
 int set_current_time        (sensor_t* sensor, data_time_t *time);
-
-/**
- * Set interrupt control
- * @param ctx sensor instance
- * @return see @error_t
- */
 int set_interrupt_control   (sensor_t* sensor, interrupt_control_t control);
+int set_sample_time         (sensor_t* sensor, uint16_t sample_time);
 
-/**
- * Poll for device ready by checking device ready bit of system status register
- * @param ctx sensor instance
- * @return see @error_t
- */
+
 int wait_for_device_ready   (sensor_t* sensor, int max_wait_msec);
-
-/**
- * Do soft reset
- * @param ctx sensor instance
- * @return see @error_t
- */
 int soft_reset              (sensor_t* sensor);
-
-/**
- * Configure sensor to default configuration
- * @param ctx sensor instance
- * @return see @error_t
- */
 int preset_config           (sensor_t* sensor);
-
-/**
- * Return SDK version
- * @return version number
- */
 unsigned int sdk_version();
-
-/**
- * Convert measurement type to string.
- * @param meas
- * @return static string array.
- */
 const char* measurement_str(measurement_type_t meas);
 
 int probe_default_init(sensor_t* sensor);

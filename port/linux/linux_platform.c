@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <poll.h>
 #include "smartsensor_private.h"
-#include "port_linux.h"
+#include "linux_platform.h"
 #include "log.h"
 
 #define MAX_POLL    2

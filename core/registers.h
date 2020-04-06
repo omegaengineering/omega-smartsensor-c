@@ -102,7 +102,7 @@ typedef struct {
     uint8_t month;
     uint8_t day;
     uint16_t year;
-} calendar_t;
+} data_date_t;
 
 typedef enum
 {

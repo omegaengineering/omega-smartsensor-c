@@ -33,7 +33,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include <assert.h>
 #include "smartsensor_private.h"
 #include "log.h"
 
@@ -97,13 +96,13 @@ int sensor_heartbeat_disable(sensor_t* sensor)
 }
 
 
-static void reverse_bytes(data_buffer_t * data_buffer)
+static void reverse_bytes(uint8_t* buffer, uint16_t buffer_sz)
 {
-    for (int i = 0; i < data_buffer->data_len/2; i++)
+    for (int i = 0; i < buffer_sz/2; i++)
     {
-        uint8_t temp = data_buffer->data[i];
-        data_buffer->data[i] = data_buffer->data[data_buffer->data_len - i-1];
-        data_buffer->data[data_buffer->data_len - i-1] = temp;
+        uint8_t temp = buffer[i];
+        buffer[i] = buffer[buffer_sz - i-1];
+        buffer[buffer_sz - i-1] = temp;
     }
 }
 
@@ -147,25 +146,23 @@ static int i2c_set_index(sensor_t* sensor, uint16_t u16_Register_in, uint16_t *u
         buffer[1] = u16_Register_in >> 8;
         buffer[2] = u16_Register_in;
 
-        data_buffer_t data = {.data = buffer, .data_len = 3};
-        if ((ret = port_comm_write(sensor->platform, data.data, data.data_len) != E_OK))
+        if ((ret = port_comm_write(sensor->platform, buffer, 3) != E_OK))
             return ret;
         *u16_Register_out = ((u16_Register_in >> 10) + R_FACTORY_ACCESS);
     }
     return (E_OK);
 }
 
-static int sensor_bus_read(sensor_t* sensor, uint16_t reg_addr, data_buffer_t * buffer)
+static int sensor_bus_read(sensor_t* sensor, uint16_t reg_addr, uint8_t* buffer, uint16_t buffer_sz)
 {
     int ret;
     uint8_t addr_buf[2];
 
     addr_buf[0] = reg_addr & 0xffU;  // register is 1 byte only
-    data_buffer_t temp = {.data = addr_buf, .data_len = 1};
 #if 1
-    if ((ret = port_comm_write(sensor->platform, temp.data, temp.data_len)) != E_OK)
+    if ((ret = port_comm_write(sensor->platform, addr_buf, 1)) != E_OK)
         return ret;
-    ret = port_comm_read(sensor->platform, buffer->data, buffer->data_len);
+    ret = port_comm_read(sensor->platform, buffer, buffer_sz);
 
 #else
     //write register addr
@@ -178,24 +175,23 @@ static int sensor_bus_read(sensor_t* sensor, uint16_t reg_addr, data_buffer_t * 
     return ret;
 }
 
-static int sensor_bus_write(sensor_t* sensor, uint16_t reg_addr, data_buffer_t * buffer)
+static int sensor_bus_write(sensor_t* sensor, uint16_t reg_addr, uint8_t* buffer, uint16_t buffer_sz)
 {
     int ret;
 
     uint8_t temp[48];
-    data_buffer_t temp_buffer = {.data = temp, .data_len = buffer->data_len + 1};
-    if (buffer->data_len > sizeof(temp) - 1)
+    if (buffer_sz > sizeof(temp) - 1)
         return E_BUFFER_MEM_SIZE;
 
     // we have to write the data to the bus at one shot starting with reg addr
     temp[0] = reg_addr & 0xffU;
-    memcpy(temp + 1, buffer->data, buffer->data_len);
+    memcpy(temp + 1, buffer, buffer_sz);
 
-    ret = port_comm_write(sensor->platform, temp_buffer.data, temp_buffer.data_len);
+    ret = port_comm_write(sensor->platform, buffer, buffer_sz + 1);
     return ret;
 }
 
-int sensor_read(sensor_t* sensor, ss_register_t ss_register, data_buffer_t *data_buffer)
+int sensor_read(sensor_t* sensor, ss_register_t ss_register, void* buffer, uint16_t buffer_sz)
 {
     int ret;
     uint16_t reg_addr;
@@ -203,7 +199,7 @@ int sensor_read(sensor_t* sensor, ss_register_t ss_register, data_buffer_t *data
 
     if (!(reg = get_register_entry(ss_register)))
         return E_INVALID_PARAM;
-    if (data_buffer->data_len < reg->size)
+    if (buffer_sz < reg->size)
         return E_BUFFER_MEM_SIZE;
 
     port_ENTER_CRITICAL_SECTION();
@@ -216,10 +212,9 @@ int sensor_read(sensor_t* sensor, ss_register_t ss_register, data_buffer_t *data
     }
 
     // only read up to the actual data size
-    data_buffer_t buf = {data_buffer->data, reg->size};
-    ret = sensor_bus_read(sensor, reg_addr, &buf);
+    ret = sensor_bus_read(sensor, reg_addr, buffer, reg->size);
     if (ret == E_OK && !(reg->access & BYTES))    // reverse I2C data (in MSB) to LSB format
-        reverse_bytes(&buf);
+        reverse_bytes(buffer, reg->size);
 
     port_EXIT_CRITICAL_SECTION();
     return ret;
@@ -298,15 +293,15 @@ int sensor_poll(sensor_t* sensor)
     return ret;
 }
 
-int sensor_indexed_read(sensor_t* sensor, ss_register_t ss_register, uint8_t index, data_buffer_t * buffer)
+int sensor_indexed_read(sensor_t* sensor, ss_register_t ss_register, uint8_t index, void* buffer, uint16_t buffer_sz)
 {
     ss_register_t indexed_register = ss_register + index;
     if ( index >= get_max_instance(ss_register))
         return E_INVALID_PARAM;
-    return sensor_read(sensor, indexed_register, buffer);
+    return sensor_read(sensor, indexed_register, buffer, buffer_sz);
 }
 
-int sensor_write(sensor_t* sensor, ss_register_t ss_register, data_buffer_t *data_buffer)
+int sensor_write(sensor_t* sensor, ss_register_t ss_register, void* buffer, uint16_t buffer_sz)
 {
     int ret;
     uint16_t reg_addr;
@@ -315,7 +310,7 @@ int sensor_write(sensor_t* sensor, ss_register_t ss_register, data_buffer_t *dat
     if (!(reg = get_register_entry(ss_register)))
         return E_INVALID_PARAM;
 
-    if (data_buffer->data_len < reg->size)
+    if (buffer_sz < reg->size)
         return E_BUFFER_MEM_SIZE;
 
     port_ENTER_CRITICAL_SECTION();
@@ -328,10 +323,9 @@ int sensor_write(sensor_t* sensor, ss_register_t ss_register, data_buffer_t *dat
     }
 
     // only write up to the actual data size
-    data_buffer_t buf = {data_buffer->data, reg->size};
     if (ret == E_OK && !(reg->access & BYTES))    // reverse I2C data (in MSB) to LSB format
-        reverse_bytes(&buf);
-    ret = sensor_bus_write(sensor, reg_addr, &buf);
+        reverse_bytes(buffer, reg->size);
+    ret = sensor_bus_write(sensor, reg_addr, buffer, buffer_sz);
 
     port_EXIT_CRITICAL_SECTION();
     return ret;
@@ -341,12 +335,12 @@ ERROR:
     return ret;
 }
 
-int sensor_indexed_write(sensor_t* sensor, ss_register_t ss_register, uint8_t index, data_buffer_t * buffer)
+int sensor_indexed_write(sensor_t* sensor, ss_register_t ss_register, uint8_t index, uint8_t* buffer, uint16_t buffer_sz)
 {
     ss_register_t indexed_register = ss_register + index;
     if ( index >= get_max_instance(ss_register))
         return E_INVALID_PARAM;
-    return sensor_write(sensor, indexed_register, buffer);
+    return sensor_write(sensor, indexed_register, buffer, buffer_sz);
 }
 
 int sensor_is_opened(sensor_t* sensor)

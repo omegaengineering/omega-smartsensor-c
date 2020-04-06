@@ -4,9 +4,9 @@ include_directories(../../port)
 
 add_library(linux_i2c
         ../../port/linux/event.c
-        ../../port/linux/port_platform.c
+        ../../port/linux/linux_platform.c
         ../../port/linux/linux_i2c.c
-        ../../port/linux/port_dio.c
+        ../../port/linux/linux_gpio.c
         ../../port/linux/linux_timer.c)
 
 add_executable(demo_linux basic_sensor.c)

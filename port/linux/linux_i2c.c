@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 #include "smartsensor.h"
-#include "port_linux.h"
+#include "linux_platform.h"
 
 
 

@@ -1,5 +1,5 @@
-#ifndef SMARTSENSOR_PORT_LINUX_H
-#define SMARTSENSOR_PORT_LINUX_H
+#ifndef SMARTSENSOR_LINUX_PLATFORM_H
+#define SMARTSENSOR_LINUX_PLATFORM_H
 
 #include <stdint.h>
 #include <pthread.h>
@@ -69,4 +69,4 @@ int gpio_set_direction(gpio_t *gpio, uint8_t direction_input);
 int gpio_set_interrupt_edge(gpio_t *gpio, uint8_t edge_rising);
 int gpio_get_fd(gpio_t* gpio);
 
-#endif //SMARTSENSOR_PORT_LINUX_H
+#endif //SMARTSENSOR_LINUX_PLATFORM_H
