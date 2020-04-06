@@ -101,13 +101,11 @@ void* platform_thread(void* args)
         return NULL;
 
     hal_t* sensor = (hal_t*) args;
-    struct pollfd pfds;
     int read_fds;
 
     while (!sensor->platform_exit)
     {
         update_poll_data(&g_poll_data, sensor);
-
         read_fds = poll(g_poll_data.polls, g_poll_data.n_poll, 500);
         if (read_fds <= 0)
             continue;
@@ -177,7 +175,7 @@ int port_platform_init(void** phal, const port_cfg_t* config, uint16_t config_sz
         return ret;
     }
 ERROR:
-    perror("");
+    perror(__FUNCTION__);
     if (hal) {
         evq_close(&hal->events);
         if (config->pin_intr >= 0)

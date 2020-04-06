@@ -295,9 +295,6 @@ int sensor_poll(sensor_t* sensor)
                 break;
         }
     }
-    else {
-        s_log("event empty %d", ret);
-    }
     return ret;
 }
 
