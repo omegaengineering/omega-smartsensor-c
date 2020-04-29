@@ -39,22 +39,22 @@
 #include <signal.h>
 #include <pthread.h>
 #include "smartsensor.h"
-#include "port/linux/linux_platform.h"
 #include "log.h"
+#include "port/platform/linux.h"
 
 
 static int do_exit = 0;
 static sensor_t g_sensor;
 
-#if 0
+#if 1
 static port_cfg_t port_cfg = {
-        .bus_res = "/dev/i2c-17",
+        .bus_res = "/dev/i2c-10",
         .bus_type = SENSOR_BUS_I2C,
         .pin_intr = 4,
         .pin_intr_enable = 1,
 };
-
-#else
+#endif
+#if 0
 static port_cfg_t port_cfg = {
         .bus_res = "/dev/i2c-2",
         .bus_type = SENSOR_BUS_I2C,
@@ -62,7 +62,14 @@ static port_cfg_t port_cfg = {
         .pin_intr_enable = 1,
 };
 #endif
-
+#if 0
+static port_cfg_t port_cfg = {
+        .bus_res = "/dev/ttyACM0",
+        .bus_type = SENSOR_BUS_MODBUS,
+        .pin_intr = 0,
+        .pin_intr_enable = 0,
+};
+#endif
 
 void signal_handler(int sig)
 {
@@ -113,27 +120,12 @@ void example_callback(api_event_t event, void* ctx)
     }
 }
 
-void* sensor_handler(void* args)
-{
-    if (!args)
-        return NULL;
-
-    sensor_t* sensor = args;
-
-    while (sensor_is_opened(sensor))
-    {
-        sensor_poll(sensor);
-    }
-    return NULL;
-}
-
 
 int main()
 {
     int ret;
     signal(SIGINT, signal_handler);
     sensor_t* sensor = &g_sensor;
-    pthread_t sensor_thread;
 
     sensor_init_t init = {
         .bus_type = SENSOR_BUS_I2C,
@@ -185,28 +177,18 @@ int main()
     s_log("On-board %d sensors.\n", io_count.sensor_count);
     s_log("On-board %d outputs.\n", io_count.output_count);
 
-    ret = sensor_heartbeat_enable(sensor, 500);
+    ret = sensor_heartbeat_enable(sensor, 2000);
     assert(ret == E_OK);
-
 
     probe_default_init(sensor);
 
-    int i = 0;
     while (!do_exit)
     {
-//        sleep(1);
-        float value;
-        if (get_sensor_reading(sensor, 0, &value) == 0)
-            s_log("Sensor value: %.2f\n", value);
-
-        i++;
-//        if (i == 5)
-//            sensor_heartbeat_disable(sensor);
-//        if (i == 10)
-//            sensor_heartbeat_enable(sensor, 1000);
+        sleep(1);
     }
 
     // close the device
+    s_log("Sensor closing");
     ret = sensor_close(sensor);
     assert(ret == E_OK);
     s_log("Device closed with status %d\n", ret);

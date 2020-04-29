@@ -58,7 +58,8 @@ typedef enum {
 uint16_t    get_register_data_size(ss_register_t ss_register);
 
 int sensor_poll(sensor_t* sensor);
-int sensor_is_opened(sensor_t* sensor);
+
+extern void* sensor_thread(void* arg);
 
 
 

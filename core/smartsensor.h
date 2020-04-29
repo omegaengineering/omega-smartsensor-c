@@ -82,7 +82,7 @@ typedef enum {
     SENSOR_BUS_MODBUS                           /**< type of bus_id is Uart Modbus */
 } sensor_bus_type_t;
 
-typedef struct {
+typedef struct _sensor_init {
     sensor_bus_type_t   bus_type;               /**< bus type @sensor_bus_type_t */
     event_callback_t    event_callback;         /**< user callback, pass NULL to disable interrupt processing */
     void*               event_callback_ctx;     /**< user provided data pointer to be passed into callback, pass NULL to disable */
@@ -103,7 +103,7 @@ typedef struct _sensor {
 //    s19_mutex_t*        data_lock;          /**< data mutex */
     uint8_t             ready;              /**< flag to prevent interrupts from using the SDK if sensor has not been opened */
     void*               platform;
-    uint8_t             opened;
+    uint8_t             do_exit;            /**< flag to exit thread if created */
 } sensor_t;
 
 typedef struct _port_cfg port_cfg_t;

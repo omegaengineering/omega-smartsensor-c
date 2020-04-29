@@ -44,6 +44,7 @@ typedef enum {
     EV_COMM_TIMEOUT,
     EV_HEARTBEAT,
     EV_DAT_INTR,
+    EV_SHUTDOWN, // is it really necessary ?
 } port_event_t;
 
 

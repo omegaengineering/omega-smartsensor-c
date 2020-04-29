@@ -8,18 +8,18 @@
 #include <stdlib.h>
 
 #include "smartsensor.h"
-#include "linux_platform.h"
+#include "port_linux.h"
 
 
-
-
-int linux_i2c_open(linux_i2c_t* i2c, const char* resource)
+int linux_i2c_open(linux_i2c_t* i2c, const char* resource, sensor_bus_type_t type)
 {
     if (i2c) {
         if ((i2c->fd = open(resource, O_RDWR)) < 0)
             return E_UNAVAILABLE;
-        if ((ioctl(i2c->fd, I2C_SLAVE, SMARTSENSOR_I2C_ADDR)) < 0)
-            return E_BUS_OPERATION;
+        if (type == SENSOR_BUS_I2C) {
+            if ((ioctl(i2c->fd, I2C_SLAVE, SMARTSENSOR_I2C_ADDR)) < 0)
+                return E_BUS_OPERATION;
+        }
         return E_OK;
     }
     return E_UNAVAILABLE;

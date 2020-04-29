@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
-#include "linux_platform.h"
+#include "port_linux.h"
 
 #define MAX_GPIO_NAME_LEN   128
 

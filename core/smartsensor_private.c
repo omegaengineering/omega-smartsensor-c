@@ -33,8 +33,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include "smartsensor_private.h"
 #include "log.h"
+#include "port.h"
 
 static void run_user_callback(sensor_t* sensor, api_event_t event);
 
@@ -65,16 +65,14 @@ int sensor_open (sensor_t* sensor, const port_cfg_t* config, uint16_t config_sz)
 {
     int ret;
     ret = port_platform_init(&sensor->platform, config, config_sz, sensor);
-    if (ret == E_OK)
-        sensor->opened = 1;
     return ret;
 }
 
 int sensor_close(sensor_t* sensor)
 {
     int ret;
+    sensor->do_exit = 1;
     ret = port_platform_deinit(sensor->platform, sensor);
-    sensor->opened = 0;
     return ret;
 }
 
@@ -160,8 +158,10 @@ static int sensor_bus_read(sensor_t* sensor, uint16_t reg_addr, uint8_t* buffer,
 
     addr_buf[0] = reg_addr & 0xffU;  // register is 1 byte only
 #if 1
-    if ((ret = port_comm_write(sensor->platform, addr_buf, 1)) != E_OK)
-        return ret;
+    if (sensor->bus_type == SENSOR_BUS_I2C) {
+        if ((ret = port_comm_write(sensor->platform, addr_buf, 1)) != E_OK)
+            return ret;
+    }
     ret = port_comm_read(sensor->platform, buffer, buffer_sz);
 
 #else
@@ -293,6 +293,20 @@ int sensor_poll(sensor_t* sensor)
     return ret;
 }
 
+void* sensor_thread(void* args)
+{
+    if (!args)
+        return NULL;
+
+    sensor_t* sensor = args;
+
+    while (!sensor->do_exit)
+    {
+        sensor_poll(sensor);
+    }
+    return NULL;
+}
+
 int sensor_indexed_read(sensor_t* sensor, ss_register_t ss_register, uint8_t index, void* buffer, uint16_t buffer_sz)
 {
     ss_register_t indexed_register = ss_register + index;
@@ -343,10 +357,6 @@ int sensor_indexed_write(sensor_t* sensor, ss_register_t ss_register, uint8_t in
     return sensor_write(sensor, indexed_register, buffer, buffer_sz);
 }
 
-int sensor_is_opened(sensor_t* sensor)
-{
-    return sensor->opened;
-}
 
 static void run_user_callback(sensor_t* sensor, api_event_t event)
 {
@@ -354,120 +364,3 @@ static void run_user_callback(sensor_t* sensor, api_event_t event)
         sensor->event_callback(event, sensor->event_callback_ctx);
 }
 
-//void miss_heartbeat(int instance)
-//{
-//    sensor_t* sensor = get_sensor(instance);
-//    if (sensor) {
-//        sensor->data.heartbeat_misses++;
-//        if (sensor->data.heartbeat_misses > HEARTBEAT_MAX_MISS)
-//        {
-//            sensor->data.sensor_attached = false;
-//            run_user_callback(instance, API_EVENT_SENSOR_DETACHED);
-//            s19_log_info("Probe detached\n");
-//        }
-//    }
-//}
-
-
-//static void resolve_intr_event(int instance)
-//{
-//    int ret;
-//    interrupt_status_t intr_status;
-//    ret = get_interrupt_status(instance, &intr_status);
-//    if (ret == E_OK)
-//    {
-//        run_user_callback(instance, (api_event_t) intr_status);
-//    }
-//    else
-//    {
-//        miss_heartbeat(instance);
-//    }
-//}
-
-//static int do_probe_attach(sensor_t * sensor)
-//{
-//    int ret;
-//    sensor->data.stat_attach_counter++;
-//    // probe init
-//    s19_log_info("Probe attached\n");
-//    // okay, new probe attached
-//    wait_for_device_ready(sensor, 1000);
-//    sensor->data.sensor_attached = true;
-//    sensor->data.heartbeat_misses = 0;
-////    run_user_callback(sensor->sensor_id, API_EVENT_SENSOR_ATTACHED);
-//}
-
-/// level 2 handling
-//static void event_handler_low_level(int instance, event_type_t intr)
-//{
-//    int ret;
-//    sensor_t* sensor = get_sensor(instance);
-//    if (!sensor)
-//        return;
-//    if (intr == SENSOR_EVT_HARD_INTR) {
-//        if (sensor->data.sensor_attached)
-//        {   // normal operation, attached and receiving interrupts
-//            resolve_intr_event(instance);
-//        }
-//        else
-//        {
-//            system_status_t status;
-//            ret = get_system_status(instance, &status);
-//            if (ret == E_OK && status.device_ready) // device ready cannot be false
-//            {
-//                do_probe_attach(sensor);
-//            }
-//            else
-//                s19_log_dbg("System Status %d %d\n", ret, status.device_ready);
-//        }
-//    }
-//    else if (intr == SENSOR_EVT_TIMEOUT)
-//    {
-//        if (sensor->data.sensor_attached)
-//        {   // was attached, then check if still attached
-//            system_status_t status;
-//            ret = get_system_status(instance, &status);
-//            if (ret != E_OK || !status.device_ready) {  // looks like no response
-//                miss_heartbeat(sensor->sensor_id);
-//            }
-//        } else {
-//            // wasn't attached, keep checking for device ready
-//            system_status_t status;
-//            ret = get_system_status(instance, &status);
-//            if (ret == E_OK && status.device_ready) // device ready cannot be false
-//            {
-//                do_probe_attach(sensor);
-//            }
-//        }
-//    }
-//}
-
-
-/// level 1 signal
-//void sensor_interrupt_triggered(int instance)
-//{
-////    if (ctx->ready)
-//    {
-////        s19_log_dbg("Hard interrupt\n");
-//        event_handler_low_level(instance, SENSOR_EVT_HARD_INTR);
-//    }
-//}
-//
-/// level 1 signal
-//void sensor_timeout_triggered(void* x)
-//{
-////    s19_log_dbg("Heartbeat timeout\n");
-////    event_handler_low_level(instance, SENSOR_EVT_TIMEOUT);
-//}
-
-#if ENABLE_UNIT_TEST
-int get_def_table_size()
-{
-    return sizeof(_def);
-}
-
-_register_t* get_def_table()
-{
-    return (_register_t*) &_def[0];
-}
-#endif
