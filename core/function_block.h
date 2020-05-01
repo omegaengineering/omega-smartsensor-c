@@ -48,18 +48,15 @@ void fb_terminate(fb_block_t* head, fb_block_t* eob);
 /*! write func blocks down to smartsensor */
 int  fb_commit(sensor_t* sensor, fb_block_t* head);
 
-/*! return index of next available function block out of max 32 of them */
-int fb_program_get_next_available(sensor_t* sensor);
 int fb_program_read(sensor_t* sensor, uint8_t index, void* buffer, uint32_t buf_len);
 int fb_program_write(sensor_t* sensor, uint8_t index, void* buffer, uint32_t buf_len);
 int fb_program_erase(sensor_t* sensor, uint8_t index);
 int fb_program_erase_all(sensor_t* sensor);
-int fb_program_enable(sensor_t* sensor, uint8_t index);
-int fb_program_disable(sensor_t* sensor, uint8_t index);
 
 int fb_param_write(sensor_t* sensor, uint8_t index, void* buffer, uint32_t buf_len);
 
 #if DEBUG
+/*! print out the function block chain for inspection */
 void fb_print(fb_block_t* head);
 #else
 #define fb_print
