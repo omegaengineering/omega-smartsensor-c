@@ -1,55 +1,55 @@
 #include <stdint.h>
 #include <string.h>
 #include "registers.h"
-#include "i2c_registers.h"
+#include "registers_i2c.h"
 
 static const _register_t _def [] =
 {
-    // register             Modbus      I2C     Access  Size
-    [DEVICE_ID]                 =   {0xf000,    R_DEVICE_ID,            1, RD,     sizeof(uint32_t)},
-    [FIRMARE_VERSION]           =   {0xf002,    R_VERSION,              1, RD,     sizeof(uint32_t)},
-    [HARDWARE_VERSION]          =   {0xf004,    R_HARDWARE_VERSION,     1, RD,     sizeof(uint32_t)},
-    [LIST_INDEX_BLOCK_SELECT]   =   {0xf006,    R_DEVICE_LIST_INDEX,    1, RD|BYTES,  sizeof(list_select_t)},
-    [USER_HOURS]                =   {0xf007,    R_USER_HOURS,           1, RD|WR,  sizeof(uint16_t)},
+    // register                     Modbus      I2C                         nInstance     Access  Size
+    [DEVICE_ID]                 =   {0xf000,    R_DEVICE_ID,                1, RD,     sizeof(uint32_t)},
+    [FIRMARE_VERSION]           =   {0xf002,    R_VERSION,                  1, RD,     sizeof(uint32_t)},
+    [HARDWARE_VERSION]          =   {0xf004,    R_HARDWARE_VERSION,         1, RD,     sizeof(uint32_t)},
+    [LIST_INDEX_BLOCK_SELECT]   =   {0xf006,    R_DEVICE_LIST_INDEX,        1, RD|BYTES,  sizeof(list_select_t)},
+    [USER_HOURS]                =   {0xf007,    R_USER_HOURS,               1, RD|WR,  sizeof(uint16_t)},
 
-    [EVENT_0_TIME_BASE]         =   {0xf008,    R_EVENT_0_TIMEBASE,     1, RD|WR,  sizeof(uint16_t)},
-    [EVENT_1_TIME_BASE]         =   {0xf009,    R_EVENT_1_TIMEBASE,     1, RD|WR,  sizeof(uint16_t)},
-    [SYSTEM_CONTROL]            =   {0xf00a,    R_SYSTEM_CONTROL,       1, RD|WR,  sizeof(uint16_t)},
-    [INTERRUPT_STATUS]          =   {0xf00b,    R_INTERRUPT_STATUS,     1, RD|WR,  sizeof(uint16_t)},
-    [INTERRUPT_CONTROL]         =   {0xf00c,    R_INTERRUPT_CONTROL,    1, RD|WR,  sizeof(uint16_t)},
+    [EVENT_0_TIME_BASE]         =   {0xf008,    R_EVENT_0_TIMEBASE,         1, RD|WR,  sizeof(uint16_t)},
+    [EVENT_1_TIME_BASE]         =   {0xf009,    R_EVENT_1_TIMEBASE,         1, RD|WR,  sizeof(uint16_t)},
+    [SYSTEM_CONTROL]            =   {0xf00a,    R_SYSTEM_CONTROL,           1, RD|WR,  sizeof(uint16_t)},
+    [INTERRUPT_STATUS]          =   {0xf00b,    R_INTERRUPT_STATUS,         1, RD|WR,  sizeof(uint16_t)},
+    [INTERRUPT_CONTROL]         =   {0xf00c,    R_INTERRUPT_CONTROL,        1, RD|WR,  sizeof(uint16_t)},
 
-    [NUMBER_OF_SENSORS]         =   {0xf00d,    R_NUMOFSENSORS,         1, RD|BYTES,     sizeof(io_count_t)},
-    [NUMBER_OF_OUTPUTS]         =   {0xf00d,    R_NUMOFOUTPUTS,         1, RD|BYTES,     sizeof(io_count_t)},
-    [OPERATING_TEMP]            =   {0xf00e,    R_OPERATING_TEMP,       1, RD|BYTES,     sizeof(operating_stat_t)},
-    [OPERATING_VOLTAGE]         =   {0xf00e,    R_OPERATING_TEMP,       1, RD|BYTES,     sizeof(operating_stat_t)},
-    [FAULT_PROCESS]             =   {0xf00f,    R_FAULT_PROCESS,        1, RD|BYTES,     sizeof(fault_stat_t)},
-    [FAULT_CODE]                =   {0xf00f,    R_FAULT_PROCESS,        1, RD|BYTES,     sizeof(fault_stat_t)},
-    [EVENT_0_TIMER]             =   {0xf010,    R_EVENT_0_TIMER,        1, RD,     sizeof(uint16_t)},
-    [EVENT_1_TIMER]             =   {0xf011,    R_EVENT_1_TIMER,        1, RD,     sizeof(uint16_t)},
-    [SYSTEM_STATUS]             =   {0xf012,    R_SYSTEM_STATUS,        1, RD,     sizeof(uint16_t)},
-    [TRIGGER_REQUESTS]          =   {0xf013,    R_TRIGGERS,             1, RD|WR,  sizeof(uint16_t)},
+    [NUMBER_OF_SENSORS]         =   {0xf00d,    R_NUMOFSENSORS,             1, RD|BYTES,     sizeof(io_count_t)},
+    [NUMBER_OF_OUTPUTS]         =   {0xf00d,    R_NUMOFOUTPUTS,             1, RD|BYTES,     sizeof(io_count_t)},
+    [OPERATING_TEMP]            =   {0xf00e,    R_OPERATING_TEMP,           1, RD|BYTES,     sizeof(operating_stat_t)},
+    [OPERATING_VOLTAGE]         =   {0xf00e,    R_OPERATING_TEMP,           1, RD|BYTES,     sizeof(operating_stat_t)},
+    [FAULT_PROCESS]             =   {0xf00f,    R_FAULT_PROCESS,            1, RD|BYTES,     sizeof(fault_stat_t)},
+    [FAULT_CODE]                =   {0xf00f,    R_FAULT_PROCESS,            1, RD|BYTES,     sizeof(fault_stat_t)},
+    [EVENT_0_TIMER]             =   {0xf010,    R_EVENT_0_TIMER,            1, RD,     sizeof(uint16_t)},
+    [EVENT_1_TIMER]             =   {0xf011,    R_EVENT_1_TIMER,            1, RD,     sizeof(uint16_t)},
+    [SYSTEM_STATUS]             =   {0xf012,    R_SYSTEM_STATUS,            1, RD,     sizeof(uint16_t)},
+    [TRIGGER_REQUESTS]          =   {0xf013,    R_TRIGGERS,                 1, RD|WR,  sizeof(uint16_t)},
 
-    [EXTRACT_START_TIME]        =   {0xf014,    R_EXTRACT_START_TIME,   1, RD|WR,  sizeof(uint16_t)},
-    [EXTRACT_END_TIME]          =   {0xf015,    R_EXTRACT_END_TIME,     1, RD|WR,  sizeof(uint16_t)},
+    [EXTRACT_START_TIME]        =   {0xf014,    R_EXTRACT_START_TIME,       1, RD|WR,  sizeof(uint16_t)},
+    [EXTRACT_END_TIME]          =   {0xf015,    R_EXTRACT_END_TIME,         1, RD|WR,  sizeof(uint16_t)},
 
-    [NUMBER_OF_RECORDS]         =   {0xf01b,    R_NUMBER_RECORDS,       1, RD,     sizeof(uint16_t)},
-    [CURRENT_TIME]              =   {0xf01c,    R_CURRENT_TIME,         1, RD,  sizeof(uint32_t)},
+    [NUMBER_OF_RECORDS]         =   {0xf01b,    R_NUMBER_RECORDS,           1, RD,     sizeof(uint16_t)},
+    [CURRENT_TIME]              =   {0xf01c,    R_CURRENT_TIME,             1, RD,  sizeof(uint32_t)},
 
-    [SENSOR_0_DATA]             =   {0xf01e,    R_SENSOR_0_VALUE,       4, RD,  sizeof(float)},
-    [SENSOR_1_DATA]             =   {0xf020,    R_SENSOR_1_VALUE,       3, RD,  sizeof(float)},
-    [SENSOR_2_DATA]             =   {0xf022,    R_SENSOR_2_VALUE,       2, RD,  sizeof(float)},
-    [SENSOR_3_DATA]             =   {0xf024,    R_SENSOR_3_VALUE,       1, RD,  sizeof(float)},
+    [SENSOR_0_DATA]             =   {0xf01e,    R_SENSOR_0_VALUE,           4, RD,  sizeof(float)},
+    [SENSOR_1_DATA]             =   {0xf020,    R_SENSOR_1_VALUE,           3, RD,  sizeof(float)},
+    [SENSOR_2_DATA]             =   {0xf022,    R_SENSOR_2_VALUE,           2, RD,  sizeof(float)},
+    [SENSOR_3_DATA]             =   {0xf024,    R_SENSOR_3_VALUE,           1, RD,  sizeof(float)},
 
-    [EXTRACTED_TIME_STAMP]      =   {0xf026,    R_EXTRACTED_TIME,       1, RD,  sizeof(uint32_t)},
-    [EXTRACTED_DATA_0]          =   {0xf028,    R_EXTRACTED_0_VALUE,    4, RD,  sizeof(float)},
-    [EXTRACTED_DATA_1]          =   {0xf02a,    R_EXTRACTED_1_VALUE,    3, RD,  sizeof(float)},
-    [EXTRACTED_DATA_2]          =   {0xf02c,    R_EXTRACTED_2_VALUE,    2, RD,  sizeof(float)},
-    [EXTRACTED_DATA_3]          =   {0xf02e,    R_EXTRACTED_3_VALUE,    1, RD,  sizeof(float)},
+    [EXTRACTED_TIME_STAMP]      =   {0xf026,    R_EXTRACTED_TIME,           1, RD,  sizeof(uint32_t)},
+    [EXTRACTED_DATA_0]          =   {0xf028,    R_EXTRACTED_0_VALUE,        4, RD,  sizeof(float)},
+    [EXTRACTED_DATA_1]          =   {0xf02a,    R_EXTRACTED_1_VALUE,        3, RD,  sizeof(float)},
+    [EXTRACTED_DATA_2]          =   {0xf02c,    R_EXTRACTED_2_VALUE,        2, RD,  sizeof(float)},
+    [EXTRACTED_DATA_3]          =   {0xf02e,    R_EXTRACTED_3_VALUE,        1, RD,  sizeof(float)},
 
-    [SENSOR_0_DESCRIPTOR]       =   {0xf030,    R_SENSOR_0_DESCRIPTOR,  4, RD|BYTES,  sizeof(sensor_descriptor_t)},
-    [SENSOR_1_DESCRIPTOR]       =   {0xf034,    R_SENSOR_1_DESCRIPTOR,  3, RD|BYTES,  sizeof(sensor_descriptor_t)},
-    [SENSOR_2_DESCRIPTOR]       =   {0xf038,    R_SENSOR_2_DESCRIPTOR,  2, RD|BYTES,  sizeof(sensor_descriptor_t)},
-    [SENSOR_3_DESCRIPTOR]       =   {0xf03c,    R_SENSOR_3_DESCRIPTOR,  1, RD|BYTES,  sizeof(sensor_descriptor_t)},
+    [SENSOR_0_DESCRIPTOR]       =   {0xf030,    R_SENSOR_0_DESCRIPTOR,      4, RD|BYTES,  sizeof(sensor_descriptor_t)},
+    [SENSOR_1_DESCRIPTOR]       =   {0xf034,    R_SENSOR_1_DESCRIPTOR,      3, RD|BYTES,  sizeof(sensor_descriptor_t)},
+    [SENSOR_2_DESCRIPTOR]       =   {0xf038,    R_SENSOR_2_DESCRIPTOR,      2, RD|BYTES,  sizeof(sensor_descriptor_t)},
+    [SENSOR_3_DESCRIPTOR]       =   {0xf03c,    R_SENSOR_3_DESCRIPTOR,      1, RD|BYTES,  sizeof(sensor_descriptor_t)},
 
     [USER_PARAMETER_0]          =   {0xf040,    R_USER_PARAMETER_0_VALUE,   16, RD|WR,  4},
     [USER_PARAMETER_1]          =   {0xf042,    R_USER_PARAMETER_1_VALUE,   15, RD|WR,  4},
@@ -68,20 +68,10 @@ static const _register_t _def [] =
     [USER_PARAMETER_14]         =   {0xf05c,    R_USER_PARAMETER_14_VALUE,  2, RD|WR,  4},
     [USER_PARAMETER_15]         =   {0xf05e,    R_USER_PARAMETER_15_VALUE,  1, RD|WR,  4},
 
-    [SENSOR_0_GAIN]             =   {0xf060,    R_SENSOR_0_GAIN,        4, RD|WR,  sizeof(float)},
-    [SENSOR_1_GAIN]             =   {0xf064,    R_SENSOR_1_GAIN,        3, RD|WR,  sizeof(float)},
-    [SENSOR_2_GAIN]             =   {0xf068,    R_SENSOR_2_GAIN,        2, RD|WR,  sizeof(float)},
-    [SENSOR_3_GAIN]             =   {0xf06c,    R_SENSOR_3_GAIN,        1, RD|WR,  sizeof(float)},
+    [SENSOR_GAIN]               =   {0xf060,    R_SENSOR_0_GAIN,        4, RD|WR,  sizeof(float),   4},
+    [SENSOR_OFFSET]             =   {0xf062,    R_SENSOR_0_OFFSET,      4, RD|WR,  sizeof(float),   4},
 
-    [SENSOR_0_OFFSET]           =   {0xf062,    R_SENSOR_0_OFFSET,      4, RD|WR,  sizeof(float)},
-    [SENSOR_1_OFFSET]           =   {0xf066,    R_SENSOR_1_OFFSET,      3, RD|WR,  sizeof(float)},
-    [SENSOR_2_OFFSET]           =   {0xf06a,    R_SENSOR_2_OFFSET,      2, RD|WR,  sizeof(float)},
-    [SENSOR_3_OFFSET]           =   {0xf06e,    R_SENSOR_3_OFFSET,      1, RD|WR,  sizeof(float)},
-
-    [SENSOR_0_UNIT]             =   {0xf032,    R_SENSOR_0_UNITS,       4, RD|WR|BYTES,  sizeof(sensor_unit_t)-1},
-    [SENSOR_1_UNIT]             =   {0xf036,    R_SENSOR_1_UNITS,       3, RD|WR|BYTES,  sizeof(sensor_unit_t)-1},
-    [SENSOR_2_UNIT]             =   {0xf03a,    R_SENSOR_2_UNITS,       2, RD|WR|BYTES,  sizeof(sensor_unit_t)-1},
-    [SENSOR_3_UNIT]             =   {0xf03e,    R_SENSOR_3_UNITS,       1, RD|WR|BYTES,  sizeof(sensor_unit_t)-1},
+    [SENSOR_UNIT]               =   {0xf032,    R_SENSOR_0_UNITS,       1, RD|WR|BYTES,  sizeof(sensor_unit_t)-1,   4},
 
     [DEVICE_NAME]               =   {0xf070,    R_DEVICE_NAME,          1, RD|BYTES,     sizeof(device_name_t)-1},
     [OUTPUT_0]                  =   {0xf078,    R_OUTPUT_0_VALUE,       4, RD,  sizeof(float)},
@@ -119,8 +109,9 @@ static const _register_t _def [] =
     [CALIBRATION_DATA]          =   {0xf100,    0x00,   1, RD,  4},
     [DEVICE_PARAMETER_DATA]     =   {0xf1f0,    0x00,   1, RD, 4*8},
 
-    [FUNCTION_BLOCK_PROGRAM]    =   {0xf200,    0x00,   1, RD,  1 *512},
-    [FUNCTION_BLOCK_PARAM]      =   {0xf300,    0x00,   1, RD,  4 *32},
+    [FUNCTION_BLOCK_PROGRAM]    =   {0xf200,    R_FUNCTION_BLOCK_PROGRAM,       128,     RD|WR,     sizeof(uint32_t)},    // 512 bytes page
+
+    [FUNCTION_BLOCK_PARAM]      =   {0xf300,    R_FUNCTION_BLOCK_PARAMETER_0,   32,     RD|WR,     sizeof(uint32_t)},
     [FUNCTION_BLOCK_PARAM_TYPE] =   {0xf340,    0x00,   1, RD,  2 *32},
     [FUNCTION_BLOCK_STATUS]     =   {0xf360,    0x00,   1, RD,  2 *32},
     [OUTPUT_0_NAME_LIST]        =   {0xf380,    R_OUTPUT_0_NAMELIST,   4, RD,  1 *64},

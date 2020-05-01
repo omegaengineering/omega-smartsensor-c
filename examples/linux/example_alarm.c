@@ -24,7 +24,6 @@ void signal_handler(int sig)
 }
 
 
-
 int main()
 {
     int ret;
@@ -54,25 +53,32 @@ int main()
     ret = fb_program_erase_all(sensor);
     assert(ret == 0);
 
+    // configuring alarm func block
     fb_alarm_t alarm1;
     fb_alarm_init(&alarm1);
     fb_alarm_set_mode(&alarm1, ALARM_HI);
     fb_alarm_set_latching(&alarm1, 0);
     fb_alarm_set_sensor(&alarm1, SENSOR_0);
     fb_alarm_enable(&alarm1, 1);
-    ret = fb_alarm_assign_user_param(sensor, 0, 24.0f);
+    ret = fb_alarm_assign_user_param(sensor, 0, 25.6f);
     assert(ret == 0);
     fb_alarm_ctrl_set_high_threshold_value(&alarm1, 0);
-    fb_alarm_commit(sensor, &alarm1);
 
-    s_log("alarm1 word 1 %08X\n", alarm1.w1);
-    s_log("alarm1 word 2 %08X\n", alarm1.w2);
+    s_log("alarm1 word 1 %08X\n", alarm1.w1.block_data);
+    s_log("alarm1 word 2 %08X\n", alarm1.w2.block_data);
 
-    // set EOB
-    u32 = 0xffffff7e;
-    ret = sensor_indexed_write(sensor, FUNCTION_BLOCK_PROGRAM, 2, &u32, sizeof(u32));
-    assert(ret == 0);
+    // make alarm1 the first block
+    fb_init_head((fb_block_t*) &alarm1, 0);
+    // done with adding blocks
+    fb_block_t eob;
+    fb_terminate((fb_block_t*) &alarm1, &eob);
 
+    fb_print(&alarm1.w1);
+
+    // write to sensor
+    fb_commit(sensor, (fb_block_t*) &alarm1);
+
+    // enable func block processing
     ret = fb_enable(sensor);
     assert(ret == 0);
 

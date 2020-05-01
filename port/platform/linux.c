@@ -177,9 +177,12 @@ int port_platform_init(void** phal, const port_cfg_t* config, uint16_t config_sz
         if ((ret = pthread_create(&hal->platform, NULL, platform_thread, hal)) != 0)
             goto ERROR;
 
+        *phal = hal; //TODO race condition btw this and the line below, need solution
+                    // sensor thread will access null hal
+
         if ((ret = pthread_create(&hal->sensor, NULL, sensor_thread, sensor)) != 0)
             goto ERROR;
-        *phal = hal;
+
         return ret;
     }
 ERROR:

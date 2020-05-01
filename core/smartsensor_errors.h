@@ -8,6 +8,7 @@ typedef enum {
     E_BUS_TYPE,
     E_BUFFER_MEM_SIZE,
     E_INVALID_PARAM,
+    E_INVALID_ADDR,
     E_NO_MEM,
     E_NOT_SUPPORTED,
     E_TRY_AGAIN,

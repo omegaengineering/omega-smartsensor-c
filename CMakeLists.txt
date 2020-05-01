@@ -19,6 +19,11 @@ if(HEARTBEAT_MAX_MISS)
     add_definitions(-DHEARTBEAT_MAX_MISS=${HEARTBEAT_MAX_MISS})
 endif()
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_definitions(-DDEBUG)
+endif()
+
+
 
 set(SDK_INCLUDES
         core/smartsensor.h)
@@ -27,15 +32,17 @@ set(SDK_INCLUDES
 
 include_directories(
         ${CMAKE_CURRENT_LIST_DIR}
-        core/
-        lib/inc/)
+        core
+        lib/inc)
 
 
 add_library(${PROJECT_NAME}
         core/op.c
         core/registers.c
         core/smartsensor_private.c
-        core/smartsensor.c)
+        core/smartsensor.c
+        core/function_block.c
+        core/alarm.c)
 
 #target_link_libraries(${PROJECT_NAME} pthread modbus)
 set_target_properties(${PROJECT_NAME} PROPERTIES

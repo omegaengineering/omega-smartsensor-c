@@ -67,11 +67,11 @@
 #define R_EXTRACT_START_TIME        0x0028
 #define R_EXTRACT_END_TIME          0x002c
 
-#define R_ACCESS_REGISTER           0x0030
-#define R_FACTORY_ACCESS            0x0032
-#define R_BLOCK_ACCESS              0x0033
-#define R_SENSOR_ACCESS             0x0034
-#define R_EXTENSION_ACCESS          0x0035
+//#define R_ACCESS_REGISTER     0x0030
+//#define R_FACTORY_ACCESS      0x0032
+//#define R_BLOCK_ACCESS              0x0033
+//#define R_SENSOR_ACCESS             0x0034
+//#define R_EXTENSION_ACCESS          0x0035
 
 #define R_NUMBER_RECORDS            0x0036
 
@@ -96,8 +96,6 @@
 #define R_SENSOR_0_FORMAT           0x0061
 #define R_SENSOR_0_CONFIG           0x0062
 #define R_SENSOR_0_DEVICE           0x0063
-
-#define R_SENSOR_UNITS              0x0064
 #define R_SENSOR_0_UNITS            0x0064
 
 #define R_SENSOR_1_DESCRIPTOR       0x0068
@@ -280,9 +278,23 @@
 #define R_USER_PARAMETER_14_NAME            0x0f60
 #define R_USER_PARAMETER_15_NAME            0x0f70
 
-#define R_FUNCTION_BLOCK_PROGRAM	        0x0400      // 512 byte block program
+#define R_REGISTER_ACCESS                   0x0030
 
-#define R_FUNCTION_BLOCK_PARAMETER_0	    0x0600      // 128 byte block param
+#define R_ACCESS_FACTORY_INDEX              0x0032
+#define R_ACCESS_FACTORY_START              0x0000
+#define R_ACCESS_FACTORY_END                0x03ff
+
+/********************************************************************************************************/
+
+#define R_ACCESS_BLOCK_INDEX                0x0033
+#define R_ACCESS_BLOCK_START                0x0400
+
+#define R_FUNCTION_BLOCK_PROGRAM	        0x0400      // 512 byte block program
+#define R_FUNCTION_BLOCK_PROGRAM_0          R_FUNCTION_BLOCK_PROGRAM
+#define R_FUNCTION_BLOCK_PROGRAM_1          0x0404
+
+#define R_FUNCTION_BLOCK_PARAMETER          0x0600      // 128 byte block param
+#define R_FUNCTION_BLOCK_PARAMETER_0	    R_FUNCTION_BLOCK_PARAMETER
 #define R_FUNCTION_BLOCK_PARAMETER_1	    0x0604
 #define R_FUNCTION_BLOCK_PARAMETER_2	    0x0608
 #define R_FUNCTION_BLOCK_PARAMETER_3	    0x060c
@@ -380,6 +392,21 @@
 #define R_FUNCTION_BLOCK_CONTROL_STATUS_30	0x06fc
 #define R_FUNCTION_BLOCK_CONTROL_STATUS_31	0x06fe
 
+#define R_ACCESS_BLOCK_END                  0x07ff
+
+/********************************************************************************************************/
+
+#define R_ACCESS_SENSOR_INDEX               0x0034  // Sensor space
+#define R_ACCESS_SENSOR_START               0x0800
+
+#define R_ACCESS_SENSOR_END                 0x0bff
+
+#define R_ACCESS_EXTENSION_INDEX            0x0035
+#define R_ACCESS_EXTENSION_START            0x0c00
+
+#define R_ACCESS_EXTENSION_END              0x0fff
+
+/********************************************************************************************************/
 
 #define R_MAX_REGISTER_INDEX                0x0fff
 

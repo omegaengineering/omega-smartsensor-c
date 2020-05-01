@@ -41,12 +41,12 @@ int get_sensor_reading(sensor_t* sensor, int sensor_num, float *reading)
 
 int get_sensor_gain(sensor_t* sensor, int sensor_num, float *gain)
 {
-    return sensor_indexed_read(sensor, SENSOR_0_GAIN, sensor_num, gain, sizeof(*gain));
+    return sensor_indexed_read(sensor, SENSOR_GAIN, sensor_num, gain, sizeof(*gain));
 }
 
 int get_sensor_offset(sensor_t* sensor, int sensor_num, float *offset)
 {
-    return sensor_indexed_read(sensor, SENSOR_0_OFFSET, sensor_num, offset, sizeof(*offset));
+    return sensor_indexed_read(sensor, SENSOR_OFFSET, sensor_num, offset, sizeof(*offset));
 }
 
 int get_device_name(sensor_t* sensor, device_name_t name)
@@ -58,7 +58,7 @@ int get_device_name(sensor_t* sensor, device_name_t name)
 int get_sensor_unit(sensor_t* sensor, int sensor_num, sensor_unit_t unit)
 {
     memset(unit, 0, sizeof(sensor_unit_t));
-    return sensor_indexed_read(sensor, SENSOR_0_UNIT, sensor_num, unit, sizeof(sensor_unit_t)-1);
+    return sensor_indexed_read(sensor, SENSOR_UNIT, sensor_num, unit, sizeof(sensor_unit_t)-1);
 }
 
 int get_sensor_descriptor(sensor_t* sensor, int sensor_num, sensor_descriptor_t *descriptor)

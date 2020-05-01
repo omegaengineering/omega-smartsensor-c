@@ -40,10 +40,13 @@ int fb_enable(sensor_t* sensor);
 int fb_disable(sensor_t* sensor);
 
 /*! init func block at index */
-void fb_init(fb_block_t* block, uint8_t index);
-void fb_chain(fb_block_t* head, fb_block_t* block);
-void fb_terminate();
-int  fb_commit();
+void fb_init_head(fb_block_t* head, uint8_t index);
+/*! chain block to the tail of list */
+void fb_chain(fb_block_t* head, fb_block_t* next_block);
+/*! terminate list with EOB marker */
+void fb_terminate(fb_block_t* head, fb_block_t* eob);
+/*! write func blocks down to smartsensor */
+int  fb_commit(sensor_t* sensor, fb_block_t* head);
 
 /*! return index of next available function block out of max 32 of them */
 int fb_program_get_next_available(sensor_t* sensor);
@@ -55,6 +58,12 @@ int fb_program_enable(sensor_t* sensor, uint8_t index);
 int fb_program_disable(sensor_t* sensor, uint8_t index);
 
 int fb_param_write(sensor_t* sensor, uint8_t index, void* buffer, uint32_t buf_len);
+
+#if DEBUG
+void fb_print(fb_block_t* head);
+#else
+#define fb_print
+#endif
 
 
 #endif //SMARTSENSOR_FUNCTION_BLOCK_H

@@ -57,6 +57,8 @@ int linux_i2c_write(linux_i2c_t* i2c, const uint8_t* buffer, uint16_t buffer_siz
         else
             break;
     }
+    if (nWritten < 0)
+        perror("linux_i2c_write");
     if (nTotal != buffer_size)
         return E_BUS_OPERATION;
     return E_OK;

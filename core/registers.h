@@ -51,6 +51,11 @@
 #define MAX_SENSOR_COUNT    4
 #define MAX_OUTPUT_COUNT    4
 
+#define SENSOR_0            0
+#define SENSOR_1            1
+#define SENSOR_2            2
+#define SENSOR_3            3
+
 typedef char sensor_unit_t[4  + 1];
 typedef char device_name_t[32 + 1];
 typedef char device_name_list_t[192 + 1];
@@ -106,22 +111,22 @@ typedef struct {
 
 typedef enum
 {
-    ENABLE_SENSOR_CHANGE_LOG    = (1 << 0),
-    ENABLE_POWER_CHANGE_LOG     = (1 << 1),
-    ENABLE_HEALTH_FAULT_LOG     = (1 << 2),
-    ENABLE_TIME_CHANGE_LOG      = (1 << 3),
-    ENABLE_EVENT_1_READ         = (1 << 4),
-    ENABLE_EVENT_1_LOG          = (1 << 5),
-    ENABLE_EVENT_2_READ         = (1 << 6),
-    ENABLE_EVENT_2_LOG          = (1 << 7),
-    ENABLE_EXTN_READ            = (1 << 8),
-    ENABLE_EXTN_LOG             = (1 << 9),
-    ENABLE_EXTN_RESET_EVENT_1   = (1 << 10),
-    ENABLE_EXTN_RESET_EVENT_2   = (1 << 11),
-    ENABLE_FUNCTION_BLOCK       = (1 << 12),
-    ENABLE_HEALTH_MONITOR       = (1 << 13),
-    ENABLE_LOG_OVERWRITE        = (1 << 14),
-    ENABLE_RTC                  = (1 << 15),
+    ENABLE_SENSOR_CHANGE_LOG    = (1U << 0U),
+    ENABLE_POWER_CHANGE_LOG     = (1U << 1U),
+    ENABLE_HEALTH_FAULT_LOG     = (1U << 2U),
+    ENABLE_TIME_CHANGE_LOG      = (1U << 3U),
+    ENABLE_EVENT_1_READ         = (1U << 4U),
+    ENABLE_EVENT_1_LOG          = (1U << 5U),
+    ENABLE_EVENT_2_READ         = (1U << 6U),
+    ENABLE_EVENT_2_LOG          = (1U << 7U),
+    ENABLE_EXTN_READ            = (1U << 8U),
+    ENABLE_EXTN_LOG             = (1U << 9U),
+    ENABLE_EXTN_RESET_EVENT_1   = (1U << 10U),
+    ENABLE_EXTN_RESET_EVENT_2   = (1U << 11U),
+    ENABLE_FUNCTION_BLOCK       = (1U << 12U),
+    ENABLE_HEALTH_MONITOR       = (1U << 13U),
+    ENABLE_LOG_OVERWRITE        = (1U << 14U),
+    ENABLE_RTC                  = (1U << 15U),
 } system_control_t;
 
 typedef enum    TRIGGER_TAG
@@ -256,7 +261,7 @@ typedef struct  Sensor_Descriptor_Tag
     uint8_t     		        u8_Device;
 } GCC_PACKED sensor_descriptor_t;
 
-typedef enum {
+typedef enum ss_register {
     /**< System Information */
     DEVICE_ID,
     FIRMARE_VERSION,
@@ -309,10 +314,7 @@ typedef enum {
     SENSOR_1_DESCRIPTOR,
     SENSOR_2_DESCRIPTOR,
     SENSOR_3_DESCRIPTOR,
-    SENSOR_0_UNIT,
-    SENSOR_1_UNIT,
-    SENSOR_2_UNIT,
-    SENSOR_3_UNIT,
+    SENSOR_UNIT,
 
     /**< User Parameters */
     USER_PARAMETER_0,
@@ -332,15 +334,8 @@ typedef enum {
     USER_PARAMETER_14,
     USER_PARAMETER_15,
 
-    SENSOR_0_OFFSET,
-    SENSOR_1_OFFSET,
-    SENSOR_2_OFFSET,
-    SENSOR_3_OFFSET,
-
-    SENSOR_0_GAIN,
-    SENSOR_1_GAIN,
-    SENSOR_2_GAIN,
-    SENSOR_3_GAIN,
+    SENSOR_OFFSET,  // indexed 4
+    SENSOR_GAIN,    // indexed 4
 
     /**< Name Strings */
     DEVICE_NAME,
@@ -383,6 +378,10 @@ typedef enum {
 
     /**< Function Block Program space */
     FUNCTION_BLOCK_PROGRAM,
+    FUNCTION_BLOCK_PROGRAM_0,
+    FUNCTION_BLOCK_PROGRAM_1,
+    FUNCTION_BLOCK_PROGRAM_2,
+
     FUNCTION_BLOCK_PARAM,
     FUNCTION_BLOCK_PARAM_TYPE,
     FUNCTION_BLOCK_STATUS,
@@ -449,11 +448,12 @@ typedef enum {
 } ss_register_t;
 
 typedef struct {
-    uint16_t    modbus_addr;
-    uint16_t    i2c_addr;
-    uint8_t     nInstance;
-    uint8_t     access;
-    uint16_t    size;
+    uint16_t    modbus_addr;// base modbus address
+    uint16_t    i2c_addr;   // base i2c address
+    uint8_t     nInstance;  // no of instances
+    uint8_t     access;     // read/write
+    uint16_t    size;       // no bytes of register size
+    uint8_t     offset;     // no bytes offset from one instance addr to another
 } _register_t;
 
 typedef enum {

@@ -145,12 +145,12 @@ int sensor_read             (sensor_t* sensor, ss_register_t ss_register, void* 
  *          E_BUFFER_MEM_SIZE is returned.
  *      - Only actual data size of the register are read into the provided buffer.
  * @param ctx sensor instance
- * @param ss_register register base to read
+ * @param base_reg register base to read
  * @param index instance index
  * @param buffer buffer data to read into
  * @return see @error_t
  */
-int sensor_indexed_read     (sensor_t* sensor, ss_register_t ss_register, uint8_t index, void* buffer, uint16_t buffer_sz);
+int sensor_indexed_read     (sensor_t* sensor, ss_register_t base_reg, uint8_t index, void* buffer, uint16_t buffer_sz);
 
 /**
  * Write data provided from data buffer to register
@@ -174,12 +174,12 @@ int sensor_write            (sensor_t* sensor, ss_register_t ss_register, void* 
  *          E_BUFFER_MEM_SIZE is returned.
  *      - Only actual data size of the register are read from the buffer and written to sensor.
  * @param ctx sensor instance
- * @param ss_register register to write
+ * @param base_register register to write
  * @param index instance index
  * @param buffer buffer to write from
  * @return see @error_t
  */
-int sensor_indexed_write    (sensor_t* sensor, ss_register_t ss_register, uint8_t index, uint8_t* buffer, uint16_t buffer_sz);
+int sensor_indexed_write    (sensor_t* sensor, ss_register_t base_register, uint8_t index, void* buffer, uint16_t buffer_sz);
 
 
 /**

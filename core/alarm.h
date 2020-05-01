@@ -27,9 +27,12 @@ typedef struct {
 } alarm_ctrl_w1_t;
 
 typedef struct {
-    uint8_t         opt_b1 : 1;
+
     union {
-        uint8_t     percent_increase : 7;
+        struct {
+            uint8_t     value : 7;
+            uint8_t     opt : 1;
+        } percent_increase;
         struct {
             uint8_t     index : 5;
             uint8_t     bpa : 1;
@@ -38,9 +41,11 @@ typedef struct {
         } low_threshold;
     };
 
-    uint8_t         opt_b2 : 1;
     union {
-        uint8_t     percent_decrease : 7;
+        struct {
+            uint8_t     value : 7;
+            uint8_t     opt : 1;
+        } percent_decrease;
         struct {
             uint8_t     index : 5;
             uint8_t     bpa : 1;
@@ -55,15 +60,18 @@ typedef struct {
     uint8_t     output_opt : 1;
 } alarm_ctrl_w2_t;
 
+//typedef struct {
+//    alarm_ctrl_w1_t     w1;         /*! private */
+//    alarm_ctrl_w2_t     w2;         /*! private */
+//} fb_alarm_t;
+
 typedef struct {
-    uint8_t             block_idx;
-    alarm_ctrl_w1_t     w1;         /*! private */
-    alarm_ctrl_w2_t     w2;         /*! private */
+    fb_block_t      w1;
+    fb_block_t      w2;
 } fb_alarm_t;
 
 /*! alarm function block configuration API */
 void fb_alarm_init(fb_alarm_t* alarm);
-void fb_alarm_set_block_index(fb_alarm_t* alarm, uint8_t index);
 void fb_alarm_set_mode(fb_alarm_t* alarm, alarm_mode_t mode);
 void fb_alarm_set_latching(fb_alarm_t* alarm, uint8_t latch);
 void fb_alarm_set_sensor(fb_alarm_t* alarm, uint8_t sensor_index);
@@ -75,7 +83,7 @@ int  fb_alarm_assign_user_param(sensor_t* sensor, uint8_t param_index, float val
 void fb_alarm_ctrl_set_low_threshold_value(fb_alarm_t* alarm, uint8_t param_index);
 void fb_alarm_ctrl_set_high_threshold_value(fb_alarm_t* alarm, uint8_t param_index);
 
-int fb_alarm_commit(sensor_t* sensor, fb_alarm_t* alarm);
+//int fb_alarm_commit(sensor_t* sensor, fb_alarm_t* alarm);
 int fb_alarm_get_status(sensor_t* sensor, fb_alarm_t* alarm, uint8_t* status);
 
 #endif //SMARTSENSOR_ALARM_H
