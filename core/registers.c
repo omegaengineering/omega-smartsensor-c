@@ -1,7 +1,11 @@
 #include <stdint.h>
 #include <string.h>
+#include "_assert.h"
 #include "registers.h"
 #include "registers_i2c.h"
+
+//STATIC_ASSERT(sizeof(system_status_t) == sizeof(uint16_t));
+//STATIC_ASSERT(sizeof(trigger_t) == sizeof(uint16_t));
 
 static const _register_t _def [] =
 {
@@ -26,13 +30,13 @@ static const _register_t _def [] =
     [FAULT_CODE]                =   {0xf00f,    R_FAULT_PROCESS,            1, RD|BYTES,     sizeof(fault_stat_t)},
     [EVENT_0_TIMER]             =   {0xf010,    R_EVENT_0_TIMER,            1, RD,     sizeof(uint16_t)},
     [EVENT_1_TIMER]             =   {0xf011,    R_EVENT_1_TIMER,            1, RD,     sizeof(uint16_t)},
-    [SYSTEM_STATUS]             =   {0xf012,    R_SYSTEM_STATUS,            1, RD,     sizeof(uint16_t)},
-    [TRIGGER_REQUESTS]          =   {0xf013,    R_TRIGGERS,                 1, RD|WR,  sizeof(uint16_t)},
+    [SYSTEM_STATUS]             =   {0xf012,    R_SYSTEM_STATUS,            1, RD,     sizeof(system_status_t)},
+    [TRIGGER_REQUESTS]          =   {0xf013,    R_TRIGGERS,                 1, RD|WR,  sizeof(trigger_t)},
 
-    [EXTRACT_START_TIME]        =   {0xf014,    R_EXTRACT_START_TIME,       1, RD|WR,  sizeof(uint16_t)},
-    [EXTRACT_END_TIME]          =   {0xf015,    R_EXTRACT_END_TIME,         1, RD|WR,  sizeof(uint16_t)},
+    [EXTRACT_START_TIME]        =   {0xf014,    R_EXTRACT_START_TIME,       1, RD|WR,  sizeof(uint32_t)},
+    [EXTRACT_END_TIME]          =   {0xf016,    R_EXTRACT_END_TIME,         1, RD|WR,  sizeof(uint32_t)},
 
-    [NUMBER_OF_RECORDS]         =   {0xf01b,    R_NUMBER_RECORDS,           1, RD,     sizeof(uint16_t)},
+    [NUMBER_OF_RECORDS]         =   {0xf01b,    R_NUMBER_RECORDS,           1, RD,  sizeof(uint16_t)},
     [CURRENT_TIME]              =   {0xf01c,    R_CURRENT_TIME,             1, RD,  sizeof(uint32_t)},
 
     [SENSOR_0_DATA]             =   {0xf01e,    R_SENSOR_0_VALUE,           4, RD,  sizeof(float)},
@@ -41,10 +45,7 @@ static const _register_t _def [] =
     [SENSOR_3_DATA]             =   {0xf024,    R_SENSOR_3_VALUE,           1, RD,  sizeof(float)},
 
     [EXTRACTED_TIME_STAMP]      =   {0xf026,    R_EXTRACTED_TIME,           1, RD,  sizeof(uint32_t)},
-    [EXTRACTED_DATA_0]          =   {0xf028,    R_EXTRACTED_0_VALUE,        4, RD,  sizeof(float)},
-    [EXTRACTED_DATA_1]          =   {0xf02a,    R_EXTRACTED_1_VALUE,        3, RD,  sizeof(float)},
-    [EXTRACTED_DATA_2]          =   {0xf02c,    R_EXTRACTED_2_VALUE,        2, RD,  sizeof(float)},
-    [EXTRACTED_DATA_3]          =   {0xf02e,    R_EXTRACTED_3_VALUE,        1, RD,  sizeof(float)},
+    [EXTRACTED_DATA]            =   {0xf028,    R_EXTRACTED_0_VALUE,        4, RD,  sizeof(float)},
 
     [SENSOR_0_DESCRIPTOR]       =   {0xf030,    R_SENSOR_0_DESCRIPTOR,      4, RD|BYTES,  sizeof(sensor_descriptor_t)},
     [SENSOR_1_DESCRIPTOR]       =   {0xf034,    R_SENSOR_1_DESCRIPTOR,      3, RD|BYTES,  sizeof(sensor_descriptor_t)},
@@ -71,7 +72,7 @@ static const _register_t _def [] =
     [SENSOR_GAIN]               =   {0xf060,    R_SENSOR_0_GAIN,        4, RD|WR,  sizeof(float),   4},
     [SENSOR_OFFSET]             =   {0xf062,    R_SENSOR_0_OFFSET,      4, RD|WR,  sizeof(float),   4},
 
-    [SENSOR_UNIT]               =   {0xf032,    R_SENSOR_0_UNITS,       1, RD|WR|BYTES,  sizeof(sensor_unit_t)-1,   4},
+    [SENSOR_UNIT]               =   {0xf032,    R_SENSOR_0_UNITS,       4, RD|WR|BYTES,  sizeof(sensor_unit_t)-1,   4},
 
     [DEVICE_NAME]               =   {0xf070,    R_DEVICE_NAME,          1, RD|BYTES,     sizeof(device_name_t)-1},
     [OUTPUT_0]                  =   {0xf078,    R_OUTPUT_0_VALUE,       4, RD,  sizeof(float)},

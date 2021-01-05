@@ -121,8 +121,9 @@ typedef enum
     ENABLE_EVENT_2_LOG          = (1U << 7U),
     ENABLE_EXTN_READ            = (1U << 8U),
     ENABLE_EXTN_LOG             = (1U << 9U),
-    ENABLE_EXTN_RESET_EVENT_1   = (1U << 10U),
-    ENABLE_EXTN_RESET_EVENT_2   = (1U << 11U),
+    ENABLE_EXTN_RESET_EVENT_1   = (1U << 10U), //
+    ENABLE_EXTN_RESET_EVENT_2   = (1U << 11U), // enable log tracking, if set, each time read, extract data will auto advance to next one
+                                                // default behavnior does not advance pointer
     ENABLE_FUNCTION_BLOCK       = (1U << 12U),
     ENABLE_HEALTH_MONITOR       = (1U << 13U),
     ENABLE_LOG_OVERWRITE        = (1U << 14U),
@@ -131,13 +132,15 @@ typedef enum
 
 typedef enum    TRIGGER_TAG
 {
-    TRIGGER_SEARCH_RECORD           = 0x0001,
+    TRIGGER_EXTRACT                 = 0x0001,
     TRIGGER_EXTRACT_NEXT            = 0x0002,
     TRIGGER_CLEAR_LOG               = 0x0003,
 
     TRIGGER_DEVICE_RESET            = 0x0004,
     TRIGGER_FACTORY_RESET           = 0x0005,
     TRIGGER_POWER_RESET             = 0x0006,
+    TRIGGER_PASSWORD_RESET          = 0x0007,
+    TRIGGER_AUTHENTICATE            = 0x0008,
 
     RESET_EVENT_0                   = 0x0010,
     TRIGGER_EVENT_0                 = 0x0020,
@@ -272,7 +275,7 @@ typedef enum ss_register {
     /**< Control Functions */
     EVENT_0_TIME_BASE,
     EVENT_1_TIME_BASE,
-    SYSTEM_CONTROL,
+    SYSTEM_CONTROL,                         // system_control_t
     INTERRUPT_STATUS,
     INTERRUPT_CONTROL,
 
@@ -286,7 +289,7 @@ typedef enum ss_register {
     EVENT_0_TIMER,
     EVENT_1_TIMER,
     SYSTEM_STATUS,
-    TRIGGER_REQUESTS,
+    TRIGGER_REQUESTS,                       // trigger_t
 
     /**< Data Extraction */
     EXTRACT_START_TIME,
@@ -304,10 +307,7 @@ typedef enum ss_register {
 
     /**< Data Extraction */
     EXTRACTED_TIME_STAMP,
-    EXTRACTED_DATA_0,
-    EXTRACTED_DATA_1,
-    EXTRACTED_DATA_2,
-    EXTRACTED_DATA_3,
+    EXTRACTED_DATA,             // index 4
 
     /**< Sensor Descriptors */
     SENSOR_0_DESCRIPTOR,
