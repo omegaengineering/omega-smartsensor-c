@@ -178,6 +178,15 @@ int soft_reset(sensor_t* sensor)
     return ret;
 }
 
+int factory_reset(sensor_t* sensor)
+{
+    uint32_t trigger = TRIGGER_FACTORY_RESET;
+    int ret = sensor_write(sensor, TRIGGER_REQUESTS, &trigger, sizeof(trigger));
+    if (ret == E_OK)
+        wait_for_device_ready(sensor, 1000);
+    return ret;
+}
+
 int preset_config(sensor_t* sensor)
 {
     int ret;
@@ -323,4 +332,34 @@ const char* measurement_str(measurement_type_t meas)
     }
 #endif
     return E_OK;
+}
+
+int system_control_set_bits(sensor_t* sensor, system_control_t bits)
+{
+    int ret;
+    uint16_t control;
+    if ((ret = sensor_read(sensor, SYSTEM_CONTROL, &control, sizeof(control))) != 0)
+        return ret;
+    control |= bits;
+    if ((ret = sensor_write(sensor, SYSTEM_CONTROL, &control, sizeof(control))) != 0)
+        return ret;
+    return ret;
+}
+
+int system_control_clear_bits(sensor_t* sensor, system_control_t bits)
+{
+    int ret;
+    uint16_t control;
+    if ((ret = sensor_read(sensor, SYSTEM_CONTROL, &control, sizeof(control))) != 0)
+        return ret;
+    control &= ~bits;
+    if ((ret = sensor_write(sensor, SYSTEM_CONTROL, &control, sizeof(control))) != 0)
+        return ret;
+    return ret;
+}
+
+int system_control_write_bits(sensor_t* sensor, system_control_t bits)
+{
+    uint16_t control = bits;
+    return sensor_write(sensor, SYSTEM_CONTROL, &control, sizeof(control));
 }

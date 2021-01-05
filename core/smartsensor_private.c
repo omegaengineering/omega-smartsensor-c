@@ -182,6 +182,8 @@ static int sensor_bus_read(sensor_t* sensor, uint16_t reg_addr, uint8_t* buffer,
             return ret;
     }
     ret = port_comm_read(sensor->platform, buffer, buffer_sz);
+    if (ret != 0)
+        printf("%d\n", ret);
 
 #else
     //write register addr
@@ -343,7 +345,7 @@ int sensor_indexed_write(sensor_t* sensor, ss_register_t base_register, uint8_t 
 
     if (!(reg = get_register_entry(base_register)))
         return E_INVALID_PARAM;
-    if (buffer_sz < reg->size)
+    if (buffer_sz < reg->size) //TODO
         return E_BUFFER_MEM_SIZE;
     if (index >= reg->nInstance)
         return E_INVALID_PARAM;

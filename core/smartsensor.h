@@ -215,10 +215,15 @@ int set_sample_time         (sensor_t* sensor, uint16_t sample_time);
 
 int wait_for_device_ready   (sensor_t* sensor, int max_wait_msec);
 int soft_reset              (sensor_t* sensor);
+int factory_reset           (sensor_t* sensor);
 int preset_config           (sensor_t* sensor);
 unsigned int sdk_version();
 const char* measurement_str(measurement_type_t meas);
 
 int probe_default_init(sensor_t* sensor);
+
+int system_control_clear_bits(sensor_t* sensor, system_control_t bits);
+int system_control_set_bits  (sensor_t* sensor, system_control_t bits);
+int system_control_write_bits(sensor_t* sensor, system_control_t bits);
 
 #endif //OMEGA_SMARTSENSOR_C_SMARTSENSOR_H
