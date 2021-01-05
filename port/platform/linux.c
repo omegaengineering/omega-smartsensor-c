@@ -6,7 +6,7 @@
 #include <poll.h>
 #include "smartsensor_private.h"
 #include "log.h"
-#include "linux/port_linux.h"
+#include "../port/linux/port_linux.h"
 #include "linux.h"
 
 #define MAX_POLL    2
@@ -198,12 +198,16 @@ ERROR:
 
 int port_platform_deinit(hal_t* hal, sensor_t* sensor)
 {
+    // shutdown sensor thread
+    port_event_put(hal, EV_SHUTDOWN);   // ?
+    pthread_join(hal->sensor, NULL);
+    // shutdown hardwares
     hal->platform_exit = 1;
     pthread_join(hal->platform, NULL);
     linux_i2c_close(&hal->i2c);
     gpio_close(&hal->data_gpio);
-    port_event_put(hal, EV_SHUTDOWN);   // ?
-    pthread_join(hal->sensor, NULL);
+    evq_close(&hal->events);
+    free(hal);
     return E_OK;
 }
 

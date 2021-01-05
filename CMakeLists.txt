@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.7)
-project(smartsensor C)
+project(smartsensorsdk C)
 set(CMAKE_C_STANDARD 99)
 
 option(NDEBUG "" OFF)
@@ -23,7 +23,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DDEBUG)
 endif()
 
-
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fshort-enums")
 
 set(SDK_INCLUDES
         core/smartsensor.h)
@@ -42,19 +42,31 @@ add_library(${PROJECT_NAME}
         core/smartsensor_private.c
         core/smartsensor.c
         core/function_block.c
-        core/alarm.c)
+        core/alarm.c
+        core/datalog.c
+
+        port/linux/linux_event.c
+        port/linux/linux_i2c.c
+        port/linux/linux_modbus.c
+        port/linux/linux_gpio.c
+        port/linux/linux_timer.c
+        port/platform/linux.c
+        )
 
 #target_link_libraries(${PROJECT_NAME} pthread modbus)
-set_target_properties(${PROJECT_NAME} PROPERTIES
-        PUBLIC_HEADER "core/smartsensor.h")
+#set_target_properties(${PROJECT_NAME} PROPERTIES
+#        PUBLIC_HEADER "core/smartsensor.h")
 
 install(TARGETS ${PROJECT_NAME}
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
         PUBLIC_HEADER DESTINATION include/omega)
-install(FILES core/registers.h DESTINATION include/omega)
-install(FILES lib/inc/common/errors.h DESTINATION include/omega/common)
-install(FILES lib/inc/common/common.h DESTINATION include/omega/common)
+install(FILES core/smartsensor.h            DESTINATION include/omega/smartsensor)
+install(FILES core/smartsensor_private.h    DESTINATION include/omega/smartsensor)
+install(FILES core/registers.h              DESTINATION include/omega/smartsensor)
+install(FILES core/smartsensor_errors.h     DESTINATION include/omega/smartsensor)
+install(FILES port/platform/linux.h         DESTINATION include/omega/smartsensor)
+install(FILES core/port.h                   DESTINATION include/omega/smartsensor)
 add_custom_target(uninstall
         "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_LIST_DIR}/uninstall.cmake")
 
