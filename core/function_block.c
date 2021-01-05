@@ -4,28 +4,12 @@
 
 int fb_enable(sensor_t* sensor)
 {
-    int ret;
-    uint16_t control;
-    if ((ret = sensor_read(sensor, SYSTEM_CONTROL, &control, sizeof(control))) != 0)
-        return ret;
-    if (!(control & ENABLE_FUNCTION_BLOCK)) {
-        control |= ENABLE_FUNCTION_BLOCK;
-        if ((ret = sensor_write(sensor, SYSTEM_CONTROL, &control, sizeof(control))) != 0)
-            return ret;
-    }
-    return ret;
+    return system_control_set_bits(sensor, ENABLE_FUNCTION_BLOCK);
 }
 
 int fb_disable(sensor_t* sensor)
 {
-    int ret;
-    uint16_t control;
-    if ((ret = sensor_read(sensor, SYSTEM_CONTROL, &control, sizeof(control))) != 0)
-        return ret;
-    control &= ~ENABLE_FUNCTION_BLOCK;
-    if ((ret = sensor_write(sensor, SYSTEM_CONTROL, &control, sizeof(control))) != 0)
-        return ret;
-    return ret;
+    return system_control_clear_bits(sensor, ENABLE_FUNCTION_BLOCK);
 }
 
 void fb_init_head(fb_block_t* head, uint8_t index)
