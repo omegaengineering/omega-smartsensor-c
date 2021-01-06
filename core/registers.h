@@ -101,13 +101,13 @@ typedef struct {
     uint8_t hours;
     uint8_t mins;
     uint8_t secs;
-} data_time_t;
+} sensor_time_t;
 
 typedef struct {
     uint8_t month;
     uint8_t day;
     uint16_t year;
-} data_date_t;
+} sensor_date_t;
 
 typedef enum
 {
@@ -130,7 +130,7 @@ typedef enum
     ENABLE_RTC                  = (1U << 15U),
 } system_control_t;
 
-typedef enum    TRIGGER_TAG
+enum    TRIGGER_TAG
 {
     TRIGGER_EXTRACT                 = 0x0001,
     TRIGGER_EXTRACT_NEXT            = 0x0002,
@@ -156,7 +156,8 @@ typedef enum    TRIGGER_TAG
     TRIGGER_CLEAR_FB_STATUS         = 0x4000,
     TRIGGER_BOOT_STRAP              = 0x8000,       // Dual purpose - user can not trigger bootstrap, bit used to force stay awake
     TRIGGER_USER_STAY_AWAKE         = 0x8000,       // Forces processor to 'stay awake' during auxiliary function processing
-} trigger_t;
+};
+typedef uint16_t trigger_t;
 
 typedef enum INTERRUPT_STATUS_TAG
 {
@@ -169,7 +170,7 @@ typedef enum INTERRUPT_STATUS_TAG
 
     FUNCTION_BLOCK_INTR         = 0x0040,       // Function Block Interrupt
     LOG_DATA_READY_INTR         = 0x0080,       // Data available in log file
-} interrupt_status_t;
+} GCC_PACKED interrupt_status_t;
 
 typedef enum INTERRUPT_CONTROL_TAG
 {

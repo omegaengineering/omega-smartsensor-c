@@ -100,7 +100,7 @@ int get_interrupt_status(sensor_t* sensor, interrupt_status_t *status)
 }
 
 
-int get_current_time(sensor_t* sensor, data_time_t *time)
+int get_current_time(sensor_t* sensor, sensor_time_t *time)
 {
     uint32_t u32_value;
     int ret = sensor_read(sensor, CURRENT_TIME, &u32_value, sizeof(u32_value));
@@ -115,7 +115,7 @@ int get_current_time(sensor_t* sensor, data_time_t *time)
     return ret;
 }
 
-int set_current_time(sensor_t* sensor, data_time_t *time)
+int set_current_time(sensor_t* sensor, sensor_time_t *time)
 {
     uint32_t data = time->days * 24 * 3600 + time->hours * 3600 + time->mins * 60 + time->secs;
     return sensor_write(sensor, CURRENT_TIME, &data, sizeof(data));
@@ -124,14 +124,14 @@ int set_current_time(sensor_t* sensor, data_time_t *time)
 #define		YEARSHIFT		9
 #define 	MONTHSHIFT		5
 #define		DAYSHIFT		0
-static void convert_to_calendar(uint16_t u16_date, data_date_t * calendar)
+static void convert_to_calendar(uint16_t u16_date, sensor_date_t * calendar)
 {
     calendar->year = (u16_date >> YEARSHIFT) +  2000;
     calendar->month = (u16_date & 0x01e0) >> MONTHSHIFT;
     calendar->day = (u16_date & 0x001f);
 }
 
-int get_calibration_date(sensor_t* sensor, data_date_t *date)
+int get_calibration_date(sensor_t* sensor, sensor_date_t *date)
 {
     uint16_t data;
     int ret = sensor_read(sensor, CALIBRATION_DATE, &data, sizeof(data));
@@ -140,7 +140,7 @@ int get_calibration_date(sensor_t* sensor, data_date_t *date)
     return ret;
 }
 
-int get_manufacturing_date(sensor_t* sensor, data_date_t *date)
+int get_manufacturing_date(sensor_t* sensor, sensor_date_t *date)
 {
     uint16_t data;
     int ret = sensor_read(sensor, MANUFACTURED_DATE, &data, sizeof(data));

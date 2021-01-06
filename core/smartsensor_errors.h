@@ -2,7 +2,7 @@
 #define SMARTSENSOR_SMARTSENSOR_ERRORS_H
 
 typedef enum {
-    E_UNAVAILABLE = -1,
+    E_UNAVAILABLE       = -1,
     E_OK                = 0,
     E_BUS_OPERATION,
     E_BUS_TYPE,

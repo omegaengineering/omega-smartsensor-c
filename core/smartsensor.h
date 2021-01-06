@@ -37,11 +37,6 @@
 #include "registers.h"
 #include "smartsensor_errors.h"
 
-enum {
-    SMARTSENSOR_0,
-    SMARTSENSOR_MAX,
-};
-
 #define SMARTSENSOR_SDK_VERSION         0x00010005
 #define SMARTSENSOR_I2C_ADDR            0x68
 #define SMARTSENSOR_MODBUS_ADDR         0x01
@@ -100,7 +95,6 @@ typedef struct _sensor {
     event_callback_t    event_callback;     /**< user provided event callback */
     event_callback_t    event_callback_ctx; /**< user provided context for event callback */
     data_t              data;               /**< internal data */
-//    s19_mutex_t*        data_lock;          /**< data mutex */
     uint8_t             ready;              /**< flag to prevent interrupts from using the SDK if sensor has not been opened */
     void*               platform;
     uint8_t             do_exit;            /**< flag to exit thread if created */
@@ -183,13 +177,14 @@ int sensor_indexed_write    (sensor_t* sensor, ss_register_t base_register, uint
 
 
 /**
- * Get the number of possible instances to index from a base register
+ * Get the number of possible instances to index from a base register.
+ * To be used in indexed read/write parameter.
  * Eg:  SENSOR_0_DATA can have 4 indexed instances which are SENSOR_(0 1 2 3)_DATA
  *      SENSOR_1_DATA can have 3 indexed instances which are SENSOR(1 2 3)_DATA
  * @param ss_register
  * @return
  */
-int get_max_instance        (ss_register_t ss_register);
+int get_register_instance_cnt (ss_register_t ss_register);
 
 
 int get_sensor_reading      (sensor_t* sensor, int sensor_num, float *reading);
@@ -201,14 +196,14 @@ int get_sensor_type         (sensor_t* sensor, int sensor_num, measurement_type_
 int get_device_name         (sensor_t* sensor, device_name_t name);
 int get_system_status       (sensor_t* sensor, system_status_t *status);
 int get_interrupt_status    (sensor_t* sensor, interrupt_status_t *status);
-int get_current_time        (sensor_t* sensor, data_time_t *time);
+int get_current_time        (sensor_t* sensor, sensor_time_t *time);
 int get_io_count            (sensor_t* sensor, io_count_t *io_count);
 int get_operating_stat      (sensor_t* sensor, operating_stat_t *stat);
-int get_calibration_date    (sensor_t* sensor, data_date_t *date);
-int get_manufacturing_date  (sensor_t* sensor, data_date_t *date);
+int get_calibration_date    (sensor_t* sensor, sensor_date_t *date);
+int get_manufacturing_date  (sensor_t* sensor, sensor_date_t *date);
 
 
-int set_current_time        (sensor_t* sensor, data_time_t *time);
+int set_current_time        (sensor_t* sensor, sensor_time_t *time);
 int set_interrupt_control   (sensor_t* sensor, interrupt_control_t control);
 int set_sample_time         (sensor_t* sensor, uint16_t sample_time);
 
@@ -217,10 +212,10 @@ int wait_for_device_ready   (sensor_t* sensor, int max_wait_msec);
 int soft_reset              (sensor_t* sensor);
 int factory_reset           (sensor_t* sensor);
 int preset_config           (sensor_t* sensor);
-unsigned int sdk_version();
-const char* measurement_str(measurement_type_t meas);
+unsigned int sdk_version    ();
+const char* measurement_str (measurement_type_t meas);
 
-int probe_default_init(sensor_t* sensor);
+int probe_default_init      (sensor_t* sensor);
 
 int system_control_clear_bits(sensor_t* sensor, system_control_t bits);
 int system_control_set_bits  (sensor_t* sensor, system_control_t bits);

@@ -43,7 +43,7 @@ static void run_user_callback(sensor_t* sensor, api_event_t event);
 
 
 
-int get_max_instance(ss_register_t ss_register)
+int get_register_instance_cnt(ss_register_t ss_register)
 {
     const _register_t* reg;
     if ((reg = get_register_entry(ss_register)))
@@ -176,7 +176,7 @@ static int sensor_bus_read(sensor_t* sensor, uint16_t reg_addr, uint8_t* buffer,
     uint8_t addr_buf[2];
 
     addr_buf[0] = reg_addr & 0xffU;  // register is 1 byte only
-#if 1
+
     if (sensor->bus_type == SENSOR_BUS_I2C) {
         if ((ret = port_comm_write(sensor->platform, addr_buf, 1)) != E_OK)
             return ret;
@@ -184,15 +184,6 @@ static int sensor_bus_read(sensor_t* sensor, uint16_t reg_addr, uint8_t* buffer,
     ret = port_comm_read(sensor->platform, buffer, buffer_sz);
     if (ret != 0)
         printf("%d\n", ret);
-
-#else
-    //write register addr
-    ret = op_push(OP_SEND, temp.data, temp.data_len);
-    assert(ret == 0);
-    // read data into buffer
-    ret = op_push(OP_RECV, buffer->data, buffer->data_len);
-    assert(ret == 0);
-#endif
     return ret;
 }
 
