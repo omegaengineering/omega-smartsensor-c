@@ -1,7 +1,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/timerfd.h>
-#include "port_linux.h"
+#include "linux_private.h"
 
 
 int linux_timer_start(linux_timer_t* timer, int period_ms)

@@ -65,7 +65,7 @@ typedef enum {
     API_DATA_READY              = DATA_READY_INTR,
     API_FUNCTION_BLOCK          = FUNCTION_BLOCK_INTR,
     API_LOG_DATA_READY          = LOG_DATA_READY_INTR,
-    API_EVENT_CONTINUE          = 0x00010000,
+    API_EVENT_CONTINUE          = 0x00010000,           // no event
     API_EVENT_SENSOR_ATTACHED   = 0x00020000,
     API_EVENT_SENSOR_DETACHED   = 0x00040000,
 } api_event_t;
@@ -81,6 +81,8 @@ typedef struct _sensor_init {
     sensor_bus_type_t   bus_type;               /**< bus type @sensor_bus_type_t */
     event_callback_t    event_callback;         /**< user callback, pass NULL to disable interrupt processing */
     void*               event_callback_ctx;     /**< user provided data pointer to be passed into callback, pass NULL to disable */
+    void*               platform_config;
+    void*               platform;
 } sensor_init_t;
 
 
@@ -92,13 +94,15 @@ typedef struct {
 
 typedef struct _sensor {
     sensor_bus_type_t   bus_type;           /**< type of bus that is being used */
-    event_callback_t    event_callback;     /**< user provided event callback */
-    event_callback_t    event_callback_ctx; /**< user provided context for event callback */
+//    event_callback_t    event_callback;     /**< user provided event callback */
+//    void*               event_callback_ctx; /**< user provided context for event callback */
     data_t              data;               /**< internal data */
     uint8_t             ready;              /**< flag to prevent interrupts from using the SDK if sensor has not been opened */
     void*               platform;
-    uint8_t             do_exit;            /**< flag to exit thread if created */
+//    uint8_t             do_exit;            /**< flag to exit thread if created */
 } sensor_t;
+
+#define SENSOR_INIT     (sensor_t){0}
 
 typedef struct _port_cfg port_cfg_t;
 
@@ -110,9 +114,11 @@ int sensor_init             (sensor_t* sensor, sensor_init_t* init);
  * @param ctx sensor instance
  * @return see @error_t
  */
-int sensor_open             (sensor_t* sensor, const port_cfg_t* config, uint16_t config_sz);
+int sensor_open             (sensor_t* sensor);
 
 int sensor_close            (sensor_t* sensor);
+
+int sensor_poll_event       (sensor_t* sensor, api_event_t* event);
 
 int sensor_heartbeat_enable (sensor_t* sensor, int period_ms);
 
@@ -206,7 +212,7 @@ int get_manufacturing_date  (sensor_t* sensor, sensor_date_t *date);
 int set_current_time        (sensor_t* sensor, sensor_time_t *time);
 int set_interrupt_control   (sensor_t* sensor, interrupt_control_t control);
 int set_sample_time         (sensor_t* sensor, uint16_t sample_time);
-
+int get_sample_time         (sensor_t* sensor, uint16_t* sample_time);
 
 int wait_for_device_ready   (sensor_t* sensor, int max_wait_msec);
 int soft_reset              (sensor_t* sensor);

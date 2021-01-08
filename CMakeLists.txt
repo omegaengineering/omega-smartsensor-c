@@ -36,28 +36,29 @@ include_directories(
         lib/inc)
 
 
-add_library(${PROJECT_NAME}
-        core/op.c
+add_library(smartsensorsdk
         core/registers.c
         core/smartsensor_private.c
         core/smartsensor.c
+        core/port.c
         core/function_block.c
         core/alarm.c
-        core/datalog.c
+        core/datalog.c)
 
+add_library(portlinux
         port/linux/linux_event.c
         port/linux/linux_i2c.c
         port/linux/linux_modbus.c
         port/linux/linux_gpio.c
         port/linux/linux_timer.c
-        port/platform/linux.c
-        )
+        port/linux/port_linux.c)
+target_link_libraries(portlinux smartsensorsdk)
 
 #target_link_libraries(${PROJECT_NAME} pthread modbus)
 #set_target_properties(${PROJECT_NAME} PROPERTIES
 #        PUBLIC_HEADER "core/smartsensor.h")
 
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS smartsensorsdk
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
         PUBLIC_HEADER DESTINATION include/omega)
@@ -67,8 +68,7 @@ install(FILES core/registers.h              DESTINATION include/omega/smartsenso
 install(FILES core/smartsensor_errors.h     DESTINATION include/omega/smartsensor)
 install(FILES port/platform/linux.h         DESTINATION include/omega/smartsensor)
 install(FILES core/port.h                   DESTINATION include/omega/smartsensor)
-add_custom_target(uninstall
-        "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_LIST_DIR}/uninstall.cmake")
+add_custom_target(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_LIST_DIR}/uninstall.cmake")
 
 option(SDK_WITH_TESTS "Build with Tests" OFF)
 if (SDK_WITH_TESTS)

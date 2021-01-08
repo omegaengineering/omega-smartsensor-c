@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include "port_linux.h"
+#include "linux_private.h"
 
 
 int evq_init(ev_queue_t* evq, int size)

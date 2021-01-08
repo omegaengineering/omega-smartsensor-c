@@ -163,7 +163,7 @@ int wait_for_device_ready(sensor_t* sensor, int max_wait_msec)
         ret = get_system_status(sensor, &s);
         if (ret == E_OK && s.device_ready)
             break;
-        port_sleep_ms(200);
+//        port_sleep_ms(200); //TODO
         max_wait_msec -= 200;
     }
    return ret;
@@ -214,6 +214,11 @@ int set_interrupt_control(sensor_t* sensor, interrupt_control_t control)
 int set_sample_time (sensor_t* sensor, uint16_t sample_time)
 {
     return sensor_write(sensor, EVENT_0_TIME_BASE, &sample_time, sizeof(sample_time));
+}
+
+int get_sample_time(sensor_t* sensor, uint16_t* sample_time)
+{
+    return sensor_read(sensor, EVENT_0_TIME_BASE, sample_time, sizeof(*sample_time));
 }
 
 unsigned int sdk_version()

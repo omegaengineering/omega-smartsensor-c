@@ -3,7 +3,7 @@
 #include <modbus/modbus-rtu.h>
 #include <modbus/modbus.h>
 #include "smartsensor.h"
-#include "port_linux.h"
+#include "linux_private.h"
 
 #define MODBUS_BUFFER_SIZE      128      /**< buffer for manipulating user data to modbus endianess */
 #define MODBUS_BAUD             115200

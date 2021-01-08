@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 #include "smartsensor.h"
-#include "port_linux.h"
+#include "linux_private.h"
 
 
 int linux_i2c_open(linux_i2c_t* i2c, const char* resource, sensor_bus_type_t type)

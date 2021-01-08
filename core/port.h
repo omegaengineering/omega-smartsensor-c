@@ -36,7 +36,6 @@
 #include "smartsensor.h"
 #include "smartsensor_private.h"
 
-typedef struct _hal hal_t;
 
 typedef enum {
     EV_COMM_SEND_DONE,
@@ -44,24 +43,59 @@ typedef enum {
     EV_COMM_TIMEOUT,
     EV_HEARTBEAT,
     EV_DAT_INTR,
-    EV_SHUTDOWN, // is it really necessary ?
 } port_event_t;
 
 
-int     port_platform_init(void** hal, const port_cfg_t* config, uint16_t config_sz, sensor_t* sensor);
-int     port_platform_deinit(hal_t* hal, sensor_t* sensor);
+//int     port_platform_init(void** hal, const port_cfg_t* config, uint16_t config_sz, sensor_t* sensor);
+//int     port_platform_deinit(hal_t* hal, sensor_t* sensor);
 
-int     port_comm_write(hal_t* hal, const uint8_t* buffer, uint16_t buffer_size);
-int     port_comm_read (hal_t* hal, uint8_t* buffer, uint16_t buffer_size);
+//int     port_comm_write(hal_t* hal, const uint8_t* buffer, uint16_t buffer_size);
+//int     port_comm_read (hal_t* hal, uint8_t* buffer, uint16_t buffer_size);
 
-int     port_heartbeat_start(hal_t* hal, int period_ms);
-int     port_heartbeat_stop(hal_t* hal);
+//int     port_heartbeat_start(hal_t* hal, int period_ms);
+//int     port_heartbeat_stop(hal_t* hal);
 
-int     port_event_get(hal_t* hal, port_event_t* event);
-int     port_event_put(hal_t* hal, port_event_t event);
+//int     port_event_get(hal_t* hal, port_event_t* event);
+//int     port_event_put(hal_t* hal, port_event_t event);
 
-void    port_sleep_ms(uint32_t ms);
+//void    port_sleep_ms(uint32_t ms);
 
+
+//typedef struct {
+//    port_init       init;
+//    port_deinit     deinit;
+//    port_bus_read   bus_read;
+//    port_bus_write  bus_write;
+//} platform_t;
+
+typedef int     (*port_bus_open_t)(void* p);
+typedef int     (*port_bus_close_t)(void* p);
+typedef int     (*port_bus_read_t)(void* p, uint8_t* buf, uint16_t buf_size);
+typedef int     (*port_bus_write_t)(void* p, const uint8_t* buf, uint16_t buf_size);
+typedef void    (*port_bus_delay_t)(uint32_t ms);
+typedef int     (*port_init_t)(void*p);
+typedef int     (*port_deinit_t)(void*p);
+
+typedef int     (*port_event_get_t)(void* p, port_event_t* event);
+typedef int     (*port_event_put_t)(void* p, port_event_t event);
+
+typedef struct {
+    sensor_t *          sensor;
+    sensor_bus_type_t   bus_type;
+//    int                 bus_id;
+    port_init_t         init;
+    port_deinit_t       deinit;
+//    port_bus_open_t     open;
+//    port_bus_close_t    close;
+    port_bus_read_t     read;
+    port_bus_write_t    write;
+    port_bus_delay_t    delay;
+    port_event_get_t    event_get;
+    port_event_put_t    event_put;
+} port_t;
+
+extern sensor_t*           port_get_sensor(const port_t* p);
+extern sensor_bus_type_t   port_get_bus_type(const port_t* p);
 
 #define         port_ENTER_CRITICAL_SECTION()
 #define         port_EXIT_CRITICAL_SECTION()

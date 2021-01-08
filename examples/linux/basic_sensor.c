@@ -37,39 +37,13 @@
 #include <assert.h>
 #include <string.h>
 #include <signal.h>
-#include <pthread.h>
 #include "smartsensor.h"
 #include "log.h"
-#include "port/platform/linux.h"
+#include "port/linux/port_linux.h"
 
 
 static int do_exit = 0;
-static sensor_t g_sensor;
-
-#if 1
-static port_cfg_t port_cfg = {
-        .bus_res = "/dev/i2c-10",
-        .bus_type = SENSOR_BUS_I2C,
-        .pin_intr = 4,
-        .pin_intr_enable = 1,
-};
-#endif
-#if 0
-static port_cfg_t port_cfg = {
-        .bus_res = "/dev/i2c-2",
-        .bus_type = SENSOR_BUS_I2C,
-        .pin_intr = 60,
-        .pin_intr_enable = 1,
-};
-#endif
-#if 0
-static port_cfg_t port_cfg = {
-        .bus_res = "/dev/ttyACM0",
-        .bus_type = SENSOR_BUS_MODBUS,
-        .pin_intr = 0,
-        .pin_intr_enable = 0,
-};
-#endif
+static sensor_t g_sensor = SENSOR_INIT;
 
 void signal_handler(int sig)
 {
@@ -79,7 +53,7 @@ void signal_handler(int sig)
 void get_readings(sensor_t* sensor)
 {
     int ret;
-    data_time_t time;
+    sensor_time_t time;
     ret = get_current_time(sensor, &time);
     assert(ret == E_OK);
     s_log("Current time %d days %d hours %d mins %d secs\n", time.days, time.hours, time.mins, time.secs);
@@ -101,7 +75,7 @@ void get_readings(sensor_t* sensor)
 }
 
 
-void example_callback(api_event_t event, void* ctx)
+static void example_callback(api_event_t event, void* ctx)
 {
     if (!ctx)
         return;
@@ -127,23 +101,29 @@ int main()
     signal(SIGINT, signal_handler);
     sensor_t* sensor = &g_sensor;
 
-    sensor_init_t init = {
+    linuxConfig_t config = {
+        .bus_res = "/dev/i2c-2",
         .bus_type = SENSOR_BUS_I2C,
-        .event_callback = example_callback,
+        .interrupt_pin = 60,
+        .event_callback = NULL,
         .event_callback_ctx = sensor,
     };
 
-    s_log("sensor init\n");
-    ret = sensor_init(sensor, &init);
-    assert(ret == E_OK);
+    sensor->bus_type = SENSOR_BUS_I2C;
+    sensor->platform = get_platform(&config);
+
+//    s_log("sensor init\n");
+//    ret = sensor_init(sensor, &init);
+//    assert(ret == E_OK);
 
 //    pthread_create(&sensor_thread, NULL, sensor_handler, NULL);
 
     s_log("sensor open\n");
-    ret = sensor_open(sensor, &port_cfg, sizeof(port_cfg));
+    ret = sensor_open(sensor);
     assert(ret == E_OK);
 
     uint8_t data[32];
+    uint16_t u16_data;
 
     ret = sensor_read(sensor, DEVICE_ID, data, sizeof(data));
     assert(ret == E_OK);
@@ -153,12 +133,16 @@ int main()
     assert(ret == E_OK);
     s_log("Firmware: 0x%08X\n", *(uint32_t*)data);
 
+    u16_data = 2;
+    ret = set_sample_time(sensor, u16_data);
+    assert(ret == E_OK);
+
     device_name_t device_name;
     ret = get_device_name(sensor, device_name);
     assert(ret == E_OK);
     s_log("Device name: %s\n", device_name);
 
-    data_date_t calendar;
+    sensor_date_t calendar;
     ret = get_calibration_date(sensor, &calendar);
     assert(ret == E_OK);
     s_log("Calibration date: %02d/%02d/%04d\n", calendar.month, calendar.day, calendar.year);
