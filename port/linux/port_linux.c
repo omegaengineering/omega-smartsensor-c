@@ -15,6 +15,7 @@ typedef struct {
     port_t          base;
     int             interrupt_pin;
     char            bus[128];
+    sensor_bus_type_t bus_type;
     pthread_t       platform_thdl;
     pthread_t       sensor_thdl;
     uint8_t         platform_exit;
@@ -155,7 +156,6 @@ int linux_init (void* port)
     if (!port)
         return E_INVALID_PARAM;
     portLinux_t * p = port;
-    sensor_bus_type_t bus_type = port_get_bus_type(&p->base);
 
     if ((ret = pthread_mutex_init(&p->evq_lock, NULL)) != 0)
         goto ERROR;
@@ -169,11 +169,11 @@ int linux_init (void* port)
     if ((ret = pthread_mutex_init(&p->bus_lock, NULL)) != 0)
         goto ERROR;
 
-    if (bus_type == SENSOR_BUS_I2C) {
-        if ((ret = linux_i2c_open(&p->i2c, p->bus, bus_type)) != E_OK)
+    if (p->bus_type == SENSOR_BUS_I2C) {
+        if ((ret = linux_i2c_open(&p->i2c, p->bus, p->bus_type)) != E_OK)
             goto ERROR;
     }
-    else if (bus_type == SENSOR_BUS_MODBUS) {
+    else if (p->bus_type == SENSOR_BUS_MODBUS) {
 
     }
 
@@ -289,13 +289,18 @@ int port_event_put(void* p, port_event_t event)
     return ret;
 }
 
+sensor_bus_type_t port_bus_type(void* port)
+{
+    portLinux_t * p = port;
+    return p->bus_type;
+}
+
 void* get_platform(void* cfg)
 {
     linuxConfig_t * config = cfg;
     portLinux_t* portLinux = malloc(sizeof(portLinux_t));
     if (portLinux) {
         memset(portLinux, 0, sizeof(portLinux_t));
-        portLinux->base.bus_type = config->bus_type;
         portLinux->interrupt_pin = config->interrupt_pin;
         strncpy(portLinux->bus, config->bus_res, sizeof(portLinux->bus));
         portLinux->base.init = linux_init;
@@ -303,6 +308,7 @@ void* get_platform(void* cfg)
         portLinux->base.read = port_comm_read;
         portLinux->base.write = port_comm_write;
         portLinux->base.delay = port_sleep_ms;
+        portLinux->base.bus_type = port_bus_type;
         portLinux->base.event_get = port_event_get;
         portLinux->base.event_put = port_event_put;
         portLinux->event_callback = config->event_callback;

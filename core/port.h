@@ -78,15 +78,15 @@ typedef int     (*port_deinit_t)(void*p);
 
 typedef int     (*port_event_get_t)(void* p, port_event_t* event);
 typedef int     (*port_event_put_t)(void* p, port_event_t event);
+typedef sensor_bus_type_t (*port_bus_type_t)();
 
 typedef struct {
     sensor_t *          sensor;
-    sensor_bus_type_t   bus_type;
-//    int                 bus_id;
     port_init_t         init;
     port_deinit_t       deinit;
 //    port_bus_open_t     open;
 //    port_bus_close_t    close;
+    port_bus_type_t     bus_type;
     port_bus_read_t     read;
     port_bus_write_t    write;
     port_bus_delay_t    delay;
@@ -95,7 +95,6 @@ typedef struct {
 } port_t;
 
 extern sensor_t*           port_get_sensor(const port_t* p);
-extern sensor_bus_type_t   port_get_bus_type(const port_t* p);
 
 #define         port_ENTER_CRITICAL_SECTION()
 #define         port_EXIT_CRITICAL_SECTION()

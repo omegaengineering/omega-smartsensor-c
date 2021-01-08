@@ -47,34 +47,20 @@ int get_register_instance_cnt(ss_register_t ss_register)
     return 0;
 }
 
-
-//int sensor_init (sensor_t* sensor, sensor_init_t* init)
-//{
-//    memset(sensor, 0, sizeof(*sensor));
-//    if (init->bus_type != SENSOR_BUS_I2C && init->bus_type != SENSOR_BUS_MODBUS)
-//        return E_BUS_TYPE;  // not supported
-//    sensor->bus_type = init->bus_type;
-//    sensor->event_callback = init->event_callback;
-//    if (sensor->event_callback)
-//        sensor->event_callback_ctx = init->event_callback_ctx;
-//    sensor->platform = init->platform;
-//    // open with configuration
-//    return ((port_t*)(sensor->platform))->init(&sensor->platform, init->platform_config);
-//}
-
-
 int sensor_open (sensor_t* sensor)
 {
     int ret;
     port_t * p = sensor->platform;
     p->sensor = sensor;
-    return p->init(p);
+    if ((ret = p->init(p)) == 0) {
+        sensor->bus_type = p->bus_type(p);
+    }
+    return ret;
 }
 
 int sensor_close(sensor_t* sensor)
 {
     int ret;
-//    sensor->do_exit = 1;
     port_t * p = sensor->platform;
     return p->deinit(sensor->platform);
 }
@@ -179,7 +165,7 @@ static int sensor_bus_read(sensor_t* sensor, uint16_t reg_addr, uint8_t* buffer,
     addr_buf[0] = reg_addr & 0xffU;  // register is 1 byte only
 
     if (sensor->bus_type == SENSOR_BUS_I2C) {
-        if ((ret = p->read(sensor->platform, addr_buf, 1)) != E_OK)
+        if ((ret = p->write(sensor->platform, addr_buf, 1)) != E_OK)
             return ret;
     }
     ret = p->read(sensor->platform, buffer, buffer_sz);
@@ -291,7 +277,7 @@ int sensor_poll_event(sensor_t* sensor, api_event_t* event)
 {
     int ret;
     port_event_t port_event;
-    api_event_t api_event = API_EVENT_CONTINUE;
+    *event = API_EVENT_CONTINUE;
     port_t* p = sensor->platform;
 
     ret = p->event_get(p, &port_event);
@@ -306,10 +292,10 @@ int sensor_poll_event(sensor_t* sensor, api_event_t* event)
             case EV_COMM_TIMEOUT:
                 break;
             case EV_HEARTBEAT:
-                ret = handle_event_heartbeat(sensor, &api_event);
+                ret = handle_event_heartbeat(sensor, event);
                 break;
             case EV_DAT_INTR:
-                ret = handle_event_data_intr(sensor, &api_event);
+                ret = handle_event_data_intr(sensor, event);
                 break;
             default:
                 break;
@@ -317,20 +303,6 @@ int sensor_poll_event(sensor_t* sensor, api_event_t* event)
     }
     return ret;
 }
-
-//void* sensor_thread(void* args)
-//{
-//    if (!args)
-//        return NULL;
-//
-//    sensor_t* sensor = args;
-//
-//    while (!sensor->do_exit)
-//    {
-//        sensor_poll_event(sensor);
-//    }
-//    return NULL;
-//}
 
 int sensor_indexed_write(sensor_t* sensor, ss_register_t base_register, uint8_t index, void* buffer, uint16_t buffer_sz)
 {

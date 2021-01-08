@@ -100,30 +100,23 @@ int main()
     int ret;
     signal(SIGINT, signal_handler);
     sensor_t* sensor = &g_sensor;
+    uint8_t data[32];
+    uint16_t u16_data;
+    uint32_t u32_data;
 
     linuxConfig_t config = {
         .bus_res = "/dev/i2c-2",
         .bus_type = SENSOR_BUS_I2C,
         .interrupt_pin = 60,
-        .event_callback = NULL,
+        .event_callback = example_callback,
         .event_callback_ctx = sensor,
     };
 
     sensor->bus_type = SENSOR_BUS_I2C;
     sensor->platform = get_platform(&config);
 
-//    s_log("sensor init\n");
-//    ret = sensor_init(sensor, &init);
-//    assert(ret == E_OK);
-
-//    pthread_create(&sensor_thread, NULL, sensor_handler, NULL);
-
-    s_log("sensor open\n");
     ret = sensor_open(sensor);
     assert(ret == E_OK);
-
-    uint8_t data[32];
-    uint16_t u16_data;
 
     ret = sensor_read(sensor, DEVICE_ID, data, sizeof(data));
     assert(ret == E_OK);
@@ -164,7 +157,8 @@ int main()
     ret = sensor_heartbeat_enable(sensor, 2000);
     assert(ret == E_OK);
 
-    probe_default_init(sensor);
+    ret = probe_default_init(sensor);
+    assert(ret == E_OK);
 
     while (!do_exit)
     {
