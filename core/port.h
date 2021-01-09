@@ -47,8 +47,8 @@ typedef enum {
 
 typedef int     (*port_bus_open_t)(void* p);
 typedef int     (*port_bus_close_t)(void* p);
-typedef int     (*port_bus_read_t)(void* p, uint8_t* buf, uint16_t buf_size);
-typedef int     (*port_bus_write_t)(void* p, const uint8_t* buf, uint16_t buf_size);
+typedef int     (*port_bus_read_t)(void* p, uint16_t reg, uint8_t* buf, uint16_t buf_size);
+typedef int     (*port_bus_write_t)(void* p, uint16_t reg, const uint8_t* buf, uint16_t buf_size);
 typedef void    (*port_bus_delay_t)(uint32_t ms);
 typedef int     (*port_init_t)(void*p);
 typedef int     (*port_deinit_t)(void*p);

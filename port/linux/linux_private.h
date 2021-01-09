@@ -4,14 +4,17 @@
 #include "port_linux.h"
 
 #if I2C_SENSOR
+#define I2C_BUFFER_SIZE     128
+
 typedef struct _bus_i2c {
     int         fd;
+    uint8_t     i2c_buf[I2C_BUFFER_SIZE];
 } linux_i2c_t;
 
 int  linux_i2c_open(linux_i2c_t* i2c, const char* resource, sensor_bus_type_t type);
 int  linux_i2c_close(linux_i2c_t* i2c);
-int  linux_i2c_read(linux_i2c_t* i2c, uint8_t* buffer, uint16_t buffer_size);
-int  linux_i2c_write(linux_i2c_t* i2c, const uint8_t* buffer, uint16_t buffer_size);
+int  linux_i2c_read(linux_i2c_t* i2c, uint16_t reg_addr, uint8_t* buffer, uint16_t buffer_size);
+int  linux_i2c_write(linux_i2c_t* i2c, uint16_t reg_addr, const uint8_t* buffer, uint16_t buffer_size);
 #endif
 
 typedef struct {
@@ -70,8 +73,8 @@ typedef struct {
 } linux_modbus_t;
 
 int linux_modbus_open(linux_modbus_t* mb, const char* device);
-int linux_modbus_read(linux_modbus_t* mb, uint16_t reg_addr, void* buffer, uint16_t buffer_sz);
-int linux_modbus_write(linux_modbus_t* mb, uint16_t reg_addr, void* buffer, uint16_t buffer_sz);
+int linux_modbus_read(linux_modbus_t* mb, uint16_t reg_addr, uint8_t* buffer, uint16_t buffer_sz);
+int linux_modbus_write(linux_modbus_t* mb, uint16_t reg_addr, const uint8_t* buffer, uint16_t buffer_sz);
 int linux_modbus_close(linux_modbus_t* mb);
 #endif
 

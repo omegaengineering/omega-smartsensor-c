@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.7)
 
 include_directories(../../port)
 
-
 add_executable(demo_linux basic_sensor.c)
 target_link_libraries(demo_linux smartsensorsdk portlinux modbus pthread)
 

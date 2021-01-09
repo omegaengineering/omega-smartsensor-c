@@ -8,8 +8,8 @@
 #include "log.h"
 #include "linux_private.h"
 
-#define MAX_POLL    2
-#define MAX_EVENTS  10
+#define MAX_POLL            2
+#define MAX_EVENTS          10
 
 typedef struct {
     port_t          base;
@@ -54,6 +54,7 @@ static poll_data_t g_poll_data;
 
 int port_event_put(void* p, port_event_t event);
 int port_event_get(void* p, port_event_t* event);
+static int is_interrupt_used(portLinux_t* port);
 
 static void update_poll_data(poll_data_t * poll, portLinux_t* hal)
 {
@@ -67,7 +68,7 @@ static void update_poll_data(poll_data_t * poll, portLinux_t* hal)
         poll->n_poll++;
     }
     // data interrupt
-    if (hal->interrupt_pin >= 0) {
+    if (is_interrupt_used(hal)) {
         poll->descriptors[poll->n_poll].type = POLL_DAT_INTR;
         poll->descriptors[poll->n_poll].fd = gpio_get_fd(&hal->interrupt_gpio);
         poll->polls[poll->n_poll].fd = poll->descriptors[poll->n_poll].fd;
@@ -155,6 +156,11 @@ void* sensor_thread(void* args)
     return NULL;
 }
 
+static int is_interrupt_used(portLinux_t* port)
+{
+    return port->interrupt_pin >= 0 && port->bus_type == SENSOR_BUS_I2C;
+}
+
 int linux_init (void* port)
 {
     int ret;
@@ -190,7 +196,8 @@ int linux_init (void* port)
     if (ret)
         goto ERROR;
 
-    if (p->interrupt_pin >= 0) {
+    // modbus uart does not use interrupt pin
+    if (is_interrupt_used(p)) {
         if ((ret = gpio_init(&p->interrupt_gpio, p->interrupt_pin)) != E_OK)
             goto ERROR;
 
@@ -219,7 +226,7 @@ int linux_init (void* port)
 ERROR:
     perror(__FUNCTION__);
     evq_close(&p->events);
-    if (p->interrupt_pin >= 0)
+    if (is_interrupt_used(p))
         gpio_close(&p->interrupt_gpio);
     return -1;
 }
@@ -232,10 +239,17 @@ int linux_deinit(void* port)
         pthread_join(p->sensor_thdl, NULL);
     }
     pthread_join(p->platform_thdl, NULL);
+    if (p->bus_type == SENSOR_BUS_I2C) {
 #if I2C_SENSOR
-    linux_i2c_close(&p->i2c);
+        linux_i2c_close(&p->i2c);
 #endif
-    if (p->interrupt_pin >= 0) {
+    }
+    else if (p->bus_type == SENSOR_BUS_MODBUS) {
+#if MODBUS_SENSOR
+        linux_modbus_close(&p->modbus);
+#endif
+    }
+    if (is_interrupt_used(p)) {
         gpio_close(&p->interrupt_gpio);
     }
     evq_close(&p->events);
@@ -243,40 +257,42 @@ int linux_deinit(void* port)
     return E_OK;
 }
 
-int port_comm_write(void* p, const uint8_t* buffer, uint16_t buffer_size)
+int port_comm_write(void* p, uint16_t reg, const uint8_t* buffer, uint16_t buffer_size)
 {
-    int ret;
+    int ret = E_PORT_UNAVAILABLE;
     portLinux_t * hal = p;
     pthread_mutex_lock(&hal->bus_lock);
-#if I2C_SENSOR
+
     if (hal->bus_type == SENSOR_BUS_I2C) {
-        ret = linux_i2c_write(&hal->i2c, buffer, buffer_size);
-    }
+#if I2C_SENSOR
+        ret = linux_i2c_write(&hal->i2c, reg, buffer, buffer_size);
 #endif
+    }
+    else if (hal->bus_type == SENSOR_BUS_MODBUS) {
 #if MODBUS_SENSOR
-    if (hal->bus_type == SENSOR_BUS_MODBUS) {
-        ret = linux_modbus_write(&hal->modbus, buffer, buffer_size);
-    }
+        ret = linux_modbus_write(&hal->modbus, reg, buffer, buffer_size);
 #endif
+    }
     pthread_mutex_unlock(&hal->bus_lock);
     return ret;
 }
 
-int port_comm_read (void* p, uint8_t* buffer, uint16_t buffer_size)
+int port_comm_read (void* p, uint16_t reg, uint8_t* buffer, uint16_t buffer_size)
 {
-    int ret;
+    int ret = E_PORT_UNAVAILABLE;
     portLinux_t * hal = p;
     pthread_mutex_lock(&hal->bus_lock);
-#if I2C_SENSOR
+
     if (hal->bus_type == SENSOR_BUS_I2C) {
-        ret = linux_i2c_read(&hal->i2c, buffer, buffer_size);
-    }
+#if I2C_SENSOR
+        ret = linux_i2c_read(&hal->i2c, reg, buffer, buffer_size);
 #endif
+    }
+    else if (hal->bus_type == SENSOR_BUS_MODBUS) {
 #if MODBUS_SENSOR
-    if (hal->bus_type == SENSOR_BUS_MODBUS) {
-        ret = linux_modbus_read(&hal->modbus, buffer, buffer_size);
-    }
+        ret = linux_modbus_read(&hal->modbus, reg, buffer, buffer_size);
 #endif
+    }
     pthread_mutex_unlock(&hal->bus_lock);
     return ret;
 }
@@ -338,6 +354,9 @@ void* get_platform(void* cfg)
         memset(portLinux, 0, sizeof(portLinux_t));
         portLinux->interrupt_pin = config->interrupt_pin;
         strncpy(portLinux->bus, config->bus_res, sizeof(portLinux->bus));
+        portLinux->event_callback = config->event_callback;
+        portLinux->event_callback_ctx = config->event_callback_ctx;
+        portLinux->bus_type = config->bus_type;
         portLinux->base.init = linux_init;
         portLinux->base.deinit = linux_deinit;
         portLinux->base.read = port_comm_read;
@@ -348,8 +367,6 @@ void* get_platform(void* cfg)
         portLinux->base.event_put = port_event_put;
         portLinux->base.timer_start = port_heartbeat_start;
         portLinux->base.timer_stop = port_heartbeat_stop;
-        portLinux->event_callback = config->event_callback;
-        portLinux->event_callback_ctx = config->event_callback_ctx;
     }
     return (void*) portLinux;
 }

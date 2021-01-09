@@ -1,9 +1,11 @@
 #include <stdint.h>
 #include <string.h>
+#include <errno.h>
 #include <modbus/modbus-rtu.h>
 #include <modbus/modbus.h>
 #include "smartsensor.h"
 #include "linux_private.h"
+#include "log.h"
 
 #define MODBUS_BAUD             115200
 #define MODBUS_PARITY           'N'
@@ -15,11 +17,13 @@ int linux_modbus_open(linux_modbus_t* mb, const char* device)
 {
     int ret;
     mb->mb = modbus_new_rtu(device,
-                        MODBUS_BAUD,
+                        SMARTSENSOR_MODBUS_BAUDRATE,
                         MODBUS_PARITY,
                         MODBUS_DATA_BITS,
                         MODBUS_STOP_BITS);
     if (mb->mb == NULL)
+        return E_BUS_OPERATION;
+    if ((ret = modbus_set_slave(mb->mb, SMARTSENSOR_MODBUS_ADDR) < 0))
         return E_BUS_OPERATION;
     if ((ret = modbus_connect(mb->mb)) < 0)
         return E_BUS_OPERATION;
@@ -31,7 +35,7 @@ static void linux_modbus_set_slave(linux_modbus_t* mb, uint16_t dev_addr)
     mb->dev_addr = dev_addr;
 }
 
-int linux_modbus_read(linux_modbus_t* mb, uint16_t reg_addr, void* buffer, uint16_t buffer_sz)
+int linux_modbus_read(linux_modbus_t* mb, uint16_t reg_addr, uint8_t* buffer, uint16_t buffer_sz)
 {
     int ret;
     uint16_t rx_size = buffer_sz % 2 ? buffer_sz + 1: buffer_sz;
@@ -53,7 +57,7 @@ int linux_modbus_read(linux_modbus_t* mb, uint16_t reg_addr, void* buffer, uint1
     return E_OK;
 }
 
-int linux_modbus_write(linux_modbus_t* mb, uint16_t reg_addr, void* buffer, uint16_t buffer_sz)
+int linux_modbus_write(linux_modbus_t* mb, uint16_t reg_addr, const uint8_t* buffer, uint16_t buffer_sz)
 {
     int ret;
     uint16_t tx_size = buffer_sz % 2 ? buffer_sz + 1: buffer_sz;

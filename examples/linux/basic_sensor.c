@@ -41,7 +41,7 @@
 #include "log.h"
 #include "port/linux/port_linux.h"
 
-#define USE_PLATFORM_THREAD     1
+#define USE_PLATFORM_THREAD     0
 
 static int do_exit = 0;
 static sensor_t g_sensor = SENSOR_INIT;
@@ -107,16 +107,19 @@ int main()
     uint32_t u32_data;
 
     linuxConfig_t config = {
+#if I2C_SENSOR
         .bus_res = "/dev/i2c-2",
         .bus_type = SENSOR_BUS_I2C,
+#elif MODBUS_SENSOR
+        .bus_res = "/dev/ttyACM0",
+        .bus_type = SENSOR_BUS_MODBUS,
+#endif
         .interrupt_pin = 60,
 #if USE_PLATFORM_THREAD
         .event_callback = example_callback,
 #endif
         .event_callback_ctx = sensor,
     };
-
-    sensor->bus_type = SENSOR_BUS_I2C;
     sensor->platform = get_platform(&config);
 
     ret = sensor_open(sensor);

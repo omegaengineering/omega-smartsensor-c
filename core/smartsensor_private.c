@@ -134,7 +134,7 @@ static int i2c_set_index(sensor_t* sensor, uint16_t u16_Register_in, uint16_t *u
         buffer[1] = u16_Register_in >> 8u;
         buffer[2] = u16_Register_in;
 
-        if ((ret = p->write(p, buffer, 3)) == E_OK) {
+        if ((ret = p->write(p, R_REGISTER_ACCESS, &buffer[1], 2)) == E_OK) {
             *u16_Register_out = ((u16_Register_in >> 10u) + R_ACCESS_FACTORY_INDEX);  //R_FACTORY_ACCESS
         }
     } else if (u16_Register_in >= R_ACCESS_BLOCK_START && u16_Register_in <= R_ACCESS_BLOCK_END) {
@@ -143,7 +143,7 @@ static int i2c_set_index(sensor_t* sensor, uint16_t u16_Register_in, uint16_t *u
         buffer[1] = u16_Register_in >> 8u;
         buffer[2] = u16_Register_in;
 
-        if ((ret = p->write(p, buffer, 3)) == E_OK) {
+        if ((ret = p->write(p, R_REGISTER_ACCESS, &buffer[1], 2)) == E_OK) {
             *u16_Register_out = ((u16_Register_in >> 10u) + R_ACCESS_BLOCK_INDEX);
         }
     } else if (u16_Register_in >= R_ACCESS_SENSOR_START && u16_Register_in <= R_ACCESS_SENSOR_END) {
@@ -156,44 +156,12 @@ static int i2c_set_index(sensor_t* sensor, uint16_t u16_Register_in, uint16_t *u
     return ret;
 }
 
-static int sensor_bus_read(sensor_t* sensor, uint16_t reg_addr, uint8_t* buffer, uint16_t buffer_sz)
-{
-    int ret;
-    uint8_t addr_buf[2];
-    port_t* p = sensor->platform;
-
-    addr_buf[0] = reg_addr & 0xffU;  // register is 1 byte only
-
-    if (sensor->bus_type == SENSOR_BUS_I2C) {
-        if ((ret = p->write(p, addr_buf, 1)) != E_OK)
-            return ret;
-    }
-    ret = p->read(p, buffer, buffer_sz);
-    return ret;
-}
-
-static int sensor_bus_write(sensor_t* sensor, uint16_t reg_addr, uint8_t* buffer, uint16_t buffer_sz)
-{
-    int ret;
-    port_t* p = sensor->platform;
-    uint8_t temp[48];
-
-    if (buffer_sz > sizeof(temp) - 1)
-        return E_BUFFER_MEM_SIZE;
-
-    // we have to write the data to the bus at one shot starting with reg addr
-    temp[0] = reg_addr & 0xffU;
-    memcpy(temp + 1, buffer, buffer_sz);
-
-    ret = p->write(p, temp, buffer_sz + 1);
-    return ret;
-}
-
 int sensor_indexed_read(sensor_t* sensor, ss_register_t base_reg, uint8_t index, void* buffer, uint16_t buffer_sz)
 {
     int ret;
     uint16_t reg_addr;
     const _register_t *reg;
+    port_t* p = sensor->platform;
 
     if (!(reg = get_register_entry(base_reg)))
         return E_INVALID_PARAM;
@@ -214,7 +182,7 @@ int sensor_indexed_read(sensor_t* sensor, ss_register_t base_reg, uint8_t index,
     }
 
     // only read up to the actual data size
-    ret = sensor_bus_read(sensor, reg_addr, buffer, reg->size);
+    ret = p->read(p, reg_addr, buffer, reg->size);
     if (ret == E_OK && !(reg->access & BYTES))    // reverse I2C data (in MSB) to LSB format
         reverse_bytes(buffer, reg->size);
 
@@ -306,6 +274,7 @@ int sensor_indexed_write(sensor_t* sensor, ss_register_t base_register, uint8_t 
     int ret = 0;
     uint16_t reg_addr;
     const _register_t *reg;
+    port_t* p = sensor->platform;
 
     if (!(reg = get_register_entry(base_register)))
         return E_INVALID_PARAM;
@@ -328,7 +297,7 @@ int sensor_indexed_write(sensor_t* sensor, ss_register_t base_register, uint8_t 
     // only write up to the actual data size
     if (ret == E_OK && !(reg->access & BYTES))    // reverse I2C data (in MSB) to LSB format
         reverse_bytes(buffer, reg->size);
-    ret = sensor_bus_write(sensor, reg_addr, buffer, buffer_sz);
+    ret = p->write(p, reg_addr, buffer, buffer_sz);
 
     port_EXIT_CRITICAL_SECTION();
     return ret;
