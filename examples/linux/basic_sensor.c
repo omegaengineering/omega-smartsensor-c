@@ -41,16 +41,17 @@
 #include "log.h"
 #include "port/linux/port_linux.h"
 
+#define USE_PLATFORM_THREAD     1
 
 static int do_exit = 0;
 static sensor_t g_sensor = SENSOR_INIT;
 
-void signal_handler(int sig)
+static void signal_handler(int sig)
 {
     do_exit = 1;
 }
 
-void get_readings(sensor_t* sensor)
+static void get_readings(sensor_t* sensor)
 {
     int ret;
     sensor_time_t time;
@@ -100,6 +101,7 @@ int main()
     int ret;
     signal(SIGINT, signal_handler);
     sensor_t* sensor = &g_sensor;
+    api_event_t event;
     uint8_t data[32];
     uint16_t u16_data;
     uint32_t u32_data;
@@ -108,7 +110,9 @@ int main()
         .bus_res = "/dev/i2c-2",
         .bus_type = SENSOR_BUS_I2C,
         .interrupt_pin = 60,
+#if USE_PLATFORM_THREAD
         .event_callback = example_callback,
+#endif
         .event_callback_ctx = sensor,
     };
 
@@ -162,7 +166,13 @@ int main()
 
     while (!do_exit)
     {
+#if USE_PLATFORM_THREAD
         sleep(1);
+#else
+        if ((ret = sensor_poll_event(sensor, &event)) == E_OK) {
+            example_callback(event, sensor);
+        }
+#endif
     }
 
     // close the device

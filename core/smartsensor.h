@@ -77,15 +77,6 @@ typedef enum {
     SENSOR_BUS_MODBUS                           /**< type of bus_id is Uart Modbus */
 } sensor_bus_type_t;
 
-typedef struct _sensor_init {
-    sensor_bus_type_t   bus_type;               /**< bus type @sensor_bus_type_t */
-    event_callback_t    event_callback;         /**< user callback, pass NULL to disable interrupt processing */
-    void*               event_callback_ctx;     /**< user provided data pointer to be passed into callback, pass NULL to disable */
-    void*               platform_config;
-    void*               platform;
-} sensor_init_t;
-
-
 typedef struct {
     uint8_t     sensor_attached;
     uint32_t    stat_attach_counter;
@@ -94,20 +85,12 @@ typedef struct {
 
 typedef struct _sensor {
     sensor_bus_type_t   bus_type;           /**< type of bus that is being used */
-//    event_callback_t    event_callback;     /**< user provided event callback */
-//    void*               event_callback_ctx; /**< user provided context for event callback */
     data_t              data;               /**< internal data */
     uint8_t             ready;              /**< flag to prevent interrupts from using the SDK if sensor has not been opened */
     void*               platform;
-//    uint8_t             do_exit;            /**< flag to exit thread if created */
 } sensor_t;
 
 #define SENSOR_INIT     (sensor_t){0}
-
-typedef struct _port_cfg port_cfg_t;
-
-
-int sensor_init             (sensor_t* sensor, sensor_init_t* init);
 
 /**
  * Open the communicating bus and initialize the device
@@ -218,7 +201,7 @@ int wait_for_device_ready   (sensor_t* sensor, int max_wait_msec);
 int soft_reset              (sensor_t* sensor);
 int factory_reset           (sensor_t* sensor);
 int preset_config           (sensor_t* sensor);
-unsigned int sdk_version    ();
+unsigned int sensor_sdk_version();
 const char* measurement_str (measurement_type_t meas);
 
 int probe_default_init      (sensor_t* sensor);

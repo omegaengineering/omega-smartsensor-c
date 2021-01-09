@@ -221,7 +221,7 @@ int get_sample_time(sensor_t* sensor, uint16_t* sample_time)
     return sensor_read(sensor, EVENT_0_TIME_BASE, sample_time, sizeof(*sample_time));
 }
 
-unsigned int sdk_version()
+unsigned int sensor_sdk_version()
 {
     return SMARTSENSOR_SDK_VERSION;
 }
