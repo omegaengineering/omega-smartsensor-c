@@ -68,6 +68,7 @@ static void update_poll_data(poll_data_t * poll, portLinux_t* hal)
         poll->n_poll++;
     }
     // data interrupt
+#if I2C_SENSOR
     if (is_interrupt_used(hal)) {
         poll->descriptors[poll->n_poll].type = POLL_DAT_INTR;
         poll->descriptors[poll->n_poll].fd = gpio_get_fd(&hal->interrupt_gpio);
@@ -75,7 +76,7 @@ static void update_poll_data(poll_data_t * poll, portLinux_t* hal)
         poll->polls[poll->n_poll].events = POLLPRI;
         poll->n_poll++;
     }
-
+#endif
 }
 
 static void process_poll_data(poll_data_t * poll, portLinux_t * p)
@@ -196,6 +197,7 @@ int linux_init (void* port)
     if (ret)
         goto ERROR;
 
+#if I2C_SENSOR
     // modbus uart does not use interrupt pin
     if (is_interrupt_used(p)) {
         if ((ret = gpio_init(&p->interrupt_gpio, p->interrupt_pin)) != E_OK)
@@ -213,6 +215,7 @@ int linux_init (void* port)
         if ((ret = gpio_open(&p->interrupt_gpio)) != E_OK)
             goto ERROR;
     }
+#endif
 
     if ((ret = pthread_create(&p->platform_thdl, NULL, platform_thread, p)) != 0)
         goto ERROR;
@@ -226,8 +229,10 @@ int linux_init (void* port)
 ERROR:
     perror(__FUNCTION__);
     evq_close(&p->events);
+#if I2C_SENSOR
     if (is_interrupt_used(p))
         gpio_close(&p->interrupt_gpio);
+#endif
     return -1;
 }
 
@@ -249,9 +254,11 @@ int linux_deinit(void* port)
         linux_modbus_close(&p->modbus);
 #endif
     }
+#if I2C_SENSOR
     if (is_interrupt_used(p)) {
         gpio_close(&p->interrupt_gpio);
     }
+#endif
     evq_close(&p->events);
     free(p);
     return E_OK;

@@ -30,8 +30,6 @@ endif()
 set(SDK_INCLUDES
         core/smartsensor.h)
 
-#find_package(Threads REQUIRED)
-
 include_directories(
         ${CMAKE_CURRENT_LIST_DIR}
         core
@@ -49,7 +47,6 @@ add_library(smartsensorsdk
 
 set(portlinux_SRC
         port/linux/linux_event.c
-        port/linux/linux_gpio.c
         port/linux/linux_timer.c
         port/linux/port_linux.c)
 if (MODBUS_SENSOR)
@@ -57,16 +54,15 @@ if (MODBUS_SENSOR)
     set(portlinux_LIBS modbus)
 endif()
 if (I2C_SENSOR)
-    set(portlinux_SRC ${portlinux_SRC} port/linux/linux_i2c.c)
+    set(portlinux_SRC
+            ${portlinux_SRC}
+            port/linux/linux_i2c.c
+            port/linux/linux_gpio.c)
     set(portlinux_LIBS )
 endif()
 
 add_library(portlinux ${portlinux_SRC})
 target_link_libraries(portlinux smartsensorsdk ${portlinux_LIBS})
-
-#target_link_libraries(${PROJECT_NAME} pthread modbus)
-#set_target_properties(${PROJECT_NAME} PROPERTIES
-#        PUBLIC_HEADER "core/smartsensor.h")
 
 install(TARGETS smartsensorsdk
         LIBRARY DESTINATION lib
