@@ -15,6 +15,7 @@ typedef enum {
     E_FULL,
     E_EMPTY,
     E_CONTINUE,
+    E_PORT_UNAVAILABLE
 } error_t;
 
 #endif //SMARTSENSOR_SMARTSENSOR_ERRORS_H

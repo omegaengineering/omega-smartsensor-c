@@ -51,11 +51,15 @@ int sensor_open (sensor_t* sensor)
 {
     int ret;
     port_t * p = sensor->platform;
-    p->sensor = sensor;
-    if ((ret = p->init(p)) == 0) {
-        sensor->bus_type = p->bus_type(p);
+    if (!p->init || !p->deinit
+        || !p->read || !p->write
+        || !p->bus_type || !p->delay
+        || !p->event_get) {
+        return E_PORT_UNAVAILABLE;
     }
-    return ret;
+    p->sensor = sensor;
+    sensor->bus_type = p->bus_type(p);
+    return p->init(p);
 }
 
 int sensor_close(sensor_t* sensor)
@@ -68,18 +72,14 @@ int sensor_close(sensor_t* sensor)
 
 int sensor_heartbeat_enable (sensor_t* sensor, int period_ms)
 {
-    int ret;
-//    if ((ret = port_heartbeat_start(sensor->platform, period_ms)))
-//        return ret;
-    return E_OK;
+    port_t * p = sensor->platform;
+    return p->timer_start ? p->timer_start(p, period_ms) : E_PORT_UNAVAILABLE;
 }
 
 int sensor_heartbeat_disable(sensor_t* sensor)
 {
-    int ret;
-//    if ((ret = port_heartbeat_stop(sensor->platform)))
-//        return ret;
-    return E_OK;
+    port_t * p = sensor->platform;
+    return p->timer_stop ? p->timer_stop(p) : E_PORT_UNAVAILABLE;
 }
 
 
@@ -169,8 +169,6 @@ static int sensor_bus_read(sensor_t* sensor, uint16_t reg_addr, uint8_t* buffer,
             return ret;
     }
     ret = p->read(sensor->platform, buffer, buffer_sz);
-    if (ret != 0)
-        printf("%d\n", ret);
     return ret;
 }
 
@@ -250,7 +248,6 @@ static int handle_event_data_intr(sensor_t* sensor, api_event_t* event)
                 sensor->data.stat_attach_counter++;
                 sensor->data.sensor_attached = true;
                 sensor->data.heartbeat_misses = 0;
-                s_log("Probe attached\n");
                 *event = API_EVENT_SENSOR_ATTACHED;
             }
         }
@@ -266,8 +263,8 @@ static int handle_event_heartbeat(sensor_t* sensor, api_event_t* event)
         sensor->data.heartbeat_misses++;
         if (sensor->data.sensor_attached && sensor->data.heartbeat_misses > HEARTBEAT_MAX_MISS) {
             sensor->data.sensor_attached = false;
-            s_log("Probe detached\n");
             *event = API_EVENT_SENSOR_DETACHED;
+            ret = 0; // event was handled
         }
     }
     return ret;

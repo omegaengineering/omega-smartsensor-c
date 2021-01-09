@@ -248,13 +248,15 @@ int port_comm_read (void* p, uint8_t* buffer, uint16_t buffer_size)
     return ret;
 }
 
-int port_heartbeat_start (portLinux_t* hal, int period_ms)
+int port_heartbeat_start (void* p, uint32_t period_ms)
 {
+    portLinux_t * hal = p;
     return linux_timer_start(&hal->heartbeat, period_ms);
 }
 
-int port_heartbeat_stop(portLinux_t* hal)
+int port_heartbeat_stop(void* p)
 {
+    portLinux_t * hal = p;
     return linux_timer_stop(&hal->heartbeat);
 }
 
@@ -311,6 +313,8 @@ void* get_platform(void* cfg)
         portLinux->base.bus_type = port_bus_type;
         portLinux->base.event_get = port_event_get;
         portLinux->base.event_put = port_event_put;
+        portLinux->base.timer_start = port_heartbeat_start;
+        portLinux->base.timer_stop = port_heartbeat_stop;
         portLinux->event_callback = config->event_callback;
         portLinux->event_callback_ctx = config->event_callback_ctx;
     }
