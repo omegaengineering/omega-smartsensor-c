@@ -42,6 +42,7 @@
 #include "port/linux/port_linux.h"
 
 #define USE_PLATFORM_THREAD     0
+#define USE_I2C_SENSOR          0
 
 static int do_exit = 0;
 static sensor_t g_sensor = SENSOR_INIT;
@@ -107,7 +108,7 @@ int main()
     uint32_t u32_data;
 
     linuxConfig_t config = {
-#if I2C_SENSOR
+#if I2C_SENSOR && USE_I2C_SENSOR
         .bus_res = "/dev/i2c-2",
         .bus_type = SENSOR_BUS_I2C,
 #elif MODBUS_SENSOR
