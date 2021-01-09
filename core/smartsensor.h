@@ -45,9 +45,6 @@
 #ifndef DEFAULT_SAMPLE_TIME
 #define DEFAULT_SAMPLE_TIME             1
 #endif
-#ifndef HEARTBEAT
-#define HEARTBEAT                       1
-#endif
 #ifndef HEARTBEAT_MAX_MISS
 #define HEARTBEAT_MAX_MISS              1
 #endif
