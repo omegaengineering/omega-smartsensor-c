@@ -5,18 +5,11 @@
 #include "smartsensor.h"
 #include "linux_private.h"
 
-#define MODBUS_BUFFER_SIZE      128      /**< buffer for manipulating user data to modbus endianess */
 #define MODBUS_BAUD             115200
 #define MODBUS_PARITY           'N'
 #define MODBUS_DATA_BITS        8
 #define MODBUS_STOP_BITS        1
 
-
-typedef struct {
-    modbus_t*       mb;
-    uint16_t        dev_addr;
-    uint8_t         buffer[MODBUS_BUFFER_SIZE];
-} linux_modbus_t;
 
 int linux_modbus_open(linux_modbus_t* mb, const char* device)
 {

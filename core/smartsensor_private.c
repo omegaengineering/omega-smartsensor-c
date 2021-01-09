@@ -134,7 +134,7 @@ static int i2c_set_index(sensor_t* sensor, uint16_t u16_Register_in, uint16_t *u
         buffer[1] = u16_Register_in >> 8u;
         buffer[2] = u16_Register_in;
 
-        if ((ret = p->write(sensor->platform, buffer, 3)) == E_OK) {
+        if ((ret = p->write(p, buffer, 3)) == E_OK) {
             *u16_Register_out = ((u16_Register_in >> 10u) + R_ACCESS_FACTORY_INDEX);  //R_FACTORY_ACCESS
         }
     } else if (u16_Register_in >= R_ACCESS_BLOCK_START && u16_Register_in <= R_ACCESS_BLOCK_END) {
@@ -143,7 +143,7 @@ static int i2c_set_index(sensor_t* sensor, uint16_t u16_Register_in, uint16_t *u
         buffer[1] = u16_Register_in >> 8u;
         buffer[2] = u16_Register_in;
 
-        if ((ret = p->write(sensor->platform, buffer, 3)) == E_OK) {
+        if ((ret = p->write(p, buffer, 3)) == E_OK) {
             *u16_Register_out = ((u16_Register_in >> 10u) + R_ACCESS_BLOCK_INDEX);
         }
     } else if (u16_Register_in >= R_ACCESS_SENSOR_START && u16_Register_in <= R_ACCESS_SENSOR_END) {
@@ -165,10 +165,10 @@ static int sensor_bus_read(sensor_t* sensor, uint16_t reg_addr, uint8_t* buffer,
     addr_buf[0] = reg_addr & 0xffU;  // register is 1 byte only
 
     if (sensor->bus_type == SENSOR_BUS_I2C) {
-        if ((ret = p->write(sensor->platform, addr_buf, 1)) != E_OK)
+        if ((ret = p->write(p, addr_buf, 1)) != E_OK)
             return ret;
     }
-    ret = p->read(sensor->platform, buffer, buffer_sz);
+    ret = p->read(p, buffer, buffer_sz);
     return ret;
 }
 
@@ -185,7 +185,7 @@ static int sensor_bus_write(sensor_t* sensor, uint16_t reg_addr, uint8_t* buffer
     temp[0] = reg_addr & 0xffU;
     memcpy(temp + 1, buffer, buffer_sz);
 
-    ret = p->write(sensor->platform, temp, buffer_sz + 1);
+    ret = p->write(p, temp, buffer_sz + 1);
     return ret;
 }
 

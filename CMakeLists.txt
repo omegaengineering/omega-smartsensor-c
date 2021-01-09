@@ -10,13 +10,15 @@ option(DEFAULT_SAMPLE_TIME "" OFF)
 if(DEFAULT_SAMPLE_TIME)
     add_definitions(-DDEFAULT_SAMPLE_TIME=${DEFAULT_SAMPLE_TIME})
 endif()
-option(HEARTBEAT "" OFF)
-if(HEARTBEAT)
-    add_definitions(-DHEARTBEAT=${HEARTBEAT})
-endif()
 option(HEARTBEAT_MAX_MISS "" OFF)
 if(HEARTBEAT_MAX_MISS)
     add_definitions(-DHEARTBEAT_MAX_MISS=${HEARTBEAT_MAX_MISS})
+endif()
+if (MODBUS_SENSOR)
+    add_definitions(-DMODBUS_SENSOR)
+endif()
+if (I2C_SENSOR)
+    add_definitions(-DI2C_SENSOR)
 endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -45,14 +47,22 @@ add_library(smartsensorsdk
         core/alarm.c
         core/datalog.c)
 
-add_library(portlinux
+set(portlinux_SRC
         port/linux/linux_event.c
-        port/linux/linux_i2c.c
-        port/linux/linux_modbus.c
         port/linux/linux_gpio.c
         port/linux/linux_timer.c
         port/linux/port_linux.c)
-target_link_libraries(portlinux smartsensorsdk)
+if (MODBUS_SENSOR)
+    set(portlinux_SRC ${portlinux_SRC} port/linux/linux_modbus.c)
+    set(portlinux_LIBS modbus)
+endif()
+if (I2C_SENSOR)
+    set(portlinux_SRC ${portlinux_SRC} port/linux/linux_i2c.c)
+    set(portlinux_LIBS )
+endif()
+
+add_library(portlinux ${portlinux_SRC})
+target_link_libraries(portlinux smartsensorsdk ${portlinux_LIBS})
 
 #target_link_libraries(${PROJECT_NAME} pthread modbus)
 #set_target_properties(${PROJECT_NAME} PROPERTIES

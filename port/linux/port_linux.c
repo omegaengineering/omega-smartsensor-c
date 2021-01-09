@@ -19,7 +19,12 @@ typedef struct {
     pthread_t       platform_thdl;
     pthread_t       sensor_thdl;
     uint8_t         platform_exit;
+#ifdef I2C_SENSOR
     linux_i2c_t     i2c;
+#endif
+#ifdef MODBUS_SENSOR
+    linux_modbus_t  modbus;
+#endif
     pthread_mutex_t bus_lock;
     linux_timer_t   heartbeat;
     ev_queue_t      events;
@@ -169,13 +174,21 @@ int linux_init (void* port)
     if ((ret = pthread_mutex_init(&p->bus_lock, NULL)) != 0)
         goto ERROR;
 
+    ret = E_PORT_UNAVAILABLE;
     if (p->bus_type == SENSOR_BUS_I2C) {
+#ifdef I2C_SENSOR
         if ((ret = linux_i2c_open(&p->i2c, p->bus, p->bus_type)) != E_OK)
             goto ERROR;
+#endif
     }
     else if (p->bus_type == SENSOR_BUS_MODBUS) {
-
+#ifdef MODBUS_SENSOR
+        if ((ret = linux_modbus_open(&p->modbus, p->bus)) != E_OK)
+            goto ERROR;
+#endif
     }
+    if (ret)
+        goto ERROR;
 
     if (p->interrupt_pin >= 0) {
         if ((ret = gpio_init(&p->interrupt_gpio, p->interrupt_pin)) != E_OK)
@@ -219,7 +232,9 @@ int linux_deinit(void* port)
         pthread_join(p->sensor_thdl, NULL);
     }
     pthread_join(p->platform_thdl, NULL);
+#if I2C_SENSOR
     linux_i2c_close(&p->i2c);
+#endif
     if (p->interrupt_pin >= 0) {
         gpio_close(&p->interrupt_gpio);
     }
@@ -233,7 +248,16 @@ int port_comm_write(void* p, const uint8_t* buffer, uint16_t buffer_size)
     int ret;
     portLinux_t * hal = p;
     pthread_mutex_lock(&hal->bus_lock);
-    ret = linux_i2c_write(&hal->i2c, buffer, buffer_size);
+#if I2C_SENSOR
+    if (hal->bus_type == SENSOR_BUS_I2C) {
+        ret = linux_i2c_write(&hal->i2c, buffer, buffer_size);
+    }
+#endif
+#if MODBUS_SENSOR
+    if (hal->bus_type == SENSOR_BUS_MODBUS) {
+        ret = linux_modbus_write(&hal->modbus, buffer, buffer_size);
+    }
+#endif
     pthread_mutex_unlock(&hal->bus_lock);
     return ret;
 }
@@ -243,7 +267,16 @@ int port_comm_read (void* p, uint8_t* buffer, uint16_t buffer_size)
     int ret;
     portLinux_t * hal = p;
     pthread_mutex_lock(&hal->bus_lock);
-    ret = linux_i2c_read(&hal->i2c, buffer, buffer_size);
+#if I2C_SENSOR
+    if (hal->bus_type == SENSOR_BUS_I2C) {
+        ret = linux_i2c_read(&hal->i2c, buffer, buffer_size);
+    }
+#endif
+#if MODBUS_SENSOR
+    if (hal->bus_type == SENSOR_BUS_MODBUS) {
+        ret = linux_modbus_read(&hal->modbus, buffer, buffer_size);
+    }
+#endif
     pthread_mutex_unlock(&hal->bus_lock);
     return ret;
 }
