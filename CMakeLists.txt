@@ -72,7 +72,7 @@ install(FILES core/smartsensor.h            DESTINATION include/omega/smartsenso
 install(FILES core/smartsensor_private.h    DESTINATION include/omega/smartsensor)
 install(FILES core/registers.h              DESTINATION include/omega/smartsensor)
 install(FILES core/smartsensor_errors.h     DESTINATION include/omega/smartsensor)
-install(FILES port/platform/linux.h         DESTINATION include/omega/smartsensor)
+install(FILES port/linux/port_linux.h       DESTINATION include/omega/smartsensor)
 install(FILES core/port.h                   DESTINATION include/omega/smartsensor)
 add_custom_target(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_LIST_DIR}/uninstall.cmake")
 

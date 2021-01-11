@@ -6,20 +6,12 @@
 #include "smartsensor.h"
 #include "datalog.h"
 #include "log.h"
-#include "port/platform/linux.h"
+#include "port/linux/port_linux.h"
 
 static int do_exit = 0;
 static sensor_t g_sensor;
 
-
-static port_cfg_t port_cfg = {
-        .bus_res = "/dev/i2c-2",
-        .bus_type = SENSOR_BUS_I2C,
-        .pin_intr = 60,
-        .pin_intr_enable = 1,
-};
-
-void signal_handler(int sig)
+static void signal_handler(int sig)
 {
     do_exit = 1;
 }
@@ -36,18 +28,17 @@ int main()
     signal(SIGINT, signal_handler);
     sensor_t* sensor = &g_sensor;
 
-    sensor_init_t init = {
-            .bus_type = SENSOR_BUS_I2C,
-            .event_callback = NULL,
-            .event_callback_ctx = sensor,
+    linuxConfig_t config = {
+        .bus_res = "/dev/i2c-2",
+        .bus_type = SENSOR_BUS_I2C,
+        .interrupt_pin = 60,
+        .event_callback = NULL,
+        .event_callback_ctx = sensor,
     };
-
-    s_log("sensor init\n");
-    ret = sensor_init(sensor, &init);
-    assert(ret == E_OK);
+    sensor->platform = get_platform(&config);
 
     s_log("sensor open\n");
-    ret = sensor_open(sensor, &port_cfg, sizeof(port_cfg));
+    ret = sensor_open(sensor);
     assert(ret == E_OK);
 
     ret = sensor_read(sensor, FIRMARE_VERSION, &u32, sizeof(u32));
