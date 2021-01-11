@@ -35,8 +35,8 @@ include_directories(
         core
         lib/inc)
 
-
-add_library(smartsensorsdk
+# add sdk core
+set(SDK_SRC
         core/registers.c
         core/smartsensor_private.c
         core/smartsensor.c
@@ -45,24 +45,26 @@ add_library(smartsensorsdk
         core/alarm.c
         core/datalog.c)
 
-set(portlinux_SRC
+# add port linux
+set(SDK_SRC
+        ${SDK_SRC}
         port/linux/linux_event.c
         port/linux/linux_timer.c
         port/linux/port_linux.c)
+
 if (MODBUS_SENSOR)
-    set(portlinux_SRC ${portlinux_SRC} port/linux/linux_modbus.c)
-    set(portlinux_LIBS modbus)
+    set(SDK_SRC
+            ${SDK_SRC}
+            port/linux/linux_modbus.c)
 endif()
 if (I2C_SENSOR)
-    set(portlinux_SRC
-            ${portlinux_SRC}
+    set(SDK_SRC
+            ${SDK_SRC}
             port/linux/linux_i2c.c
             port/linux/linux_gpio.c)
-    set(portlinux_LIBS )
 endif()
 
-add_library(portlinux ${portlinux_SRC})
-target_link_libraries(portlinux smartsensorsdk ${portlinux_LIBS})
+add_library(smartsensorsdk ${SDK_SRC})
 
 install(TARGETS smartsensorsdk
         LIBRARY DESTINATION lib
