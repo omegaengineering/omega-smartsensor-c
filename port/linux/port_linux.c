@@ -240,10 +240,14 @@ int linux_deinit(void* port)
 {
     portLinux_t * p = port;
     p->platform_exit = 1;       // signal thread to exit
-    if (p->event_callback) {
+    if (p->sensor_thdl) {
+        pthread_cancel(p->sensor_thdl);
         pthread_join(p->sensor_thdl, NULL);
     }
-    pthread_join(p->platform_thdl, NULL);
+    if (p->platform_thdl) {
+        pthread_cancel(p->platform_thdl);
+        pthread_join(p->platform_thdl, NULL);
+    }
     if (p->bus_type == SENSOR_BUS_I2C) {
 #if I2C_SENSOR
         linux_i2c_close(&p->i2c);
@@ -326,9 +330,14 @@ int port_event_get(void* p, port_event_t* event)
     int ret;
     portLinux_t * hal = p;
     pthread_mutex_lock(&hal->evq_lock);
-    while ((ret = evq_get(&hal->events, event)) == E_EMPTY)
+    while (!hal->platform_exit
+            && (ret = evq_get(&hal->events, event)) == E_EMPTY)
     {
-        pthread_cond_wait(&hal->evq_cond, &hal->evq_lock);
+        if ((pthread_cond_wait(&hal->evq_cond, &hal->evq_lock) != 0)) {
+            // was interrupted
+            ret = E_CONTINUE;
+            break;
+        }
     }
     pthread_mutex_unlock(&hal->evq_lock);
     return ret;

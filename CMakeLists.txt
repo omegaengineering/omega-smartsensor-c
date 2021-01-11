@@ -14,12 +14,6 @@ option(HEARTBEAT_MAX_MISS "" OFF)
 if(HEARTBEAT_MAX_MISS)
     add_definitions(-DHEARTBEAT_MAX_MISS=${HEARTBEAT_MAX_MISS})
 endif()
-if (MODBUS_SENSOR)
-    add_definitions(-DMODBUS_SENSOR)
-endif()
-if (I2C_SENSOR)
-    add_definitions(-DI2C_SENSOR)
-endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DDEBUG)
@@ -53,15 +47,20 @@ set(SDK_SRC
         port/linux/port_linux.c)
 
 if (MODBUS_SENSOR)
+    add_definitions(-DMODBUS_SENSOR)
     set(SDK_SRC
             ${SDK_SRC}
             port/linux/linux_modbus.c)
 endif()
 if (I2C_SENSOR)
+    add_definitions(-DI2C_SENSOR)
     set(SDK_SRC
             ${SDK_SRC}
             port/linux/linux_i2c.c
             port/linux/linux_gpio.c)
+endif()
+if (NOT MODBUS_SENSOR AND NOT I2C_SENSOR)
+    message(FATAL_ERROR Must enable one: MODBUS_SENSOR, I2C_SENSOR)
 endif()
 
 add_library(smartsensorsdk ${SDK_SRC})

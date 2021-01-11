@@ -41,8 +41,8 @@
 #include "log.h"
 #include "port/linux/port_linux.h"
 
-#define USE_PLATFORM_THREAD     0
-#define USE_I2C_SENSOR          0
+#define USE_PLATFORM_THREAD     1
+#define USE_I2C_SENSOR          1
 
 static int do_exit = 0;
 static sensor_t g_sensor = SENSOR_INIT;
@@ -109,13 +109,13 @@ int main()
 
     linuxConfig_t config = {
 #if I2C_SENSOR && USE_I2C_SENSOR
-        .bus_res = "/dev/i2c-2",
+        .bus_res = "/dev/i2c-0",
         .bus_type = SENSOR_BUS_I2C,
 #elif MODBUS_SENSOR
         .bus_res = "/dev/ttyACM0",
         .bus_type = SENSOR_BUS_MODBUS,
 #endif
-        .interrupt_pin = 60,
+        .interrupt_pin = -1,
 #if USE_PLATFORM_THREAD
         .event_callback = example_callback,
 #endif
@@ -168,7 +168,7 @@ int main()
     ret = probe_default_init(sensor);
     assert(ret == E_OK);
 
-    while (!do_exit)
+    while (0)
     {
 #if USE_PLATFORM_THREAD
         sleep(1);
@@ -180,7 +180,7 @@ int main()
     }
 
     // close the device
-    s_log("Sensor closing");
+    s_log("Sensor closing\n");
     ret = sensor_close(sensor);
     assert(ret == E_OK);
     s_log("Device closed with status %d\n", ret);
