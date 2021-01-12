@@ -59,10 +59,11 @@ int linux_i2c_write(linux_i2c_t* i2c, uint16_t reg_addr, const uint8_t* buffer, 
     // prepare the buffer
     i2c->i2c_buf[0] = reg_addr & 0xffU;
     memcpy(i2c->i2c_buf + 1, buffer, buffer_size);
+    buffer_size += 1;   // add 1 for the first byte
 
     while (nTotal < buffer_size)
     {
-        nWritten = write(i2c->fd, buffer, buffer_size);
+        nWritten = write(i2c->fd, i2c->i2c_buf, buffer_size);
         if (nWritten < 0 && errno == EINTR)
             continue;
         else if (nWritten > 0)
