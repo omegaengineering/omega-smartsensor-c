@@ -158,12 +158,13 @@ int wait_for_device_ready(sensor_t* sensor, int max_wait_msec)
 {
     int ret = E_OK;
     system_status_t s;
+    port_t* p = sensor->platform;
     while (max_wait_msec > 0)
     {
         ret = get_system_status(sensor, &s);
         if (ret == E_OK && s.device_ready)
             break;
-//        port_sleep_ms(200); //TODO
+        p->delay(200);
         max_wait_msec -= 200;
     }
    return ret;
