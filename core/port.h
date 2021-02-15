@@ -57,6 +57,7 @@ typedef int     (*port_event_get_t)(void* p, port_event_t* event);
 typedef int     (*port_event_put_t)(void* p, port_event_t event);
 typedef int     (*port_timer_start_t)(void* p, uint32_t period_ms);
 typedef int     (*port_timer_stop_t)(void* p);
+typedef char*   (*strerror_t)(int errnum);
 typedef sensor_bus_type_t (*port_bus_type_t)();
 
 typedef struct {
@@ -69,9 +70,9 @@ typedef struct {
     port_bus_delay_t    delay;
     port_timer_start_t  timer_start;
     port_timer_stop_t   timer_stop;
-
     port_event_get_t    event_get;
     port_event_put_t    event_put;
+    strerror_t          strerror;
 } port_t;
 
 extern sensor_t*           port_get_sensor(const port_t* p);

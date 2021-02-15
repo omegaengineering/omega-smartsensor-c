@@ -10,29 +10,34 @@
 #include "smartsensor.h"
 #include "linux_private.h"
 
+#if 1
+#include <i2c/smbus.h>
+#endif
+
 
 int linux_i2c_open(linux_i2c_t* i2c, const char* resource, sensor_bus_type_t type)
 {
-    if (i2c) {
-        if ((i2c->fd = open(resource, O_RDWR)) < 0)
-            return E_UNAVAILABLE;
-        if (type == SENSOR_BUS_I2C) {
-            if ((ioctl(i2c->fd, I2C_SLAVE, SMARTSENSOR_I2C_ADDR)) < 0)
-                return E_BUS_OPERATION;
+    if ((i2c->fd = open(resource, O_RDWR)) < 0)
+        return SET_PORT_ERR(errno);
+    if (type == SENSOR_BUS_I2C) {
+        if ((ioctl(i2c->fd, I2C_SLAVE, SMARTSENSOR_I2C_ADDR)) < 0) {
+            return SET_PORT_ERR(errno);
         }
-        return E_OK;
     }
-    return E_UNAVAILABLE;
+    return E_OK;
 }
 
+#if 0
 int linux_i2c_read(linux_i2c_t* i2c, uint16_t reg_addr, uint8_t* buffer, uint16_t buffer_size)
 {
     int nRead, nTotal = 0;
 
     // write i2c reg address (1 byte)
     uint8_t reg = reg_addr & 0xFF;
-    if (write(i2c->fd, &reg, 1) != 1)
-        return E_BUS_OPERATION;
+    if (write(i2c->fd, &reg, 1) != 1) {
+        perror("yyy");
+        return SET_PORT_ERR(errno);
+    }
 
     while (nTotal < buffer_size) {
         nRead = read(i2c->fd, buffer, buffer_size);
@@ -40,14 +45,49 @@ int linux_i2c_read(linux_i2c_t* i2c, uint16_t reg_addr, uint8_t* buffer, uint16_
             continue;
         else if (nRead > 0)
             nTotal += nRead;
-        else
+        else {
+            perror("read 0");
+            printf("error %d\n", errno);
             break;
+        }
     }
-    if (nTotal != buffer_size)
+    if (nTotal != buffer_size) {
+        printf("xxx\n");
+        perror("xxx");
         return E_BUS_OPERATION;
+    }
+    return E_OK;
+}
+#endif
+
+int linux_i2c_read(linux_i2c_t* i2c, uint16_t reg_addr, uint8_t* buffer, uint16_t buffer_size)
+{
+    int nRead, nTotal = 0;
+
+    // write i2c reg address (1 byte)
+    uint8_t reg = reg_addr & 0xFF;
+
+    while (nTotal < buffer_size) {
+        nRead = i2c_smbus_read_i2c_block_data(i2c->fd, reg, buffer_size, buffer);
+        if (nRead < 0 && errno == EINTR)
+            continue;
+        else if (nRead > 0)
+            nTotal += nRead;
+        else {
+            perror("read 0");
+            printf("error %d\n", errno);
+            break;
+        }
+    }
+    if (nTotal != buffer_size) {
+        printf("xxx\n");
+        perror("xxx");
+        return E_BUS_OPERATION;
+    }
     return E_OK;
 }
 
+#if 0
 int linux_i2c_write(linux_i2c_t* i2c, uint16_t reg_addr, const uint8_t* buffer, uint16_t buffer_size)
 {
     int nWritten, nTotal = 0;
@@ -75,6 +115,23 @@ int linux_i2c_write(linux_i2c_t* i2c, uint16_t reg_addr, const uint8_t* buffer, 
         return E_BUS_OPERATION;
     return E_OK;
 }
+#endif
+
+#if 1
+int linux_i2c_write(linux_i2c_t* i2c, uint16_t reg_addr, const uint8_t* buffer, uint16_t buffer_size)
+{
+    int ret;
+    reg_addr &= 0xff;
+
+    // this func does not return nWritten, we cannot check for completeness
+    // the driver code is responsible for completeness
+    ret = i2c_smbus_write_i2c_block_data(i2c->fd, reg_addr, buffer_size, buffer);
+    if (ret) {
+        ret = SET_PORT_ERR(errno);
+    }
+    return ret;
+}
+#endif
 
 int linux_i2c_close(linux_i2c_t* i2c)
 {

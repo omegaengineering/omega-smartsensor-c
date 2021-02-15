@@ -174,8 +174,9 @@ int sensor_indexed_read(sensor_t* sensor, ss_register_t base_reg, uint8_t index,
 
     if (sensor->bus_type == SENSOR_BUS_I2C) {
         reg_addr = reg->i2c_addr + index * (reg->size + reg->offset);
-        if ((ret = i2c_set_index(sensor, reg_addr, &reg_addr) != E_OK))
+        if ((ret = i2c_set_index(sensor, reg_addr, &reg_addr) != E_OK)) {
             goto ERROR;
+        }
     }
     else {
         reg_addr = reg->modbus_addr + (index * reg->size)/2;
@@ -312,3 +313,28 @@ int sensor_write(sensor_t* sensor, ss_register_t ss_register, void* buffer, uint
     return sensor_indexed_write(sensor, ss_register, INDEX_0, buffer, buffer_sz);
 }
 
+const char* sensor_strerror (sensor_t* sensor, int err)
+{
+    port_t* p = sensor->platform;
+    int sensor_err = GET_SENSOR_ERR(err);
+    int port_err = GET_PORT_ERR(err);
+    switch (sensor_err)
+    {
+        case E_UNAVAILABLE:         return "E_UNAVAILABLE";
+        case E_OK:                  return "E_OK";
+        case E_BUS_OPERATION:       return "E_BUS_OPERATION";
+        case E_BUS_TYPE:            return "E_BUS_TYPE";
+        case E_BUFFER_MEM_SIZE:     return "E_BUFFER_MEM_SIZE";
+        case E_INVALID_PARAM:       return "E_INVALID_PARAM";
+        case E_INVALID_ADDR:        return "E_INVALID_ADDR";
+        case E_NO_MEM:              return "E_NO_MEM";
+        case E_NOT_SUPPORTED:       return "E_NOT_SUPPORTED";
+        case E_TRY_AGAIN:           return "E_TRY_AGAIN";
+        case E_FULL:                return "E_FULL";
+        case E_EMPTY:               return "E_EMPTY";
+        case E_CONTINUE:            return "E_CONTINUE";
+        case E_PORT_UNAVAILABLE:    return "E_PORT_UNAVAILABLE";
+        case E_PORT_ERR:            return p->strerror ? p->strerror(port_err): "E_PORT_ERR";
+        default:                    return "Unknown";
+    }
+}

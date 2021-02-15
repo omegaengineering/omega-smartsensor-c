@@ -39,6 +39,7 @@
 #include <signal.h>
 #include "smartsensor.h"
 #include "log.h"
+#include "errno.h"
 #include "port/linux/port_linux.h"
 
 #define USE_PLATFORM_THREAD     1
@@ -109,7 +110,7 @@ int main()
 
     linuxConfig_t config = {
 #if I2C_SENSOR && USE_I2C_SENSOR
-        .bus_res = "/dev/i2c-0",
+        .bus_res = "/dev/i2c-1",
         .bus_type = SENSOR_BUS_I2C,
 #elif MODBUS_SENSOR
         .bus_res = "/dev/ttyACM0",
@@ -124,18 +125,8 @@ int main()
     sensor->platform = get_platform(&config);
 
     ret = sensor_open(sensor);
-    assert(ret == E_OK);
-
-    ret = sensor_read(sensor, DEVICE_ID, data, sizeof(data));
-    assert(ret == E_OK);
-    s_log("Device Id: 0x%08X\n", *(uint32_t*)data );
-
-    ret = sensor_read(sensor, FIRMARE_VERSION, data, sizeof(data));
-    assert(ret == E_OK);
-    s_log("Firmware: 0x%08X\n", *(uint32_t*)data);
-
-    u16_data = 2;
-    ret = set_sample_time(sensor, u16_data);
+    perror("got error");
+    s_log("%d %d\n", ret, errno);
     assert(ret == E_OK);
 
     device_name_t device_name;
@@ -143,32 +134,59 @@ int main()
     assert(ret == E_OK);
     s_log("Device name: %s\n", device_name);
 
-    sensor_date_t calendar;
-    ret = get_calibration_date(sensor, &calendar);
-    assert(ret == E_OK);
-    s_log("Calibration date: %02d/%02d/%04d\n", calendar.month, calendar.day, calendar.year);
-    ret = get_manufacturing_date(sensor, &calendar);
-    assert(ret == E_OK);
-    s_log("MFR date: %02d/%02d/%04d\n", calendar.month, calendar.day, calendar.year);
-
-    operating_stat_t stat;
-    ret = get_operating_stat(sensor, &stat);
-    assert(ret == E_OK);
-    s_log("Sensor Temperature = %d.\n"
-           "Sensor Voltage = %d.\n", stat.operating_temp, stat.operating_voltage);
-    io_count_t io_count;
-    ret = get_io_count(sensor, &io_count);
-    assert(ret == E_OK);
-    s_log("On-board %d sensors.\n", io_count.sensor_count);
-    s_log("On-board %d outputs.\n", io_count.output_count);
-
-    ret = sensor_heartbeat_enable(sensor, 2000);
+    strcpy(device_name, "testing123");
+    ret = set_device_name(sensor, device_name);
     assert(ret == E_OK);
 
-    ret = probe_default_init(sensor);
+    ret = get_device_name(sensor, device_name);
     assert(ret == E_OK);
+    s_log("Device name: %s\n", device_name);
 
-    while (0)
+    goto EXIT;
+
+    while (!do_exit)
+    {
+        ret = sensor_read(sensor, FIRMARE_VERSION, data, sizeof(data));
+        assert(ret == E_OK);
+        s_log("Firmware: 0x%08X\n", *(uint32_t*)data);
+
+        u16_data = 2;
+        ret = set_sample_time(sensor, u16_data);
+        assert(ret == E_OK);
+
+        device_name_t device_name;
+        ret = get_device_name(sensor, device_name);
+        assert(ret == E_OK);
+        s_log("Device name: %s\n", device_name);
+
+        sensor_date_t calendar;
+        ret = get_calibration_date(sensor, &calendar);
+        assert(ret == E_OK);
+        s_log("Calibration date: %02d/%02d/%04d\n", calendar.month, calendar.day, calendar.year);
+        ret = get_manufacturing_date(sensor, &calendar);
+        assert(ret == E_OK);
+        s_log("MFR date: %02d/%02d/%04d\n", calendar.month, calendar.day, calendar.year);
+
+        operating_stat_t stat;
+        ret = get_operating_stat(sensor, &stat);
+        assert(ret == E_OK);
+        s_log("Sensor Temperature = %d.\n"
+              "Sensor Voltage = %d.\n", stat.operating_temp, stat.operating_voltage);
+        io_count_t io_count;
+        ret = get_io_count(sensor, &io_count);
+        assert(ret == E_OK);
+        s_log("On-board %d sensors.\n", io_count.sensor_count);
+        s_log("On-board %d outputs.\n", io_count.output_count);
+
+//        ret = sensor_heartbeat_enable(sensor, 2000);
+//        printf("heart beat %d\n", ret);
+//        assert(ret == E_OK);
+
+//        ret = probe_default_init(sensor);
+//        assert(ret == E_OK);
+    }
+
+    while (!do_exit)
     {
 #if USE_PLATFORM_THREAD
         sleep(1);
@@ -179,8 +197,9 @@ int main()
 #endif
     }
 
+EXIT:
     // close the device
-    s_log("Sensor closing\n");
+    s_log("Sensor closing");
     ret = sensor_close(sensor);
     assert(ret == E_OK);
     s_log("Device closed with status %d\n", ret);

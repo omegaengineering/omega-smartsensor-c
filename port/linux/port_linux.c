@@ -4,6 +4,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <poll.h>
+#include <errno.h>
 #include "smartsensor_private.h"
 #include "log.h"
 #include "linux_private.h"
@@ -233,7 +234,7 @@ ERROR:
     if (is_interrupt_used(p))
         gpio_close(&p->interrupt_gpio);
 #endif
-    return -1;
+    return SET_PORT_ERR(errno);
 }
 
 int linux_deinit(void* port)
@@ -362,6 +363,11 @@ sensor_bus_type_t port_bus_type(void* port)
     return p->bus_type;
 }
 
+char* port_strerror(int errnum)
+{
+    return strerror(errnum);
+}
+
 void* get_platform(void* cfg)
 {
     linuxConfig_t * config = cfg;
@@ -383,6 +389,7 @@ void* get_platform(void* cfg)
         portLinux->base.event_put = port_event_put;
         portLinux->base.timer_start = port_heartbeat_start;
         portLinux->base.timer_stop = port_heartbeat_stop;
+        portLinux->base.strerror = port_strerror;
     }
     return (void*) portLinux;
 }

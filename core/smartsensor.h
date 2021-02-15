@@ -38,7 +38,7 @@
 #include "smartsensor_errors.h"
 
 #define SMARTSENSOR_SDK_VERSION         0x00010005
-#define SMARTSENSOR_I2C_ADDR            0x68
+#define SMARTSENSOR_I2C_ADDR            0x6c
 #define SMARTSENSOR_MODBUS_ADDR         0x01
 #define SMARTSENSOR_MODBUS_BAUDRATE     38400
 
@@ -172,6 +172,13 @@ int sensor_indexed_write    (sensor_t* sensor, ss_register_t base_register, uint
  */
 int get_register_instance_cnt (ss_register_t ss_register);
 
+/**
+ * Return a string that describes the error with provided errnum
+ * @param sensor
+ * @param errnum
+ * @return
+ */
+const char* sensor_strerror (sensor_t* sensor, int errnum);
 
 int get_sensor_reading      (sensor_t* sensor, int sensor_num, float *reading);
 int get_sensor_gain         (sensor_t* sensor, int sensor_num, float *gain);
@@ -193,6 +200,7 @@ int set_current_time        (sensor_t* sensor, sensor_time_t *time);
 int set_interrupt_control   (sensor_t* sensor, interrupt_control_t control);
 int set_sample_time         (sensor_t* sensor, uint16_t sample_time);
 int get_sample_time         (sensor_t* sensor, uint16_t* sample_time);
+int set_device_name         (sensor_t* sensor, device_name_t name);
 
 int wait_for_device_ready   (sensor_t* sensor, int max_wait_msec);
 int soft_reset              (sensor_t* sensor);
