@@ -4,9 +4,6 @@
 #include "registers.h"
 #include "registers_i2c.h"
 
-STATIC_ASSERT(sizeof(system_status_t) == sizeof(uint16_t));
-STATIC_ASSERT(sizeof(trigger_t) == sizeof(uint16_t));
-
 static const _register_t _def [] =
 {
     // register                     Modbus      I2C                         nInstance     Access  Size
@@ -190,3 +187,14 @@ uint16_t get_register_data_size(ss_register_t ss_register)
     }
     return 0;
 }
+
+/** type width safe */
+
+STATIC_ASSERT(sizeof(system_status_t) == sizeof(uint16_t));
+STATIC_ASSERT(sizeof(trigger_t) == sizeof(uint16_t));
+
+STATIC_ASSERT(sizeof(sensor_descriptor_format_t) == sizeof(uint8_t));
+STATIC_ASSERT(sizeof(sensor_config_t) == sizeof(uint8_t));
+STATIC_ASSERT(sizeof(sensor_descriptor_t) == sizeof(uint32_t));
+
+STATIC_ASSERT(sizeof(trigger_t) == sizeof(uint16_t));

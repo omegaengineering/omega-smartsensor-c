@@ -201,9 +201,10 @@ int set_interrupt_control   (sensor_t* sensor, interrupt_control_t control);
 int set_sample_time         (sensor_t* sensor, uint16_t sample_time);
 int get_sample_time         (sensor_t* sensor, uint16_t* sample_time);
 int set_device_name         (sensor_t* sensor, device_name_t name);
+int set_sensor_descriptor   (sensor_t* sensor, int sensor_num, sensor_descriptor_t *descriptor);
 
 int wait_for_device_ready   (sensor_t* sensor, int max_wait_msec);
-int soft_reset              (sensor_t* sensor);
+int soft_reset              (sensor_t* sensor, uint8_t wait_ready);
 int factory_reset           (sensor_t* sensor);
 int preset_config           (sensor_t* sensor);
 unsigned int sensor_sdk_version();

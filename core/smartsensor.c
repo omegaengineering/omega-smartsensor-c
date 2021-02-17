@@ -66,6 +66,11 @@ int get_sensor_descriptor(sensor_t* sensor, int sensor_num, sensor_descriptor_t 
     return sensor_indexed_read(sensor, SENSOR_0_DESCRIPTOR, sensor_num, descriptor, sizeof(sensor_descriptor_t));
 }
 
+int set_sensor_descriptor(sensor_t* sensor, int sensor_num, sensor_descriptor_t *descriptor)
+{
+    return sensor_indexed_write(sensor, SENSOR_0_DESCRIPTOR, sensor_num, descriptor, sizeof(sensor_descriptor_t));
+}
+
 int get_io_count(sensor_t* sensor, io_count_t *io_count)
 {
     return sensor_read(sensor, NUMBER_OF_SENSORS, io_count, sizeof(*io_count));
@@ -170,11 +175,11 @@ int wait_for_device_ready(sensor_t* sensor, int max_wait_msec)
    return ret;
 }
 
-int soft_reset(sensor_t* sensor)
+int soft_reset(sensor_t* sensor, uint8_t wait_ready)
 {
     uint32_t trigger = TRIGGER_DEVICE_RESET;
     int ret = sensor_write(sensor, TRIGGER_REQUESTS, &trigger, sizeof(trigger));
-    if (ret == E_OK)
+    if (ret == E_OK && wait_ready)
         wait_for_device_ready(sensor, 1000);
     return ret;
 }

@@ -37,7 +37,7 @@
 
 #include <stdint.h>
 
-#if defined(__GNU__)
+#if defined(__GNU__) || defined(__GNUC__)
 #define GCC_PACKED __attribute__((packed))
     #define PACKED
 #elif defined(__DCC__)
@@ -157,7 +157,10 @@ enum    TRIGGER_TAG
     TRIGGER_BOOT_STRAP              = 0x8000,       // Dual purpose - user can not trigger bootstrap, bit used to force stay awake
     TRIGGER_USER_STAY_AWAKE         = 0x8000,       // Forces processor to 'stay awake' during auxiliary function processing
 };
-typedef uint16_t trigger_t;
+
+typedef struct {
+    enum TRIGGER_TAG trigger: 16;
+} GCC_PACKED trigger_t;
 
 typedef enum INTERRUPT_STATUS_TAG
 {
@@ -259,10 +262,10 @@ typedef struct Sensor_Config_Tag
 
 typedef struct  Sensor_Descriptor_Tag
 {
-    measurement_type_t	        e_Measurement_Type: 8;
-    sensor_descriptor_format_t  st_Format;
-    sensor_config_t     		st_Config;
-    uint8_t     		        u8_Device;
+    measurement_type_t	        e_Measurement_Type: 8;      // 1 byte
+    sensor_descriptor_format_t  st_Format;                  // 1 byte
+    sensor_config_t     		st_Config;                  // 1 byte
+    uint8_t     		        u8_Device;                  // 1 byte
 } GCC_PACKED sensor_descriptor_t;
 
 typedef enum ss_register {
