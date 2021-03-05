@@ -60,6 +60,7 @@ int linux_i2c_read(linux_i2c_t* i2c, uint16_t reg_addr, uint8_t* buffer, uint16_
 }
 #endif
 
+#if 1
 int linux_i2c_read(linux_i2c_t* i2c, uint16_t reg_addr, uint8_t* buffer, uint16_t buffer_size)
 {
     int nRead, nTotal = 0;
@@ -86,6 +87,7 @@ int linux_i2c_read(linux_i2c_t* i2c, uint16_t reg_addr, uint8_t* buffer, uint16_
     }
     return E_OK;
 }
+#endif
 
 #if 0
 int linux_i2c_write(linux_i2c_t* i2c, uint16_t reg_addr, const uint8_t* buffer, uint16_t buffer_size)

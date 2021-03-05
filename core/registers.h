@@ -266,6 +266,7 @@ typedef struct  Sensor_Descriptor_Tag
     sensor_descriptor_format_t  st_Format;                  // 1 byte
     sensor_config_t     		st_Config;                  // 1 byte
     uint8_t     		        u8_Device;                  // 1 byte
+    uint8_t                     au8_unit[4];                // 4 bytes
 } GCC_PACKED sensor_descriptor_t;
 
 typedef enum ss_register {

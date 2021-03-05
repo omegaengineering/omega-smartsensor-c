@@ -195,6 +195,6 @@ STATIC_ASSERT(sizeof(trigger_t) == sizeof(uint16_t));
 
 STATIC_ASSERT(sizeof(sensor_descriptor_format_t) == sizeof(uint8_t));
 STATIC_ASSERT(sizeof(sensor_config_t) == sizeof(uint8_t));
-STATIC_ASSERT(sizeof(sensor_descriptor_t) == sizeof(uint32_t));
+STATIC_ASSERT(sizeof(sensor_descriptor_t) == 8);
 
 STATIC_ASSERT(sizeof(trigger_t) == sizeof(uint16_t));
