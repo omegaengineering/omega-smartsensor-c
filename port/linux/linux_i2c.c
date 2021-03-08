@@ -15,14 +15,13 @@
 #endif
 
 
-int linux_i2c_open(linux_i2c_t* i2c, const char* resource, sensor_bus_type_t type)
+int linux_i2c_open(linux_i2c_t* i2c, const char* resource, uint8_t i2c_address)
 {
-    if ((i2c->fd = open(resource, O_RDWR)) < 0)
+    if ((i2c->fd = open(resource, O_RDWR)) < 0) {
         return SET_PORT_ERR(errno);
-    if (type == SENSOR_BUS_I2C) {
-        if ((ioctl(i2c->fd, I2C_SLAVE, SMARTSENSOR_I2C_ADDR)) < 0) {
-            return SET_PORT_ERR(errno);
-        }
+    }
+    if ((ioctl(i2c->fd, I2C_SLAVE, i2c_address)) < 0) {
+        return SET_PORT_ERR(errno);
     }
     return E_OK;
 }

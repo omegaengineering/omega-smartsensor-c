@@ -20,6 +20,7 @@ typedef struct {
     pthread_t       platform_thdl;
     pthread_t       sensor_thdl;
     uint8_t         platform_exit;
+    uint8_t         i2c_addr;
 #ifdef I2C_SENSOR
     linux_i2c_t     i2c;
 #endif
@@ -185,7 +186,7 @@ int linux_init (void* port)
     ret = E_PORT_UNAVAILABLE;
     if (p->bus_type == SENSOR_BUS_I2C) {
 #ifdef I2C_SENSOR
-        if ((ret = linux_i2c_open(&p->i2c, p->bus, p->bus_type)) != E_OK)
+        if ((ret = linux_i2c_open(&p->i2c, p->bus, p->i2c_addr)) != E_OK)
             goto ERROR;
 #endif
     }
@@ -375,6 +376,7 @@ void* get_platform(void* cfg)
     if (portLinux) {
         memset(portLinux, 0, sizeof(portLinux_t));
         portLinux->interrupt_pin = config->interrupt_pin;
+        portLinux->i2c_addr = config->i2c_addr > 0 ? config->i2c_addr : SMARTSENSOR_I2C_ADDR;
         strncpy(portLinux->bus, config->bus_res, sizeof(portLinux->bus));
         portLinux->event_callback = config->event_callback;
         portLinux->event_callback_ctx = config->event_callback_ctx;

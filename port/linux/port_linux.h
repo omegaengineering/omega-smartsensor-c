@@ -6,6 +6,7 @@
 typedef struct {
     sensor_bus_type_t   bus_type;
     const char*         bus_res;
+    uint8_t             i2c_addr;           // smartsensor i2c address
     int                 interrupt_pin;
     event_callback_t    event_callback;     // set to handle sensor event automatically, unset to opt out
     void*               event_callback_ctx;
