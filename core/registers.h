@@ -449,6 +449,8 @@ typedef enum ss_register {
     PARAM_14_NAME,
     PARAM_15_NAME,
     CALIBRATION_STRING,
+
+    PROBE_STATUS,
     LAST_REGISTER
 } ss_register_t;
 
@@ -467,6 +469,18 @@ typedef enum {
     EXE     = (1U << 2U),
     BYTES   = (1U << 3U)  // LSB format
 } control_t;
+
+typedef struct {
+    uint8_t     p0_active: 1;
+    uint8_t     p0_auth_fault: 1;
+    uint8_t     p0_passwd_fault: 1;
+    uint8_t     p0_intr: 1;
+    uint8_t     p1_active: 1;
+    uint8_t     p1_auth_fault: 1;
+    uint8_t     p1_passwd_fault: 1;
+    uint8_t     p1_intr: 1;
+    uint8_t     padding;        // all zeros
+} probe_status_t;
 
 extern const _register_t* get_register_entry(ss_register_t ss_register);
 

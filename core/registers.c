@@ -170,6 +170,7 @@ static const _register_t _def [] =
     [PARAM_15_NAME]             =   {0xf7b8,    R_USER_PARAMETER_15_NAME,       1,  RD|WR,     16},
     [CALIBRATION_STRING]        =   {0xf7e0,    0x00,                           1,  RD,        64},
 
+    [PROBE_STATUS]              =   {0xf607,    R_PROBE_STATUS,                 1,  RD,        sizeof(uint16_t)},
 };
 
 const _register_t* get_register_entry(ss_register_t ss_register)
@@ -198,3 +199,5 @@ STATIC_ASSERT(sizeof(sensor_config_t) == sizeof(uint8_t));
 STATIC_ASSERT(sizeof(sensor_descriptor_t) == 8);
 
 STATIC_ASSERT(sizeof(trigger_t) == sizeof(uint16_t));
+
+STATIC_ASSERT(sizeof(probe_status_t) == sizeof(uint16_t));

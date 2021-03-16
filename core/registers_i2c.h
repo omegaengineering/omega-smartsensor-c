@@ -497,5 +497,7 @@
 #define X_STATS_NAK_COUNT                   0x1105
 #define X_STATS_PWRFLT_COUNT                0x1106
 
+#define R_PROBE_STATUS                      0x0c0e
+
 #endif /* I2C_REGISTERS_H */
 
