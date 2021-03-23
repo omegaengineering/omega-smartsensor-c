@@ -51,6 +51,7 @@ if (MODBUS_SENSOR)
     set(SDK_SRC
             ${SDK_SRC}
             port/linux/linux_modbus.c)
+    set(SDK_LIB ${SDK_LIB} modbus)
 endif()
 if (I2C_SENSOR)
     add_definitions(-DI2C_SENSOR)
@@ -58,6 +59,7 @@ if (I2C_SENSOR)
             ${SDK_SRC}
             port/linux/linux_i2c.c
             port/linux/linux_gpio.c)
+    set(SDK_LIB ${SDK_LIB} i2c)
 endif()
 if (NOT MODBUS_SENSOR AND NOT I2C_SENSOR)
     message(FATAL_ERROR Must enable one: MODBUS_SENSOR, I2C_SENSOR)

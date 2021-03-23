@@ -360,8 +360,7 @@ int port_event_put(void* p, port_event_t event)
 
 sensor_bus_type_t port_bus_type(void* port)
 {
-    portLinux_t * p = port;
-    return p->bus_type;
+    return ((portLinux_t*)port)->bus_type;
 }
 
 char* port_strerror(int errnum)

@@ -58,7 +58,6 @@ int sensor_open (sensor_t* sensor)
         return E_PORT_UNAVAILABLE;
     }
     p->sensor = sensor;
-    sensor->bus_type = p->bus_type(p);
     return p->init(p);
 }
 
@@ -172,7 +171,7 @@ int sensor_indexed_read(sensor_t* sensor, ss_register_t base_reg, uint8_t index,
 
     port_ENTER_CRITICAL_SECTION();
 
-    if (sensor->bus_type == SENSOR_BUS_I2C) {
+    if (p->bus_type() == SENSOR_BUS_I2C) {
         reg_addr = reg->i2c_addr + index * (reg->size + reg->offset);
         if ((ret = i2c_set_index(sensor, reg_addr, &reg_addr) != E_OK)) {
             goto ERROR;
@@ -286,7 +285,7 @@ int sensor_indexed_write(sensor_t* sensor, ss_register_t base_register, uint8_t 
 
     port_ENTER_CRITICAL_SECTION();
 
-    if (sensor->bus_type == SENSOR_BUS_I2C) {
+    if (p->bus_type() == SENSOR_BUS_I2C) {
         reg_addr = reg->i2c_addr + index * (reg->size + reg->offset);
         if ((ret = i2c_set_index(sensor, reg_addr, &reg_addr) != E_OK))
             goto ERROR;

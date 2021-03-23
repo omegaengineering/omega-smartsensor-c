@@ -81,7 +81,6 @@ typedef struct {
 } data_t;
 
 typedef struct _sensor {
-    sensor_bus_type_t   bus_type;           /**< type of bus that is being used */
     data_t              data;               /**< internal data */
     uint8_t             ready;              /**< flag to prevent interrupts from using the SDK if sensor has not been opened */
     void*               platform;
