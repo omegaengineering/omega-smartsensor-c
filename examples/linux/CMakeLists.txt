@@ -9,10 +9,13 @@ if(${MODBUS_SENSOR})
 endif()
 
 add_executable(example_alarm example_alarm.c)
-target_link_libraries(example_alarm smartsensorsdk modbus pthread)
+target_link_libraries(example_alarm smartsensorsdk ${SDK_LIB})
 
 add_executable(example_datalog example_datalog.c)
-target_link_libraries(example_datalog smartsensorsdk modbus pthread)
+target_link_libraries(example_datalog smartsensorsdk ${SDK_LIB})
 
 add_executable(junk junk.c)
 target_link_libraries(junk i2c)
+
+add_executable(debug debug.c)
+target_link_libraries(debug smartsensorsdk pthread ${SDK_LIB})

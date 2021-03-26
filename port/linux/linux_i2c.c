@@ -15,12 +15,12 @@
 #endif
 
 
-int linux_i2c_open(linux_i2c_t* i2c, const char* resource, uint8_t i2c_address)
+int linux_i2c_open(linux_i2c_t* i2c, const comm_config_t* comm)
 {
-    if ((i2c->fd = open(resource, O_RDWR)) < 0) {
+    if ((i2c->fd = open(comm->i2c.bus, O_RDWR)) < 0) {
         return SET_PORT_ERR(errno);
     }
-    if ((ioctl(i2c->fd, I2C_SLAVE, i2c_address)) < 0) {
+    if ((ioctl(i2c->fd, I2C_SLAVE, comm->i2c.i2c_addr)) < 0) {
         return SET_PORT_ERR(errno);
     }
     return E_OK;

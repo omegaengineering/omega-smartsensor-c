@@ -8,22 +8,22 @@
 #include "log.h"
 
 #define MODBUS_BAUD             115200
-#define MODBUS_PARITY           'N'
+#define MODBUS_PARITY           'E'
 #define MODBUS_DATA_BITS        8
 #define MODBUS_STOP_BITS        1
 
 
-int linux_modbus_open(linux_modbus_t* mb, const char* device)
+int linux_modbus_open(linux_modbus_t* mb, const comm_config_t* comm)
 {
     int ret;
-    mb->mb = modbus_new_rtu(device,
-                        SMARTSENSOR_MODBUS_BAUDRATE,
-                        MODBUS_PARITY,
-                        MODBUS_DATA_BITS,
-                        MODBUS_STOP_BITS);
+    mb->mb = modbus_new_rtu(comm->modbus.bus,
+                        comm->modbus.baud_rate,
+                        comm->modbus.parity,
+                        comm->modbus.data_bit,
+                        comm->modbus.stop_bit);
     if (mb->mb == NULL)
         return E_BUS_OPERATION;
-    if ((ret = modbus_set_slave(mb->mb, SMARTSENSOR_MODBUS_ADDR) < 0))
+    if ((ret = modbus_set_slave(mb->mb, comm->modbus.modbus_addr) < 0))
         return E_BUS_OPERATION;
     if ((ret = modbus_connect(mb->mb)) < 0)
         return E_BUS_OPERATION;
