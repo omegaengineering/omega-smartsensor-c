@@ -66,6 +66,11 @@ typedef struct {
 } list_select_t;
 
 typedef struct {
+    uint8_t default_index;
+    uint8_t max_index;
+} io_list_t;
+
+typedef struct {
     uint8_t sensor_bits:    4;
     uint8_t power_reset:    1;
     uint8_t device_reset:   1;
@@ -361,6 +366,8 @@ typedef enum ss_register {
     DEFAULT_INTERRUPT_CONTROL,
     SENSOR_LIST_INDEX,
     SENSOR_LIST_SELECT,
+    IO_LIST_INDEX,
+    IO_LIST_SELECT,
     SENSOR_0_ERROR_COUNT,
     SENSOR_1_ERROR_COUNT,
     SENSOR_2_ERROR_COUNT,
