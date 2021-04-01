@@ -69,9 +69,9 @@ static const _register_t _def [] =
     [SENSOR_GAIN]               =   {0xf060,    R_SENSOR_0_GAIN,            4, RD|WR,       sizeof(float),   4},
     [SENSOR_OFFSET]             =   {0xf062,    R_SENSOR_0_OFFSET,          4, RD|WR,       sizeof(float),   4},
 
-    [SENSOR_UNIT]               =   {0xf032,    R_SENSOR_0_UNITS,           4, RD|WR|BYTES, sizeof(sensor_unit_t)-1,   4},
+    [SENSOR_UNIT]               =   {0xf032,    R_SENSOR_0_UNITS,           4, RD|WR|BYTES, sizeof(sensor_unit_t),   4},
 
-    [DEVICE_NAME]               =   {0xf070,    R_DEVICE_NAME,              1, RD|BYTES,    sizeof(device_name_t)-1},
+    [DEVICE_NAME]               =   {0xf070,    R_DEVICE_NAME,              1, RD|BYTES,    sizeof(device_name_t)},
     [OUTPUT_0]                  =   {0xf078,    R_OUTPUT_0_VALUE,           4, RD,          sizeof(float)},
     [OUTPUT_1]                  =   {0xf07a,    R_OUTPUT_1_VALUE,           3, RD,          sizeof(float)},
     [OUTPUT_2]                  =   {0xf07c,    R_OUTPUT_2_VALUE,           2, RD,          sizeof(float)},
@@ -104,7 +104,7 @@ static const _register_t _def [] =
     [OUTPUT_3_CONFIG]           =   {0xf09d,    R_OUTPUT_3_DESCRIPTOR,          1, RD,      sizeof(uint16_t)},
     [BASE_HARDWARE_TYPE]        =   {0xf09e,    R_BASE_TYPE,                    1, RD,      sizeof(uint16_t)},
     [EXTRACT_STOP_SIZE]         =   {0xf09f,    R_SENTINEL,                     1, RD,      sizeof(uint16_t)},
-    [DEVICE_NAME_LIST]          =   {0xf0a0,    R_IO_DEVICE_LIST_NAMES,         1, RD,      sizeof(device_name_list_t)-1},
+    [DEVICE_NAME_LIST]          =   {0xf0a0,    R_IO_DEVICE_LIST_NAMES,         1, RD,      sizeof(device_name_list_t)},
 
     [CALIBRATION_DATA]          =   {0xf100,    0x00,   1, RD,  4},
     [DEVICE_PARAMETER_DATA]     =   {0xf1f0,    0x00,   1, RD, 4*8},
@@ -173,6 +173,10 @@ static const _register_t _def [] =
     [CALIBRATION_STRING]        =   {0xf7e0,    0x00,                           1,  RD,        64},
 
     [PROBE_STATUS]              =   {0xf607,    R_PROBE_STATUS,                 1,  RD,        sizeof(uint16_t)},
+
+    [BOOTSTRAP_CONTROL]         =   {0xf000,    0x00,                           1,  RD|WR,     sizeof(uint16_t)},
+    [BOOTSTRAP_ADDRESS]         =   {0xf001,    0x02,                           1,  RD|WR,     sizeof(uint16_t)},
+    [BOOTSTRAP_DATA]            =   {0xf002,    0x04,                           1,  RD|WR,     32},
 };
 
 const _register_t* get_register_entry(ss_register_t ss_register)

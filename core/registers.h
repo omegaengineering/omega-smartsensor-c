@@ -56,9 +56,9 @@
 #define SENSOR_2            2
 #define SENSOR_3            3
 
-typedef char sensor_unit_t[4  + 1];
-typedef char device_name_t[32 + 1];
-typedef char device_name_list_t[192 + 1];
+typedef char sensor_unit_t[4  ];
+typedef char device_name_t[32 ];
+typedef char device_name_list_t[192 ];
 
 typedef struct {
     uint8_t list_select;
@@ -458,6 +458,11 @@ typedef enum ss_register {
     CALIBRATION_STRING,
 
     PROBE_STATUS,
+
+    BOOTSTRAP_CONTROL,
+    BOOTSTRAP_ADDRESS,
+    BOOTSTRAP_DATA,
+
     LAST_REGISTER
 } ss_register_t;
 
@@ -488,6 +493,19 @@ typedef struct {
     uint8_t     p1_intr: 1;
     uint8_t     padding;        // all zeros
 } probe_status_t;
+
+typedef enum BootStrap_Control
+{
+    WRITE_CMD           = 0x1,
+    ERASE_CMD           = 0x2,
+    INFO_READ_CMD       = 0x4,
+    CRC_VERIFY_CMD      = 0x8,
+    RESET_CMD           = 0x10,
+    INDEX_FAULT         = 0x20,
+    CRC_FAULT           = 0x40,
+    ADDRESS_FAULT       = 0x80,
+    ANY_FAULT           = 0xE0,
+} BootStrap_Control_t;
 
 extern const _register_t* get_register_entry(ss_register_t ss_register);
 

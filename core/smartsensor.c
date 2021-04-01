@@ -52,13 +52,13 @@ int get_sensor_offset(sensor_t* sensor, int sensor_num, float *offset)
 int get_device_name(sensor_t* sensor, device_name_t name)
 {
     memset(name, 0, sizeof(device_name_t));
-    return sensor_read(sensor, DEVICE_NAME, name, sizeof(device_name_t)-1);
+    return sensor_read(sensor, DEVICE_NAME, name, sizeof(device_name_t));
 }
 
 int get_sensor_unit(sensor_t* sensor, int sensor_num, sensor_unit_t unit)
 {
     memset(unit, 0, sizeof(sensor_unit_t));
-    return sensor_indexed_read(sensor, SENSOR_UNIT, sensor_num, unit, sizeof(sensor_unit_t)-1);
+    return sensor_indexed_read(sensor, SENSOR_UNIT, sensor_num, unit, sizeof(sensor_unit_t));
 }
 
 int get_sensor_descriptor(sensor_t* sensor, int sensor_num, sensor_descriptor_t *descriptor)
@@ -164,32 +164,32 @@ int wait_for_device_ready(sensor_t* sensor, int max_wait_msec)
     int ret = E_OK;
     system_status_t s;
     port_t* p = sensor->platform;
-    while (max_wait_msec > 0)
+    do
     {
+        p->delay(200);
+        max_wait_msec -= 200;
         ret = get_system_status(sensor, &s);
         if (ret == E_OK && s.device_ready)
             break;
-        p->delay(200);
-        max_wait_msec -= 200;
-    }
+    } while (max_wait_msec > 0);
    return ret;
 }
 
 int soft_reset(sensor_t* sensor, uint8_t wait_ready)
 {
-    uint32_t trigger = TRIGGER_DEVICE_RESET;
+    uint16_t trigger = TRIGGER_DEVICE_RESET;
     int ret = sensor_write(sensor, TRIGGER_REQUESTS, &trigger, sizeof(trigger));
     if (ret == E_OK && wait_ready)
-        wait_for_device_ready(sensor, 1000);
+        wait_for_device_ready(sensor, 1500);
     return ret;
 }
 
 int factory_reset(sensor_t* sensor)
 {
-    uint32_t trigger = TRIGGER_FACTORY_RESET;
+    uint16_t trigger = TRIGGER_FACTORY_RESET;
     int ret = sensor_write(sensor, TRIGGER_REQUESTS, &trigger, sizeof(trigger));
     if (ret == E_OK)
-        wait_for_device_ready(sensor, 1000);
+        wait_for_device_ready(sensor, 2000);
     return ret;
 }
 
