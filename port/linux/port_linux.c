@@ -322,7 +322,7 @@ int port_heartbeat_stop(void* p)
 
 void port_sleep_ms(uint32_t msec)
 {
-    usleep(msec);
+    usleep(msec * 1000);
 }
 
 int port_event_get(void* p, port_event_t* event)
