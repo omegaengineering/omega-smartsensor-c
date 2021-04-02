@@ -164,7 +164,8 @@ int sensor_indexed_read(sensor_t* sensor, ss_register_t base_reg, uint8_t index,
 
     if (!(reg = get_register_entry(base_reg)))
         return E_INVALID_PARAM;
-    if (buffer_sz < reg->size)
+    if (!(reg->access & BYTES) && buffer_sz != reg->size
+        || (reg->access & BYTES) && buffer_sz > reg->size)
         return E_BUFFER_MEM_SIZE;
     if (index >= reg->nInstance)
         return E_INVALID_PARAM;
@@ -184,7 +185,7 @@ int sensor_indexed_read(sensor_t* sensor, ss_register_t base_reg, uint8_t index,
     // only read up to the actual data size
     ret = p->read(p, reg_addr, buffer, reg->size);
     if (ret == E_OK && !(reg->access & BYTES))    // reverse I2C data (in MSB) to LSB format
-        reverse_bytes(buffer, reg->size);
+        reverse_bytes(buffer, buffer_sz);
 
     port_EXIT_CRITICAL_SECTION();
     return ret;
@@ -278,7 +279,8 @@ int sensor_indexed_write(sensor_t* sensor, ss_register_t base_register, uint8_t 
 
     if (!(reg = get_register_entry(base_register)))
         return E_INVALID_PARAM;
-    if (buffer_sz != reg->size) //TODO
+    if (!(reg->access & BYTES) && buffer_sz != reg->size
+        || (reg->access & BYTES) && buffer_sz > reg->size)
         return E_BUFFER_MEM_SIZE;
     if (index >= reg->nInstance)
         return E_INVALID_PARAM;
@@ -296,7 +298,7 @@ int sensor_indexed_write(sensor_t* sensor, ss_register_t base_register, uint8_t 
 
     // only write up to the actual data size
     if (ret == E_OK && !(reg->access & BYTES))    // reverse I2C data (in MSB) to LSB format
-        reverse_bytes(buffer, reg->size);
+        reverse_bytes(buffer, buffer_sz);
     ret = p->write(p, reg_addr, buffer, buffer_sz);
 
     port_EXIT_CRITICAL_SECTION();

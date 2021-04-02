@@ -176,7 +176,7 @@ static const _register_t _def [] =
 
     [BOOTSTRAP_CONTROL]         =   {0xf000,    0x00,                           1,  RD|WR,     sizeof(uint16_t)},
     [BOOTSTRAP_ADDRESS]         =   {0xf001,    0x02,                           1,  RD|WR,     sizeof(uint16_t)},
-    [BOOTSTRAP_DATA]            =   {0xf002,    0x04,                           1,  RD|WR,     32},
+    [BOOTSTRAP_DATA]            =   {0xf002,    0x04,                           1,  RD|WR|BYTES, 32},
 };
 
 const _register_t* get_register_entry(ss_register_t ss_register)
