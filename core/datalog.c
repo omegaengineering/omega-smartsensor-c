@@ -118,7 +118,7 @@ int sensor_log_erase_all(sensor_t* sensor)
     return sensor_log_erase(sensor, LOG_TIME_LAST_FOUND, LOG_TIME_LAST_FOUND);
 }
 
-int sensor_log_record_count(sensor_t* sensor, uint32_t* result, uint32_t start_time, uint32_t end_time)
+int sensor_log_count_record(sensor_t* sensor, uint32_t* result, uint32_t start_time, uint32_t end_time)
 {
     int ret;
     uint32_t cnt = 0;

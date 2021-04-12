@@ -42,19 +42,20 @@ int main()
     ret = sensor_open(sensor);
     assert(ret == E_OK);
 
-#if INIT
+#if INIT || 0
     u32 = time(NULL);
     ret = sensor_write(sensor, CURRENT_TIME, &u32, sizeof(u32));
     assert(ret == 0);
 
-    u16 = 1;
+    u16 = 5;
     ret = sensor_write(sensor, EVENT_0_TIME_BASE, &u16, sizeof(u16));
     assert(ret == 0);
 
-    ret = system_control_write_bits(sensor, ENABLE_EVENT_1_LOG
-    | ENABLE_EVENT_1_READ
-    | ENABLE_TIME_CHANGE_LOG
-    | ENABLE_RTC);
+    ret = system_control_write_bits(sensor,
+                                    ENABLE_EVENT_1_LOG
+                                    | ENABLE_EVENT_1_READ
+                                    | ENABLE_TIME_CHANGE_LOG
+                                    | ENABLE_RTC);
     assert(ret == 0);
 
     // Extract full span of data available
@@ -80,7 +81,7 @@ int main()
     sleep(1);
 #endif
 
-#if ERASE
+#if ERASE || 0
     s_log("erase\n");
     ret = sensor_log_erase_all(sensor);
     assert(ret == 0);
@@ -121,7 +122,7 @@ int main()
     end_time = LOG_TIME_LAST_FOUND;
     ret = sensor_log_search(sensor, &start_time, &end_time);
     assert(ret == 0);
-    s_log("log search finished. Found from %d to %d \n", start_time, end_time);
+    s_log("log search finished. Found from %d to %d. Delta of %d\n", start_time, end_time, end_time - start_time);
 
     uint32_t count = 0;
     do {
@@ -132,7 +133,6 @@ int main()
         assert(ret == 0);
 
         sensor_log_print_record(&record, &count);
-//        usleep(1000);
 
     } while (sensor_log_get_record_type(&record) != REC_EOF && sensor_log_extract_next(sensor) == E_OK);
 
