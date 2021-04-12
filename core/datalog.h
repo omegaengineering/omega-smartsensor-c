@@ -6,6 +6,13 @@
 #define LOG_TIME_LAST_FOUND         0x7fffffff
 #define LOG_TIME_EOF                0xffffffff
 
+#define _RECORD_HEALTH              0x0000
+#define _RECORD_TIME_CHANGE         0x0001
+#define _RECORD_POWER_UP            0x0002
+#define _RECORD_POWER_DOWN          0x0003
+#define _RECORD_SENSOR_CHANGE       0x0004
+#define _RECORD_DEVICE_RESET        0x0005
+
 typedef enum {
     REC_UNKNOWN,
     REC_SENSOR_DATA,
@@ -96,20 +103,21 @@ typedef struct {
         rec_user_data_t     user_data;
         rec_eof_t           eof;
     } data;
-} log_record_t;
+} sensor_log_record_t;
 
-int log_enable(sensor_t* sensor, uint16_t sysctrl_log_bits);
-int log_disable(sensor_t* sensor, uint16_t sysctrl_log_bits);
+int sensor_log_enable(sensor_t* sensor, system_control_t log_bits);
+int sensor_log_disable(sensor_t* sensor, system_control_t log_bits);
 
-int log_erase(sensor_t* sensor, uint32_t start_time, uint32_t end_time);
+int sensor_log_erase(sensor_t* sensor, uint32_t start_time, uint32_t end_time);
+int sensor_log_erase_all(sensor_t* sensor);
 
 /*! start_time & end_time are input/output.
  * may use LOG_TIME_FIRST_FOUND, LOG_TIME_LAST_FOUND to do blind search */
-int log_search(sensor_t* sensor, uint32_t* start_time, uint32_t* end_time);
-int log_extract(sensor_t* sensor, log_record_t* record);
-int log_extract_next(sensor_t* sensor);
+int sensor_log_search(sensor_t* sensor, uint32_t* start_time, uint32_t* end_time);
+int sensor_log_extract(sensor_t* sensor, sensor_log_record_t* record);
+int sensor_log_extract_next(sensor_t* sensor);
 
-int log_record_count(sensor_t* sensor, uint32_t* result, uint32_t start_time, uint32_t end_time);
-void log_record_print(const log_record_t *record, const uint32_t* rec_num);
+int sensor_log_record_count(sensor_t* sensor, uint32_t* result, uint32_t start_time, uint32_t end_time);
+void sensor_log_print_record(const sensor_log_record_t *record, const uint32_t* rec_num);
 
 #endif //SMARTSENSOR_DATALOG_H

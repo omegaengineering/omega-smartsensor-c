@@ -24,14 +24,15 @@ int main()
     uint32_t u32;
     uint16_t u16;
     uint32_t start_time, end_time;
-    log_record_t record;
+    sensor_log_record_t record;
     signal(SIGINT, signal_handler);
     sensor_t* sensor = &g_sensor;
 
     linuxConfig_t config = {
-        .bus_res = "/dev/i2c-2",
+        .comm.i2c.bus = "/dev/i2c-1",
+        .comm.i2c.i2c_addr = 0x68,
+        .comm.i2c.interrupt_pin = -1,
         .bus_type = SENSOR_BUS_I2C,
-        .interrupt_pin = 60,
         .event_callback = NULL,
         .event_callback_ctx = sensor,
     };
@@ -40,10 +41,6 @@ int main()
     s_log("sensor open\n");
     ret = sensor_open(sensor);
     assert(ret == E_OK);
-
-    ret = sensor_read(sensor, FIRMARE_VERSION, &u32, sizeof(u32));
-    s_log("firmware %08X\n", u32);
-    sleep(1);
 
 #if INIT
     u32 = time(NULL);
@@ -54,7 +51,10 @@ int main()
     ret = sensor_write(sensor, EVENT_0_TIME_BASE, &u16, sizeof(u16));
     assert(ret == 0);
 
-    ret = system_control_write_bits(sensor, ENABLE_EVENT_1_LOG | ENABLE_EVENT_1_READ | ENABLE_TIME_CHANGE_LOG | ENABLE_RTC);
+    ret = system_control_write_bits(sensor, ENABLE_EVENT_1_LOG
+    | ENABLE_EVENT_1_READ
+    | ENABLE_TIME_CHANGE_LOG
+    | ENABLE_RTC);
     assert(ret == 0);
 
     // Extract full span of data available
@@ -81,8 +81,8 @@ int main()
 #endif
 
 #if ERASE
-//    ret = log_erase(sensor, LOG_TIME_FIRST_FOUND , LOG_TIME_LAST_FOUND);
-    ret = log_erase(sensor, LOG_TIME_LAST_FOUND , LOG_TIME_LAST_FOUND);
+    s_log("erase\n");
+    ret = sensor_log_erase_all(sensor);
     assert(ret == 0);
     sleep(1);
     start_time = 0;
@@ -119,23 +119,22 @@ int main()
     // search log
     start_time = LOG_TIME_FIRST_FOUND;
     end_time = LOG_TIME_LAST_FOUND;
-    ret = log_search(sensor, &start_time , &end_time);
+    ret = sensor_log_search(sensor, &start_time, &end_time);
     assert(ret == 0);
     s_log("log search finished. Found from %d to %d \n", start_time, end_time);
-    sleep(1);
 
     uint32_t count = 0;
     do {
         count++;
 
         // extract first or extract next first ?
-        ret = log_extract(sensor, &record);
+        ret = sensor_log_extract(sensor, &record);
         assert(ret == 0);
 
-        log_record_print(&record, &count);
+        sensor_log_print_record(&record, &count);
 //        usleep(1000);
 
-    } while (record.type != REC_EOF && log_extract_next(sensor) == E_OK);
+    } while (record.type != REC_EOF && sensor_log_extract_next(sensor) == E_OK);
 
     s_log("total %d record\n", count);
 #endif

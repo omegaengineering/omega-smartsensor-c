@@ -110,13 +110,19 @@ int main()
 
     linuxConfig_t config = {
 #if I2C_SENSOR && USE_I2C_SENSOR
-        .bus_res = "/dev/i2c-1",
+        .comm.i2c.bus = "/dev/i2c-1",
+        .comm.i2c.interrupt_pin = -1,
+        .comm.i2c.i2c_addr = 0x68,
         .bus_type = SENSOR_BUS_I2C,
-#elif MODBUS_SENSOR
-        .bus_res = "/dev/ttyACM0",
+#elif MODBUS_SENSOR && !USE_I2C_SENSOR
+        .comm.modbus.bus = "/dev/ttyACM0",
+        .comm.modbus.modbus_addr = 0x01,
+        .comm.modbus.baud_rate = 115200,
+        .comm.modbus.data_bit = 8,
+        .comm.modbus.parity = 'E',
+        .comm.modbus.stop_bit = 1,
         .bus_type = SENSOR_BUS_MODBUS,
 #endif
-        .interrupt_pin = -1,
 #if USE_PLATFORM_THREAD
         .event_callback = example_callback,
 #endif

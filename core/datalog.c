@@ -11,17 +11,17 @@
  * Start = 0, end = T
  */
 
-int log_enable(sensor_t* sensor, uint16_t sysctrl_log_bits)
+int sensor_log_enable(sensor_t* sensor, system_control_t log_bits)
 {
-    return system_control_set_bits(sensor, sysctrl_log_bits);
+    return system_control_set_bits(sensor, log_bits);
 }
 
-int log_disable(sensor_t* sensor, uint16_t sysctrl_log_bits)
+int sensor_log_disable(sensor_t* sensor, system_control_t log_bits)
 {
-    return system_control_clear_bits(sensor, sysctrl_log_bits);
+    return system_control_clear_bits(sensor, log_bits);
 }
 
-int log_search(sensor_t* sensor, uint32_t* start_time, uint32_t* end_time)
+int sensor_log_search(sensor_t* sensor, uint32_t* start_time, uint32_t* end_time)
 {
     int ret;
     uint16_t trigger;
@@ -39,32 +39,37 @@ int log_search(sensor_t* sensor, uint32_t* start_time, uint32_t* end_time)
     return ret;
 }
 
-static int log_record_parse(log_record_t* record)
+static rec_type_t sensor_log_record_type(const sensor_log_record_t* record)
+{
+
+}
+
+static int log_record_parse(sensor_log_record_t* record)
 {
     rec_framer_t * framer = &record->data.frame;
     if (framer->timestamp & 0x80000000) { // last bit is set
         if (framer->timestamp == LOG_TIME_EOF) {
             record->type = REC_EOF;
         }
-        else if (framer->value[0] == 0) {
+        else if (framer->value[0] == _RECORD_HEALTH) {
             record->type = REC_HEALTH;
         }
-        else if (framer->value[0] == 1) {
+        else if (framer->value[0] == _RECORD_TIME_CHANGE) {
             record->type = REC_TIME_CHANGE;
         }
-        else if (framer->value[0] == 2) {
+        else if (framer->value[0] == _RECORD_POWER_UP) {
             record->type = REC_POWER_UP;
         }
-        else if (framer->value[0] == 3) {
+        else if (framer->value[0] == _RECORD_POWER_DOWN) {
             record->type = REC_POWER_DOWN;
         }
-        else if (framer->value[0] == 4) {
+        else if (framer->value[0] == _RECORD_SENSOR_CHANGE) {
             record->type = REC_SENSOR_CHANGE;
         }
-        else if (framer->value[0] == 5) {
+        else if (framer->value[0] == _RECORD_DEVICE_RESET) {
             record->type = REC_DEVICE_RESET;
         }
-        else if (framer->value[0] > 5 && framer->value[0] < 0xffff) {
+        else if (framer->value[0] > _RECORD_DEVICE_RESET && framer->value[0] < 0xffff) {
             record->type = REC_USER_RECORD;
         }
         else {
@@ -78,7 +83,7 @@ static int log_record_parse(log_record_t* record)
 }
 
 /// TODO: race condition ? log search -> log extract
-int log_extract(sensor_t* sensor, log_record_t* record)
+int sensor_log_extract(sensor_t* sensor, sensor_log_record_t* record)
 {
     int ret;
     rec_framer_t * frame = &record->data.frame;
@@ -91,14 +96,13 @@ int log_extract(sensor_t* sensor, log_record_t* record)
     return log_record_parse(record);
 }
 
-int log_extract_next(sensor_t* sensor)
+int sensor_log_extract_next(sensor_t* sensor)
 {
     uint16_t trigger = TRIGGER_EXTRACT_NEXT;
     return sensor_write(sensor, TRIGGER_REQUESTS, &trigger, sizeof(trigger));
 }
 
-/// TRIGGER_CLEAR_LOG; ?????
-int log_erase(sensor_t* sensor, uint32_t start_time, uint32_t end_time)
+int sensor_log_erase(sensor_t* sensor, uint32_t start_time, uint32_t end_time)
 {
     int ret;
     uint16_t trigger;
@@ -112,30 +116,36 @@ int log_erase(sensor_t* sensor, uint32_t start_time, uint32_t end_time)
     return ret;
 }
 
-int log_record_count(sensor_t* sensor, uint32_t* result, uint32_t start_time, uint32_t end_time)
+int sensor_log_erase_all(sensor_t* sensor)
+{
+    // write both LOG_TIME_LAST_FOUND to trigger complete erase
+    return sensor_log_erase(sensor, LOG_TIME_LAST_FOUND, LOG_TIME_LAST_FOUND);
+}
+
+int sensor_log_record_count(sensor_t* sensor, uint32_t* result, uint32_t start_time, uint32_t end_time)
 {
     int ret;
     uint32_t cnt = 0;
-    log_record_t record;
-    if ((ret = log_search(sensor, &start_time, &end_time)) != E_OK)
+    sensor_log_record_t record;
+    if ((ret = sensor_log_search(sensor, &start_time, &end_time)) != E_OK)
         return ret;
-    if ((ret = log_extract_next(sensor)) != E_OK)
+    if ((ret = sensor_log_extract_next(sensor)) != E_OK)
         return ret;
-    if ((ret = log_extract(sensor, &record)) != E_OK)
+    if ((ret = sensor_log_extract(sensor, &record)) != E_OK)
         return ret;
     while (record.type != REC_EOF) {
         cnt++;
-        log_record_print(&record, NULL);
-        if ((ret = log_extract_next(sensor)) != E_OK)
+        sensor_log_print_record(&record, NULL);
+        if ((ret = sensor_log_extract_next(sensor)) != E_OK)
             return ret;
-        if ((ret = log_extract(sensor, &record)) != E_OK)
+        if ((ret = sensor_log_extract(sensor, &record)) != E_OK)
             return ret;
     }
     *result = cnt;
     return ret;
 }
 
-void log_record_print(const log_record_t *record, const uint32_t* rec_num)
+void sensor_log_print_record(const sensor_log_record_t *record, const uint32_t* rec_num)
 {
     char prefix[8] = "";
     if (rec_num)

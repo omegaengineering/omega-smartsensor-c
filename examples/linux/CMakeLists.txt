@@ -12,7 +12,7 @@ add_executable(example_alarm example_alarm.c)
 target_link_libraries(example_alarm smartsensorsdk ${SDK_LIB})
 
 add_executable(example_datalog example_datalog.c)
-target_link_libraries(example_datalog smartsensorsdk ${SDK_LIB})
+target_link_libraries(example_datalog smartsensorsdk ${SDK_LIB} pthread)
 
 add_executable(junk junk.c)
 target_link_libraries(junk i2c)
