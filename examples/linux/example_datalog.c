@@ -134,7 +134,7 @@ int main()
         sensor_log_print_record(&record, &count);
 //        usleep(1000);
 
-    } while (record.type != REC_EOF && sensor_log_extract_next(sensor) == E_OK);
+    } while (sensor_log_get_record_type(&record) != REC_EOF && sensor_log_extract_next(sensor) == E_OK);
 
     s_log("total %d record\n", count);
 #endif

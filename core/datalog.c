@@ -39,47 +39,43 @@ int sensor_log_search(sensor_t* sensor, uint32_t* start_time, uint32_t* end_time
     return ret;
 }
 
-static rec_type_t sensor_log_record_type(const sensor_log_record_t* record)
+rec_type_t sensor_log_get_record_type(const sensor_log_record_t* record)
 {
-
-}
-
-static int log_record_parse(sensor_log_record_t* record)
-{
-    rec_framer_t * framer = &record->data.frame;
+    const rec_framer_t * framer = &record->data.frame;
+    rec_type_t rec_type;
     if (framer->timestamp & 0x80000000) { // last bit is set
         if (framer->timestamp == LOG_TIME_EOF) {
-            record->type = REC_EOF;
+            rec_type = REC_EOF;
         }
         else if (framer->value[0] == _RECORD_HEALTH) {
-            record->type = REC_HEALTH;
+            rec_type = REC_HEALTH;
         }
         else if (framer->value[0] == _RECORD_TIME_CHANGE) {
-            record->type = REC_TIME_CHANGE;
+            rec_type = REC_TIME_CHANGE;
         }
         else if (framer->value[0] == _RECORD_POWER_UP) {
-            record->type = REC_POWER_UP;
+            rec_type = REC_POWER_UP;
         }
         else if (framer->value[0] == _RECORD_POWER_DOWN) {
-            record->type = REC_POWER_DOWN;
+            rec_type = REC_POWER_DOWN;
         }
         else if (framer->value[0] == _RECORD_SENSOR_CHANGE) {
-            record->type = REC_SENSOR_CHANGE;
+            rec_type = REC_SENSOR_CHANGE;
         }
         else if (framer->value[0] == _RECORD_DEVICE_RESET) {
-            record->type = REC_DEVICE_RESET;
+            rec_type = REC_DEVICE_RESET;
         }
         else if (framer->value[0] > _RECORD_DEVICE_RESET && framer->value[0] < 0xffff) {
-            record->type = REC_USER_RECORD;
+            rec_type = REC_USER_RECORD;
         }
         else {
-            record->type = REC_UNKNOWN;
+            rec_type = REC_UNKNOWN;
         }
     }
     else {
-        record->type = REC_SENSOR_DATA;
+        rec_type = REC_SENSOR_DATA;
     }
-    return 0;
+    return rec_type;
 }
 
 /// TODO: race condition ? log search -> log extract
@@ -93,7 +89,7 @@ int sensor_log_extract(sensor_t* sensor, sensor_log_record_t* record)
         if ((ret = sensor_indexed_read(sensor, EXTRACTED_DATA, i, &frame->value[i], sizeof(frame->value[i]))) != E_OK)
             return ret;
     }
-    return log_record_parse(record);
+    return ret;
 }
 
 int sensor_log_extract_next(sensor_t* sensor)
@@ -133,7 +129,7 @@ int sensor_log_record_count(sensor_t* sensor, uint32_t* result, uint32_t start_t
         return ret;
     if ((ret = sensor_log_extract(sensor, &record)) != E_OK)
         return ret;
-    while (record.type != REC_EOF) {
+    while (sensor_log_get_record_type(&record) != REC_EOF) {
         cnt++;
         sensor_log_print_record(&record, NULL);
         if ((ret = sensor_log_extract_next(sensor)) != E_OK)
@@ -150,7 +146,7 @@ void sensor_log_print_record(const sensor_log_record_t *record, const uint32_t* 
     char prefix[8] = "";
     if (rec_num)
         snprintf(&prefix[0], sizeof(prefix), "%-4d", *rec_num);
-    switch (record->type)
+    switch (sensor_log_get_record_type(record))
     {
         case REC_UNKNOWN:
             s_log("%s REC_UNKNOWN: %08X %08X %08X %08X %08X\n",

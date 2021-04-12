@@ -90,7 +90,6 @@ typedef struct {
 } rec_eof_t;
 
 typedef struct {
-    rec_type_t type;
     union {
         rec_framer_t        frame;
         rec_sensor_t        sensor;
@@ -116,6 +115,7 @@ int sensor_log_erase_all(sensor_t* sensor);
 int sensor_log_search(sensor_t* sensor, uint32_t* start_time, uint32_t* end_time);
 int sensor_log_extract(sensor_t* sensor, sensor_log_record_t* record);
 int sensor_log_extract_next(sensor_t* sensor);
+rec_type_t sensor_log_get_record_type(const sensor_log_record_t* record);
 
 int sensor_log_record_count(sensor_t* sensor, uint32_t* result, uint32_t start_time, uint32_t end_time);
 void sensor_log_print_record(const sensor_log_record_t *record, const uint32_t* rec_num);
