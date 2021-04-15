@@ -193,9 +193,11 @@ int get_io_count            (sensor_t* sensor, io_count_t *io_count);
 int get_operating_stat      (sensor_t* sensor, operating_stat_t *stat);
 int get_calibration_date    (sensor_t* sensor, sensor_date_t *date);
 int get_manufacturing_date  (sensor_t* sensor, sensor_date_t *date);
+int get_current_time_epoch  (sensor_t* sensor, uint32_t* timestamp);
 
 
 int set_current_time        (sensor_t* sensor, sensor_time_t *time);
+int set_current_time_epoch  (sensor_t* sensor, uint32_t timestamp);
 int set_interrupt_control   (sensor_t* sensor, interrupt_control_t control);
 int set_sample_time         (sensor_t* sensor, uint16_t sample_time);
 int get_sample_time         (sensor_t* sensor, uint16_t* sample_time);
