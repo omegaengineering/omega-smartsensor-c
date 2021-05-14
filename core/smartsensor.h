@@ -196,7 +196,7 @@ int get_manufacturing_date  (sensor_t* sensor, sensor_date_t *date);
 int get_current_time_epoch  (sensor_t* sensor, uint32_t* timestamp);
 
 
-int set_current_time        (sensor_t* sensor, sensor_time_t *time);
+int set_current_time        (sensor_t* sensor, uint32_t time);
 int set_current_time_epoch  (sensor_t* sensor, uint32_t timestamp);
 int set_interrupt_control   (sensor_t* sensor, interrupt_control_t control);
 int set_sample_time         (sensor_t* sensor, uint16_t sample_time);

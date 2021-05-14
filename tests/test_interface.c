@@ -93,7 +93,7 @@ int main()
     mark.hours = 34;
     mark.mins = 10;
     mark.secs = 20;
-    ret = set_current_time(sensor, &mark);
+    ret = set_current_time(sensor, *(uint32_t*)&mark);
     assert(ret == E_OK);
     sleep(2);
     ret = get_current_time(sensor, &check);

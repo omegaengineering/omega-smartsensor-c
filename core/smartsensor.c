@@ -120,18 +120,17 @@ int get_current_time(sensor_t* sensor, sensor_time_t *time)
     return ret;
 }
 
-int set_current_time(sensor_t* sensor, sensor_time_t *time)
+int set_current_time(sensor_t* sensor, uint32_t time)
 {
-    uint32_t data = time->days * 24 * 3600 + time->hours * 3600 + time->mins * 60 + time->secs;
-    return sensor_write(sensor, CURRENT_TIME, &data, sizeof(data));
+    return sensor_write(sensor, CURRENT_TIME, &time, sizeof(time));
 }
 
+#define UTC_BASE_2KY		946684800	/* 2000/01/01 00:00:00 */
 int set_current_time_epoch(sensor_t* sensor, uint32_t timestamp)
 {
-    sensor_time_t sensor_time;
     // convert offset of 1/1/1970 to 1/1/2000
-    *(uint32_t*)(&sensor_time) = timestamp - 30 * 24 * 3600;
-    return set_current_time(sensor, &sensor_time);
+    uint32_t sensor_time = timestamp - UTC_BASE_2KY;
+    return set_current_time(sensor, sensor_time);
 }
 
 int get_current_time_epoch(sensor_t* sensor, uint32_t* timestamp)
@@ -140,7 +139,7 @@ int get_current_time_epoch(sensor_t* sensor, uint32_t* timestamp)
     sensor_time_t sensor_time;
     if ((ret = get_current_time(sensor, &sensor_time)))
         return ret;
-    *timestamp = *(uint32_t*)&sensor_time + 30 * 24 * 3600;
+    *timestamp = *(uint32_t*)&sensor_time + UTC_BASE_2KY;
     return ret;
 }
 
