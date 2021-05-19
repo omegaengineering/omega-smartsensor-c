@@ -135,11 +135,11 @@ int set_current_time_epoch(sensor_t* sensor, uint32_t timestamp)
 
 int get_current_time_epoch(sensor_t* sensor, uint32_t* timestamp)
 {
-    int ret;
-    sensor_time_t sensor_time;
-    if ((ret = get_current_time(sensor, &sensor_time)))
+	uint32_t u32_value = 0;
+    int ret = sensor_read(sensor, CURRENT_TIME, &u32_value, sizeof(u32_value));
+    if (ret != E_OK)
         return ret;
-    *timestamp = *(uint32_t*)&sensor_time + UTC_BASE_2KY;
+    *timestamp = u32_value + UTC_BASE_2KY;
     return ret;
 }
 
