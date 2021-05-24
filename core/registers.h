@@ -201,12 +201,16 @@ typedef enum    MEASUREMENT_TYPE_TAG
     SENSOR_BAROMETRIC_TYPE  = 0x03,
     SENSOR_LIGHT_TYPE       = 0x04,
 
+    SENSOR_DIFFERENTIAL_PRESSURE_TYPE = 0x05,
+
     SENSOR_VOLT_TYPE        = 0x10,        // Voltage
     SENSOR_MILLIVOLT_TYPE   = 0x11,
     SENSOR_AMP_TYPE         = 0x12,        // Current Loops
     SENSOR_MILLIAMP_TYPE    = 0x13,
 
-    SENSOR_DIGITAL_TYPE     = 0x17,        // Any Digital Type
+    SENSOR_DIO_TYPE         = 0x17,        // DIO type
+
+    SENSOR_DIGITAL_TYPE     = 0x18,        // Any Digital Type
     SENSOR_DIGITAL_DIN_TYPE = 0x18,        // Digital Inputs
     SENSOR_RATE_TYPE        = 0x19,        // Rate (Hz)
     SENSOR_PULSE_WIDTH_TYPE = 0x1a,        // Width (usec) of pulse input
@@ -225,13 +229,32 @@ typedef enum    MEASUREMENT_TYPE_TAG
     SENSOR_PH_TYPE          = 0x25,
     SENSOR_CO2_TYPE         = 0x26,
 
+    SENSOR_WEIGHT_TYPE      = 0x27,         // use this to report weight..
+
     SENSOR_PRESSURE_TYPE    = 0x28,
 
-    SENSOR_ACCELERATION_TYPE= 0x29,
-    SENSOR_INCLINATION_TYPE = 0x2a,
+    SENSOR_ACCELEROMETER_TYPE   = 0x29,
+    SENSOR_INCLINOMETER_TYPE    = 0x2a,
+    SENSOR_MAGNETOMETER_TYPE    = 0x2b,
+    SENSOR_SPEED_TYPE           = 0x2c,
+    SENSOR_DISTANCE_TYPE        = 0x2d,
 
-    SENSOR_SERIAL_TYPE      = 0x30,
-    SENSOR_ADC_COUNTS_TYPE  = 0x31,
+    SENSOR_SERIAL_TYPE          = 0x30,
+    SENSOR_ADC_COUNTS_TYPE      = 0x31,
+
+    SENSOR_MASS_CONCENTRATION   = 0x32,
+    SENSOR_MASS_COUNT           = 0x33,
+    SENSOR_PARTICLE_SIZE        = 0x34,
+
+    SENSOR_HEATFLUX_TYPE        = 0x35,
+    SENSOR_DEWPOINT_TYPE        = 0x36,
+    SENSOR_CLAMPON_TYPE         = 0x37,
+
+    SENSOR_TVOC_TYPE            = 0x38,
+
+    SENSOR_LEAK_TYPE            = 0x39,
+
+
 
 } measurement_type_t;
 

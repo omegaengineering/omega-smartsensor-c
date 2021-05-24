@@ -258,12 +258,13 @@ const char* measurement_str(measurement_type_t meas)
         case SENSOR_HUMIDITY_TYPE       :   return "humidity";
         case SENSOR_BAROMETRIC_TYPE     :   return "barometric";
         case SENSOR_LIGHT_TYPE          :   return "light";
+        case SENSOR_DIFFERENTIAL_PRESSURE_TYPE: return "diff pressure";
         case SENSOR_VOLT_TYPE           :   return "volt";
         case SENSOR_MILLIVOLT_TYPE      :   return "milivolt";
         case SENSOR_AMP_TYPE            :   return "ampere";
         case SENSOR_MILLIAMP_TYPE       :   return "miliampere";
+        case SENSOR_DIO_TYPE		:   return "digital out";
         case SENSOR_DIGITAL_TYPE        :   return "digital";
-        case SENSOR_DIGITAL_DIN_TYPE    :   return "digital";
         case SENSOR_RATE_TYPE           :   return "rate";
         case SENSOR_PULSE_WIDTH_TYPE    :   return "pulse width";
         case SENSOR_PULSE_DELAY_TYPE    :   return "pulse delay";
@@ -271,6 +272,7 @@ const char* measurement_str(measurement_type_t meas)
         case SENSOR_COUNT_TYPE          :   return "count";
         case SENSOR_UP_DOWN_COUNT_TYPE  :   return "up down count";
         case SENSOR_QUAD_COUNT_TYPE     :   return "quad count";
+        case SENSOR_DIGITAL_MASK	:   return "digital mask";
         case SENSOR_TC_TYPE             :   return "temperature";
         case SENSOR_RTD_TYPE            :   return "rtd";
         case SENSOR_THERMISTOR_TYPE     :   return "thermistor";
@@ -278,13 +280,27 @@ const char* measurement_str(measurement_type_t meas)
         case SENSOR_CJC_TYPE            :   return "cold junction";
         case SENSOR_PH_TYPE             :   return "ph";
         case SENSOR_CO2_TYPE            :   return "co2";
+        case SENSOR_WEIGHT_TYPE		:   return "weight";
         case SENSOR_PRESSURE_TYPE       :   return "pressure";
-        case SENSOR_ACCELERATION_TYPE   :   return "acceleration";
-        case SENSOR_INCLINATION_TYPE    :   return "inclination";
+        case SENSOR_ACCELEROMETER_TYPE  :   return "acceleration";
+        case SENSOR_INCLINOMETER_TYPE   :   return "inclination";
+        case SENSOR_MAGNETOMETER_TYPE   :   return "magnetometer";
+        case SENSOR_SPEED_TYPE          :   return "velocity";
+        case SENSOR_DISTANCE_TYPE       :   return "distance";
         case SENSOR_SERIAL_TYPE         :   return "serial";
         case SENSOR_ADC_COUNTS_TYPE     :   return "adc count";
 
-        case SENSOR_DIGITAL_MASK        :
+        case SENSOR_MASS_CONCENTRATION  :   return "mass concen";
+        case SENSOR_MASS_COUNT          :   return "mass count";
+        case SENSOR_PARTICLE_SIZE       :   return "particle size";
+
+        case SENSOR_HEATFLUX_TYPE       :   return "heatflux";
+        case SENSOR_DEWPOINT_TYPE       :   return "dewpoint";
+        case SENSOR_CLAMPON_TYPE        :   return "clamp on";
+
+        case SENSOR_TVOC_TYPE           :   return "tvoc";
+
+        case SENSOR_LEAK_TYPE           :   return "leak";
         default: return "unknown";
     }
 }
