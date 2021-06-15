@@ -126,8 +126,8 @@ typedef enum
     ENABLE_EVENT_2_LOG          = (1U << 7U),
     ENABLE_EXTN_READ            = (1U << 8U),
     ENABLE_EXTN_LOG             = (1U << 9U),
-    ENABLE_INTERNAL CLOCK READ  = (1U << 10U), //
-    ENABLE LOG TRACKING	        = (1U << 11U), // enable log tracking, if set, each time read, extract data will auto advance to next one
+    ENABLE_INTERNAL_CLOCK_READ  = (1U << 10U), //
+    ENABLE_LOG_TRACKING	        = (1U << 11U), // enable log tracking, if set, each time read, extract data will auto advance to next one
                                                 // default behavnior does not advance pointer
     ENABLE_FUNCTION_BLOCK       = (1U << 12U),
     ENABLE_HEALTH_MONITOR       = (1U << 13U),
