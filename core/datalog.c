@@ -85,9 +85,12 @@ int sensor_log_extract(sensor_t* sensor, sensor_log_record_t* record)
     rec_framer_t * frame = &record->data.frame;
     if ((ret = sensor_read(sensor, EXTRACTED_TIME_STAMP, &frame->timestamp, sizeof(frame->timestamp))) != E_OK)
         return ret;
-    for (int i = 0; i < MAX_SENSOR_COUNT; i++) {
-        if ((ret = sensor_indexed_read(sensor, EXTRACTED_DATA, i, &frame->value[i], sizeof(frame->value[i]))) != E_OK)
-            return ret;
+    if (frame->timestamp != 0xffffffff)
+    {
+	    for (int i = 0; i < MAX_SENSOR_COUNT; i++) {
+		if ((ret = sensor_indexed_read(sensor, EXTRACTED_DATA, i, &frame->value[i], sizeof(frame->value[i]))) != E_OK)
+		    return ret;
+	    }
     }
     return ret;
 }
