@@ -73,6 +73,7 @@ int set_sensor_descriptor(sensor_t* sensor, int sensor_num, sensor_descriptor_t 
 
 int get_sensor_name(sensor_t* sensor, int sensor_num, sensor_name_t name)
 {
+	memset(name, 0, sizeof(sensor_name_t));
 	return sensor_indexed_read(sensor, SENSOR_0_NAME, sensor_num, name, sizeof(sensor_name_t));
 }
 
