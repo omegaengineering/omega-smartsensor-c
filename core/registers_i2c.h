@@ -251,14 +251,14 @@
 
 #define R_NAME_LIST                         0x0e00    // Names of Sensors, Output, Parameters etc...
 #define R_SENSOR_0_NAME                     0x0e00
-#define R_SENSOR_1_NAME                     0x0e08
-#define R_SENSOR_2_NAME                     0x0e10
-#define R_SENSOR_3_NAME                     0x0e18
+#define R_SENSOR_1_NAME                     0x0e10
+#define R_SENSOR_2_NAME                     0x0e20
+#define R_SENSOR_3_NAME                     0x0e30
 
-#define R_OUTPUT_0_NAME                     0x0e20
-#define R_OUTPUT_1_NAME                     0x0e28
-#define R_OUTPUT_2_NAME                     0x0e30
-#define R_OUTPUT_3_NAME                     0x0e38
+#define R_OUTPUT_0_NAME                     0x0e40
+#define R_OUTPUT_1_NAME                     0x0e50
+#define R_OUTPUT_2_NAME                     0x0e60
+#define R_OUTPUT_3_NAME                     0x0e70
 
 #define R_USER_PARAMETER_0_NAME             0x0e80
 #define R_USER_PARAMETER_1_NAME             0x0e90
