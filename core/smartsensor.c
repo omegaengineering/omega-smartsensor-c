@@ -71,6 +71,16 @@ int set_sensor_descriptor(sensor_t* sensor, int sensor_num, sensor_descriptor_t 
     return sensor_indexed_write(sensor, SENSOR_0_DESCRIPTOR, sensor_num, descriptor, sizeof(sensor_descriptor_t));
 }
 
+int get_sensor_name(sensor_t* sensor, int sensor_num, sensor_name_t name)
+{
+	return sensor_indexed_read(sensor, SENSOR_0_NAME, sensor_num, name, sizeof(sensor_name_t));
+}
+
+int set_sensor_name(sensor_t* sensor, int sensor_num, sensor_name_t name)
+{
+	return sensor_indexed_write(sensor, SENSOR_0_NAME, sensor_num, name, sizeof(sensor_name_t));
+}
+
 int get_io_count(sensor_t* sensor, io_count_t *io_count)
 {
     return sensor_read(sensor, NUMBER_OF_SENSORS, io_count, sizeof(*io_count));

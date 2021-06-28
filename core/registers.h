@@ -57,6 +57,7 @@
 #define SENSOR_3            3
 
 typedef char sensor_unit_t[4  ];
+typedef char sensor_name_t[16];
 typedef char device_name_t[32 ];
 typedef char device_name_list_t[192 ];
 

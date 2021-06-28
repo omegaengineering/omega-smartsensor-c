@@ -184,6 +184,8 @@ int get_sensor_gain         (sensor_t* sensor, int sensor_num, float *gain);
 int get_sensor_offset       (sensor_t* sensor, int sensor_num, float *offset);
 int get_sensor_unit         (sensor_t* sensor, int sensor_num, sensor_unit_t unit);
 int get_sensor_descriptor   (sensor_t* sensor, int sensor_num, sensor_descriptor_t *descriptor);
+int get_sensor_name(sensor_t* sensor, int sensor_num, sensor_name_t name);
+int set_sensor_name(sensor_t* sensor, int sensor_num, sensor_name_t name);
 int get_sensor_type         (sensor_t* sensor, int sensor_num, measurement_type_t *sensor_type);
 int get_device_name         (sensor_t* sensor, device_name_t name);
 int get_system_status       (sensor_t* sensor, system_status_t *status);
