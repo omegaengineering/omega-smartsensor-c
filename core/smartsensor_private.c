@@ -126,32 +126,22 @@ static int i2c_set_index(sensor_t* sensor, uint16_t u16_Register_in, uint16_t *u
         // single byte address
         *u16_Register_out = u16_Register_in & 0xffu;
         ret = E_OK;
-    } else if (1) {
-    //} else if (u16_Register_in >= R_ACCESS_FACTORY_START && u16_Register_in <= R_ACCESS_FACTORY_END) {
-        uint8_t buffer[3];
-        buffer[0] = R_REGISTER_ACCESS;
-        buffer[1] = u16_Register_in >> 8u;
-        buffer[2] = u16_Register_in;
-
-        if ((ret = p->write(p, R_REGISTER_ACCESS, &buffer[1], 2)) == E_OK) {
-            *u16_Register_out = ((u16_Register_in >> 10u) + R_ACCESS_FACTORY_INDEX);  //R_FACTORY_ACCESS
-        }
-    } else if (u16_Register_in >= R_ACCESS_BLOCK_START && u16_Register_in <= R_ACCESS_BLOCK_END) {
-        uint8_t buffer[3];
-        buffer[0] = R_REGISTER_ACCESS;
-        buffer[1] = u16_Register_in >> 8u;
-        buffer[2] = u16_Register_in;
-
-        if ((ret = p->write(p, R_REGISTER_ACCESS, &buffer[1], 2)) == E_OK) {
-            *u16_Register_out = ((u16_Register_in >> 10u) + R_ACCESS_BLOCK_INDEX);
-        }
-    } else if (u16_Register_in >= R_ACCESS_SENSOR_START && u16_Register_in <= R_ACCESS_SENSOR_END) {
-        ret = E_INVALID_ADDR;
-    } else if (u16_Register_in >= R_ACCESS_EXTENSION_START && u16_Register_in <= R_ACCESS_EXTENSION_END) {
-        ret = E_INVALID_ADDR;
-    } else {
-        ret = E_INVALID_ADDR;
     }
+    else if(u16_Register_in > 0xff && u16_Register_in < 0x8000)
+    {
+		uint8_t buffer[2];
+		buffer[0] = u16_Register_in >> 8u;
+		buffer[1] = u16_Register_in & 0xff;
+
+		if (((ret = p->write(p, R_REGISTER_ACCESS, &buffer[0], 2)) == E_OK) )
+		{
+			*u16_Register_out = ((u16_Register_in >> 10u) + R_ACCESS_FACTORY_INDEX);
+		}
+    }
+	else
+	{
+		ret = E_INVALID_ADDR;
+	}
     return ret;
 }
 
