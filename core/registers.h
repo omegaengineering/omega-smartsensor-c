@@ -503,7 +503,8 @@ typedef enum {
     RD      = (1U << 0U),
     WR      = (1U << 1U),
     EXE     = (1U << 2U),
-    BYTES   = (1U << 3U)  // LSB format
+    BYTES   = (1U << 3U),// LSB format
+	STR     = (1U << 4U)//check to see if swapping of bytes needed for strings
 } control_t;
 
 typedef struct {

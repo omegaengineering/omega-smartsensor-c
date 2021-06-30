@@ -174,8 +174,22 @@ int sensor_indexed_read(sensor_t* sensor, ss_register_t base_reg, uint8_t index,
 
     // only read up to the actual data size
     ret = p->read(p, reg_addr, buffer, reg->size);
-    if (ret == E_OK && !(reg->access & BYTES))    // reverse I2C data (in MSB) to LSB format
-        reverse_bytes(buffer, buffer_sz);
+    if(ret == E_OK)
+    {
+    	if(reg->access & STR)
+    	{
+    		char * stringbuf = buffer;
+    		if((stringbuf[0]== 0) && (stringbuf[reg->size-1] !=0))
+    		{
+    			reverse_bytes(buffer, buffer_sz);
+    		}
+    	}
+    	else if (!(reg->access & BYTES))
+    	{// reverse I2C data (in MSB) to LSB format
+    		reverse_bytes(buffer, buffer_sz);
+    	}
+    }
+
 
     port_EXIT_CRITICAL_SECTION();
     return ret;
