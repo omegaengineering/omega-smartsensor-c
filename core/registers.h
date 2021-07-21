@@ -298,6 +298,33 @@ typedef struct  Sensor_Descriptor_Tag
     uint8_t                     au8_unit[4];                // 4 bytes
 } GCC_PACKED sensor_descriptor_t;
 
+typedef enum    EXTENSION_SPACE_STATUS_TAG
+{
+ VDC_LOW_THRESHOLD      = 4000,        // Assume battery power if VDC < 4000 mV
+ BATTERY_MINIMUM        = 1800,        // <= 1.8 Vdc, treat as 0%
+ BATTERY_CUTOUT         = 1600,        // < 1.6 then shut down completely
+ BATTERY_MAXIMUM        = 3000,        // >= 3.0 Vdc, treat as 100 %
+
+// Status fields
+ BATTERY_POWERED        = 0x0001,      // if Set then Battery Powered, otherwise Line Powered
+ BATTERY_LOW            = 0x0002,      // Set if Battery below BAT_MINIMUM
+ SHUTDOWN_REQUIRED      = 0x0004,      // set if < SHUTDOWN voltage (1.6 volts)
+
+ BATTERY_100            = 0x0080,      // Battery @ 100% capacity
+ BATTERY_75             = 0x0040,
+ BATTERY_50             = 0x0020,
+ BATTERY_25             = 0x0010,      // Battery less than 25% capacity
+ BATTERY_0              = 0x0000,      // No battery left
+ BATTERY_CAPACITY_MASK  = 0x00f0,
+
+ PROBE_ATTACHED          = 0x0100,      // probe has successfully attached
+ AUTHENTICATION_FAULT    = 0x0200,      // Commissioning fault
+ PASSWORD_FAULT          = 0x0400,      // Password fault detected
+ ENUMERATING_PROBE       = 0x4000,      // re-purposed to tell gw we are using float values
+ EXTENDED_VALID          = 0x8000,      // set iff PROBE_ATTACHED, AUTHENTICATION FAULT & PASSWORD FAULT are valid
+
+} Extension_Space_Status_t;
+
 typedef enum ss_register {
     /**< System Information */
     DEVICE_ID,
@@ -481,7 +508,8 @@ typedef enum ss_register {
     PARAM_15_NAME,
     CALIBRATION_STRING,
 
-    PROBE_STATUS,
+	EXTENSION_STATUS,
+	PROBE_STATUS,
 
     BOOTSTRAP_CONTROL,
     BOOTSTRAP_ADDRESS,

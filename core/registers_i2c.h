@@ -498,6 +498,7 @@
 #define X_STATS_PWRFLT_COUNT                0x1106
 
 #define R_PROBE_STATUS                      0x0c0e
+#define R_EXTENSION_STATUS					0x0c06
 
 #endif /* I2C_REGISTERS_H */
 

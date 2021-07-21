@@ -172,6 +172,7 @@ static const _register_t _def [] =
     [PARAM_15_NAME]             =   {0xf7b8,    R_USER_PARAMETER_15_NAME,       1,  RD|WR,     16},
     [CALIBRATION_STRING]        =   {0xf7e0,    0x00,                           1,  RD,        64},
 
+	[EXTENSION_STATUS]			=	{0xf603,    R_EXTENSION_STATUS,             1,  RD,        sizeof(uint16_t)},
     [PROBE_STATUS]              =   {0xf607,    R_PROBE_STATUS,                 1,  RD,        sizeof(uint16_t)},
 
     [BOOTSTRAP_CONTROL]         =   {0xf000,    0x00,                           1,  RD|WR,     sizeof(uint16_t)},
