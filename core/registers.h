@@ -254,8 +254,8 @@ typedef enum    MEASUREMENT_TYPE_TAG
     SENSOR_TVOC_TYPE            = 0x38,
 
     SENSOR_LEAK_TYPE            = 0x39,
-
-
+    SENSOR_HEATINDEX_TYPE       = 0x3a,
+    SENSOR_HUMIDEX_TYPE         = 0x3b,
 
 } measurement_type_t;
 
