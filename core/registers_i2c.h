@@ -500,6 +500,7 @@
 #define R_EXTENSION_VBAT 0x0c02
 #define R_EXTENSION_VPOWER 0x0c04
 #define R_EXTENSION_STATUS					0x0c06
+#define R_EXTENSION_BATT_CAPACITY 0x0c0a
 #define R_PROBE_STATUS                      0x0c0e
 
 #endif /* I2C_REGISTERS_H */

@@ -174,7 +174,9 @@ static const _register_t _def [] =
 
 	[EXTENSION_VBAT] = {0xf601, R_EXTENSION_VBAT, 1, RD, sizeof(uint16_t)},
 	[EXTENSION_VPOWER] = {0xf602, R_EXTENSION_VPOWER, 1, RD, sizeof(uint16_t)},
+
 	[EXTENSION_STATUS]			=	{0xf603,    R_EXTENSION_STATUS,             1,  RD,        sizeof(uint16_t)},
+	[EXTENSION_BATT_CAPACITY] = {0xf605, R_EXTENSION_BATT_CAPACITY, 1, RD, sizeof(uint16_t)},
     [PROBE_STATUS]              =   {0xf607,    R_PROBE_STATUS,                 1,  RD,        sizeof(uint16_t)},
 
     [BOOTSTRAP_CONTROL]         =   {0xf000,    0x00,                           1,  RD|WR,     sizeof(uint16_t)},
