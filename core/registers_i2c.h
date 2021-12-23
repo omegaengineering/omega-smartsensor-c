@@ -193,7 +193,7 @@
 #define R_SENSOR_0_NAMELIST                 0x0800
 #define R_SENSOR_0_IPSO_TYPE                0x08a8
 #define R_SENSOR_0_PRECISION                0x08aa  // int8_t giving number of of digits of precision, ie: 12.345  -> Precision = +3, negative prc implies  12?.? -> Precision = -1
-#define R_SENSOR_0_RESET_MINMAX             0x08ac  // Write any value to reset the Min/Max values
+#define R_SENSOR_0_FUNCTION             0x08ac  // Refer to the sensor function enum
 
 #define R_SENSOR_0_MINVALUE                 0x08b0  // float giving minimum Value
 #define R_SENSOR_0_MAXVALUE                 0x08b4  // float giving maximum Value
@@ -208,7 +208,7 @@
 
 #define R_SENSOR_1_IPSO_TYPE                0x09a8
 #define R_SENSOR_1_PRECISION                0x09aa  // int8_t giving number of of digits of precision, ie: 12.345  -> Precision = +3, negative prc implies  12?.? -> Precision = -1
-#define R_SENSOR_1_RESET_MINMAX             0x09ac  // Write any value to reset the Min/Max values
+#define R_SENSOR_1_FUNCTION             0x09ac  // Refer to the sensor function enum
 
 #define R_SENSOR_1_MINVALUE                 0x09b0  // float giving minimum Value
 #define R_SENSOR_1_MAXVALUE                 0x09b4  // float giving maximum Value
@@ -223,7 +223,7 @@
 
 #define R_SENSOR_2_IPSO_TYPE                0x0aa8
 #define R_SENSOR_2_PRECISION                0x0aaa  // int8_t giving number of of digits of precision, ie: 12.345  -> Precision = +3, negative prc implies  12?.? -> Precision = -1
-#define R_SENSOR_2_RESET_MINMAX             0x0aac  // Write any value to reset the Min/Max values
+#define R_SENSOR_2_FUNCTION             0x0aac  // Refer to the sensor function enum
 
 #define R_SENSOR_2_MINVALUE                 0x0ab0  // float giving minimum Value
 #define R_SENSOR_2_MAXVALUE                 0x0ab4  // float giving maximum Value
@@ -238,7 +238,7 @@
 
 #define R_SENSOR_3_IPSO_TYPE                0x0ba8
 #define R_SENSOR_3_PRECISION                0x0baa  // int8_t giving number of of digits of precision, ie: 12.345  -> Precision = +3, negative prc implies  12?.? -> Precision = -1
-#define R_SENSOR_3_RESET_MINMAX             0x0bac  // Write any value to reset the Min/Max values
+#define R_SENSOR_3_FUNCTION             0x0bac  // Refer to the sensor function enum
 
 #define R_SENSOR_3_MINVALUE                 0x0bb0  // float giving minimum Value
 #define R_SENSOR_3_MAXVALUE                 0x0bb4  // float giving maximum Value
