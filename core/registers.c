@@ -107,6 +107,8 @@ static const _register_t _def [] =
     [DEVICE_NAME_LIST]          =   {0xf0a0,    R_IO_DEVICE_LIST_NAMES,         1, RD,      sizeof(device_name_list_t)},
 
     [CALIBRATION_DATA]          =   {0xf100,    0x00,   1, RD,  4},
+	[CONFIG_PASSWORD] = {0xf1c0, R_CONFIG_PASSWORD, 1, RD|WR, sizeof(uint64_t)},
+	[CONNECTIVITY_PASSWORD] = {0xf1c8, R_CONN_PASSWORD, 1 , RD|WR, sizeof(uint64_t)},
     [DEVICE_PARAMETER_DATA]     =   {0xf1f0,    0x00,   1, RD, 4*8},
 
     [FUNCTION_BLOCK_PROGRAM]    =   {0xf200,    R_FUNCTION_BLOCK_PROGRAM,       128, RD|WR,     sizeof(uint32_t)},    // 512 bytes page

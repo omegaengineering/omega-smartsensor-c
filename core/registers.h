@@ -449,6 +449,9 @@ typedef enum ss_register {
     EXTRACT_STOP_SIZE,
     DEVICE_NAME_LIST,
 
+	CONFIG_PASSWORD,
+	CONNECTIVITY_PASSWORD,
+
     /**< Factory Calibration */
     CALIBRATION_DATA,
     DEVICE_PARAMETER_DATA,

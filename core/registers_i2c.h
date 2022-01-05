@@ -185,6 +185,9 @@
 #define R_SENTINEL                          0x013e    // SENTINEL
 #define R_IO_DEVICE_LIST_NAMES              0x0140    // treated as an array of bytes...
 
+#define R_CONFIG_PASSWORD 0x0380
+#define R_CONN_PASSWORD 0x0390
+
 #define R_OUTPUT_0_NAMELIST                 0x0700
 #define R_OUTPUT_1_NAMELIST                 0x0740
 #define R_OUTPUT_2_NAMELIST                 0x0780
