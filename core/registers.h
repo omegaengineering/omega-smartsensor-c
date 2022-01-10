@@ -58,6 +58,7 @@
 
 typedef char sensor_unit_t[4  ];
 typedef char sensor_name_t[16];
+typedef char sensor_password_t[16];
 typedef char device_name_t[32 ];
 typedef char device_name_list_t[192 ];
 
@@ -641,6 +642,14 @@ typedef struct {
     uint8_t     p1_intr: 1;
     uint8_t     padding;        // all zeros
 } probe_status_t;
+
+//password status
+typedef enum SENSOR_PASSWORD_STATUS
+{
+	PASSWORD_NO_SUPPORT = 0xffff,
+	PASSWORD_DISABLED = 0x0101,
+	PASSWORD_ENABLED = 0,
+}Sensor_Password_Status_t;
 
 typedef enum BootStrap_Control
 {
