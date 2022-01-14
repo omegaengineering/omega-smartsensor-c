@@ -10,7 +10,7 @@ static const _register_t _def [] =
     [DEVICE_ID]                 =   {0xf000,    R_DEVICE_ID,                1, RD,          sizeof(uint32_t)},
     [FIRMARE_VERSION]           =   {0xf002,    R_VERSION,                  1, RD,          sizeof(uint32_t)},
     [HARDWARE_VERSION]          =   {0xf004,    R_HARDWARE_VERSION,         1, RD,          sizeof(uint32_t)},
-    [LIST_INDEX_BLOCK_SELECT]   =   {0xf006,    R_DEVICE_LIST_INDEX,        1, RD|BYTES,    sizeof(list_select_t)},
+    [LIST_INDEX_BLOCK_SELECT]   =   {0xf006,    R_DEVICE_LIST_INDEX,        1, RD|WR,    sizeof(uint16_t)},
     [USER_HOURS]                =   {0xf007,    R_USER_HOURS,               1, RD|WR,       sizeof(uint16_t)},
 
     [EVENT_0_TIME_BASE]         =   {0xf008,    R_EVENT_0_TIMEBASE,         1, RD|WR,       sizeof(uint16_t)},
