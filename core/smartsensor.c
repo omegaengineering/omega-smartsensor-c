@@ -221,6 +221,15 @@ int factory_reset(sensor_t* sensor)
     return ret;
 }
 
+int password_reset(sensor_t* sensor)
+{
+    uint16_t trigger = TRIGGER_PASSWORD_RESET;
+    int ret = sensor_write(sensor, TRIGGER_REQUESTS, &trigger, sizeof(trigger));
+    if (ret == E_OK)
+        wait_for_device_ready(sensor, 2000);
+    return ret;
+}
+
 int preset_config(sensor_t* sensor)
 {
     int ret;

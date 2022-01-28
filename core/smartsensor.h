@@ -209,6 +209,7 @@ int set_sensor_descriptor   (sensor_t* sensor, int sensor_num, sensor_descriptor
 int wait_for_device_ready   (sensor_t* sensor, int max_wait_msec);
 int soft_reset              (sensor_t* sensor, uint8_t wait_ready);
 int factory_reset           (sensor_t* sensor);
+int password_reset(sensor_t* sensor);
 int preset_config           (sensor_t* sensor);
 unsigned int sensor_sdk_version();
 const char* measurement_str (measurement_type_t meas);
