@@ -205,28 +205,31 @@ int wait_for_device_ready(sensor_t* sensor, int max_wait_msec)
 
 int soft_reset(sensor_t* sensor, uint8_t wait_ready)
 {
+    port_t* p = sensor->platform;
     uint16_t trigger = TRIGGER_DEVICE_RESET;
     int ret = sensor_write(sensor, TRIGGER_REQUESTS, &trigger, sizeof(trigger));
     if (ret == E_OK && wait_ready)
-        wait_for_device_ready(sensor, 1500);
+        p->delay(2000); //sleep for 2 seconds
     return ret;
 }
 
 int factory_reset(sensor_t* sensor)
 {
+	port_t* p = sensor->platform;
     uint16_t trigger = TRIGGER_FACTORY_RESET;
     int ret = sensor_write(sensor, TRIGGER_REQUESTS, &trigger, sizeof(trigger));
     if (ret == E_OK)
-        wait_for_device_ready(sensor, 2000);
+        p->delay(2000);//sleep, allow for probe to reset
     return ret;
 }
 
 int password_reset(sensor_t* sensor)
 {
+	port_t* p = sensor->platform;
     uint16_t trigger = TRIGGER_PASSWORD_RESET;
     int ret = sensor_write(sensor, TRIGGER_REQUESTS, &trigger, sizeof(trigger));
     if (ret == E_OK)
-        wait_for_device_ready(sensor, 2000);
+        p->delay(2000);//sleep, allow for probe to reset
     return ret;
 }
 
