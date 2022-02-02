@@ -321,8 +321,11 @@ int port_heartbeat_stop(void* p)
 }
 
 void port_sleep_ms(uint32_t msec)
-{
-    usleep(msec * 1000);
+{//use select to do timeout to avoid any signals returning to cause usleep to return early
+	  struct timeval timeout;
+	  timeout.tv_sec = 0;
+	  timeout.tv_usec = msec*1000;
+	  select (0, NULL, NULL, NULL, &timeout);
 }
 
 int port_event_get(void* p, port_event_t* event)
