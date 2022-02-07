@@ -611,6 +611,9 @@ typedef enum ss_register {
     BOOTSTRAP_ADDRESS,
     BOOTSTRAP_DATA,
 
+	CAL_CJC_1_OFFSET,
+	CAL_CJC_2_OFFSET,
+
     LAST_REGISTER
 } ss_register_t;
 

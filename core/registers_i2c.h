@@ -506,5 +506,8 @@
 #define R_EXTENSION_BATT_CAPACITY 0x0c0a
 #define R_PROBE_STATUS                      0x0c0e
 
+#define R_CAL_CJC_1_OFFSET 0x0248
+#define R_CAL_CJC_2_OFFSET 0x0258
+
 #endif /* I2C_REGISTERS_H */
 
