@@ -66,10 +66,10 @@ static const _register_t _def [] =
     [USER_PARAMETER_14]         =   {0xf05c,    R_USER_PARAMETER_14_VALUE,  2, RD|WR,       4},
     [USER_PARAMETER_15]         =   {0xf05e,    R_USER_PARAMETER_15_VALUE,  1, RD|WR,       4},
 
-    [SENSOR_GAIN]               =   {0xf060,    R_SENSOR_0_GAIN,            4, RD|WR,       sizeof(float),   4},
-    [SENSOR_OFFSET]             =   {0xf062,    R_SENSOR_0_OFFSET,          4, RD|WR,       sizeof(float),   4},
+    [SENSOR_GAIN]               =   {0xf060,    R_SENSOR_0_GAIN,            4, RD|WR,       sizeof(float)},
+    [SENSOR_OFFSET]             =   {0xf062,    R_SENSOR_0_OFFSET,          4, RD|WR,       sizeof(float)},
 
-    [SENSOR_UNIT]               =   {0xf032,    R_SENSOR_0_UNITS,           4, RD|WR|BYTES, sizeof(sensor_unit_t),   4},
+    [SENSOR_UNIT]               =   {0xf032,    R_SENSOR_0_UNITS,           4, RD|WR|BYTES, sizeof(sensor_unit_t)},
 
     [DEVICE_NAME]               =   {0xf070,    R_DEVICE_NAME,              1, RD|BYTES,    sizeof(device_name_t)},
     [OUTPUT_0]                  =   {0xf078,    R_OUTPUT_0_VALUE,           4, RD,          sizeof(float)},
@@ -77,7 +77,7 @@ static const _register_t _def [] =
     [OUTPUT_2]                  =   {0xf07c,    R_OUTPUT_2_VALUE,           2, RD,          sizeof(float)},
     [OUTPUT_3]                  =   {0xf07e,    R_OUTPUT_3_VALUE,           1, RD,          sizeof(float)},
 
-    [LONG_DEVICE_ID]            =   {0xf080,    F_DEVICE_ID,                    1, RD,      sizeof(uint64_t)},
+    [LONG_DEVICE_ID]            =   {0xf080,    F_DEVICE_ID,                    1, RD,      8},
     [CORE_VERSION]              =   {0xf084,    R_CORE_VERSION,                 1, RD,      sizeof(uint32_t)},
     [BLOCK_START_RETRY_COUNT]   =   {0xf086,    R_BLOCK_START_RETRY,            1, RD,      sizeof(uint16_t)},
     [RTC_CALIBRATION_CONTROL]   =   {0xf087,    R_RTC_TUNING,                   1, RD,      sizeof(uint16_t)},
