@@ -212,6 +212,15 @@ static const _register_t _def [] =
     [BOOTSTRAP_ADDRESS]         =   {0xf001,    0x02,                           1,  RD|WR,     sizeof(uint16_t)},
     [BOOTSTRAP_DATA]            =   {0xf002,    0x04,                           1,  RD|WR|BYTES, 32},
 
+    [CAL_CH0_G16_GAIN] ={0x00,    R_CAL_CH0_G16_GAIN,            1, RD|WR,      sizeof(float)},
+	[CAL_CH0_G16_OFFSET] = {0x00,    R_CAL_CH0_G16_OFFSET,            1, RD|WR,      sizeof(float)},
+	[CAL_CH0_G32_GAIN] = {0x00,    R_CAL_CH0_G32_GAIN,            1, RD|WR,      sizeof(float)},
+	[CAL_CH0_G32_OFFSET] ={0x00,    R_CAL_CH0_G32_OFFSET,            1, RD|WR,      sizeof(float)},
+	[CAL_CH1_G16_GAIN] = {0x00,    R_CAL_CH1_G16_GAIN,            1, RD|WR,      sizeof(float)},
+	[CAL_CH1_G16_OFFSET] = {0x00,    R_CAL_CH1_G16_OFFSET,            1, RD|WR,      sizeof(float)},
+	[CAL_CH1_G32_GAIN] = {0x00,    R_CAL_CH1_G32_GAIN,            1, RD|WR,      sizeof(float)},
+	[CAL_CH1_G32_OFFSET] = {0x00,    R_CAL_CH1_G32_OFFSET,            1, RD|WR,      sizeof(float)},
+
 	[CAL_CJC_1_OFFSET] = {0x00,    R_CAL_CJC_1_OFFSET,            1, RD|WR,      sizeof(float)},
 	[CAL_CJC_2_OFFSET] = {0x00,    R_CAL_CJC_2_OFFSET,            1, RD|WR,      sizeof(float)},
 };
