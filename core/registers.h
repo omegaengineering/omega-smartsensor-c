@@ -272,6 +272,24 @@ typedef enum {
     SENSOR_DATA_TYPE_BOOL   = 8
 } sensor_datatype_t;
 
+typedef enum {
+    OPEN_TC_DETECT_OFF = 0,
+    OPEN_TC_DETECT_ON = 16,
+
+} open_tc_detect_t;
+
+typedef enum {
+	TC_J = 0x00,
+	TC_K = 0x01,
+	TC_T = 0x02,
+	TC_E = 0x03,
+	TC_N = 0x04,
+	TC_R = 0x06,
+	TC_S = 0x07,
+	TC_B = 0x08,
+	TC_C = 0x09
+}thermocouple_type_t;
+
 typedef struct Sensor_Descriptor_Format_Tag
 {
     sensor_datatype_t       u8_Data_Type : 4;
