@@ -182,6 +182,8 @@ const char* sensor_strerror (sensor_t* sensor, int errnum);
 int get_sensor_reading      (sensor_t* sensor, int sensor_num, float *reading);
 int get_sensor_gain         (sensor_t* sensor, int sensor_num, float *gain);
 int get_sensor_offset       (sensor_t* sensor, int sensor_num, float *offset);
+int set_sensor_gain         (sensor_t* sensor, int sensor_num, float *gain);
+int set_sensor_offset       (sensor_t* sensor, int sensor_num, float *offset);
 int get_sensor_unit         (sensor_t* sensor, int sensor_num, sensor_unit_t unit);
 int get_sensor_descriptor   (sensor_t* sensor, int sensor_num, sensor_descriptor_t *descriptor);
 int get_sensor_name(sensor_t* sensor, int sensor_num, sensor_name_t name);
