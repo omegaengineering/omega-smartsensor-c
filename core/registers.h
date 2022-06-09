@@ -61,6 +61,7 @@ typedef char sensor_name_t[16];
 typedef char sensor_password_t[16];
 typedef char device_name_t[32 ];
 typedef char device_name_list_t[192 ];
+typedef char device_model_name_t[16];
 
 typedef struct {
     uint8_t list_select;
@@ -640,6 +641,8 @@ typedef enum ss_register {
 
 	CAL_CJC_1_OFFSET,
 	CAL_CJC_2_OFFSET,
+
+	DEVICE_MODEL_NAME,
 
     LAST_REGISTER
 } ss_register_t;
