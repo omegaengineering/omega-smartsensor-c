@@ -305,7 +305,6 @@ int sensor_indexed_write(sensor_t* sensor, ss_register_t base_register, uint8_t 
         reverse_bytes(buffer, buffer_sz);
     ret = p->write(p, reg_addr, buffer, buffer_sz);
 
-    p->delay(100); //give probe time to process writes
     port_EXIT_CRITICAL_SECTION();
     return ret;
 
