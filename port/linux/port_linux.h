@@ -1,6 +1,7 @@
 #ifndef SMARTSENSOR_LINUX_H
 #define SMARTSENSOR_LINUX_H
 
+#include <pthread.h>
 #include "port.h"
 
 typedef union {
@@ -27,5 +28,8 @@ typedef struct {
 } linuxConfig_t;
 
 void* get_platform(void* config);
+pthread_mutex_t* create_shared_mutex(void);
+void destroy_shared_mutex(pthread_mutex_t* shared_mutex);
+
 
 #endif //SMARTSENSOR_LINUX_H

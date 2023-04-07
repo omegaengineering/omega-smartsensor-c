@@ -5,12 +5,18 @@
 #include <pthread.h>
 #include <poll.h>
 #include <errno.h>
+#include <sys/types.h>
+#include <sys/mman.h>
+#include <fcntl.h>
 #include "smartsensor_private.h"
 #include "log.h"
 #include "linux_private.h"
 
+
 #define MAX_POLL            2
 #define MAX_EVENTS          10
+
+#define SHARED_MUTEX "/shared_mutex"
 
 typedef struct {
     port_t          base;
@@ -25,7 +31,8 @@ typedef struct {
 #ifdef MODBUS_SENSOR
     linux_modbus_t  modbus;
 #endif
-    pthread_mutex_t bus_lock;
+    pthread_mutex_t *bus_lock;
+    int des_mutex; //shared mutex descriptor
     linux_timer_t   heartbeat;
     ev_queue_t      events;
     pthread_mutex_t evq_lock;
@@ -157,6 +164,68 @@ void* sensor_thread(void* args)
     return NULL;
 }
 
+/*
+ * Function Name: create_shared_mutex
+ * input:
+ * output: pointer to shared mutex
+ *
+ * Description: The shared mutex needs to be created before using the communication.
+ *              ONLY ONE SHOULD BE CREATED, this mutex will be used by any new process using this library
+ *              The shared mutex will help ensure only one process will use the i2c bus.
+ */
+pthread_mutex_t* create_shared_mutex(void)
+{
+    pthread_mutex_t* mutex;
+    char* message;
+    int des_mutex;
+    int mode = S_IRWXU | S_IRWXG;
+
+    des_mutex = shm_open(SHARED_MUTEX, O_CREAT | O_RDWR | O_TRUNC |O_EXCL, mode);
+
+    if (des_mutex < 0) {
+        perror("failure on shm_open on des_mutex");
+        exit(1);
+    }
+
+    if (ftruncate(des_mutex, sizeof(pthread_mutex_t)) == -1) {
+        perror("Error on ftruncate to sizeof pthread_cond_t\n");
+        exit(-1);
+    }
+
+    mutex = (pthread_mutex_t*) mmap(NULL, sizeof(pthread_mutex_t),
+            PROT_READ | PROT_WRITE, MAP_SHARED, des_mutex, 0);
+
+    if (mutex == MAP_FAILED ) {
+        perror("Error on mmap on mutex\n");
+        exit(1);
+    }
+
+    //create the shared mutex, this program must run before the others
+    //that use this shared mutex
+    /* set mutex shared between processes */
+    pthread_mutexattr_t mattr;
+    pthread_mutexattr_init(&mattr);
+    pthread_mutexattr_setpshared(&mattr, PTHREAD_PROCESS_SHARED);
+    pthread_mutex_init(mutex, &mattr);
+    pthread_mutexattr_destroy(&mattr);
+
+    return mutex;
+}
+
+/*
+ * Function Name: create_shared_mutex
+ * input:  pointer to shared mutex that was returned by create_shared_mutex
+ * output:
+ *
+ * Description: Cleanup and destroy the shared mutex
+ */
+
+void destroy_shared_mutex(pthread_mutex_t* shared_mutex)
+{
+    pthread_mutex_destroy(shared_mutex);
+    shm_unlink(SHARED_MUTEX);
+}
+
 static int is_interrupt_used(portLinux_t* port)
 {
     return port->bus_type == SENSOR_BUS_I2C && port->comm.i2c.interrupt_pin >= 0;
@@ -178,8 +247,23 @@ int linux_init (void* port)
     if ((ret = evq_init(&p->events, MAX_EVENTS)) != E_OK)
         goto ERROR;
 
-    if ((ret = pthread_mutex_init(&p->bus_lock, NULL)) != 0)
-        goto ERROR;
+    int mode = S_IRWXU | S_IRWXG;
+
+    p->des_mutex = shm_open(SHARED_MUTEX, O_RDWR , mode);
+
+    if (p->des_mutex < 0) {
+        perror("failure on shm_open on des_mutex");
+        exit(1);
+    }
+
+    p->bus_lock = (pthread_mutex_t*) mmap(NULL, sizeof(pthread_mutex_t),
+            PROT_READ | PROT_WRITE, MAP_SHARED, p->des_mutex, 0);
+
+    if (p->bus_lock == MAP_FAILED ) {
+        perror("Error on mmap on mutex\n");
+        exit(1);
+    }
+
 
     ret = E_PORT_UNAVAILABLE;
     if (p->bus_type == SENSOR_BUS_I2C) {
@@ -263,6 +347,8 @@ int linux_deinit(void* port)
         gpio_close(&p->interrupt_gpio);
     }
 #endif
+    munmap(&p->bus_lock,sizeof(pthread_mutex_t));
+    close(p->des_mutex);
     evq_close(&p->events);
     free(p);
     return E_OK;
@@ -271,8 +357,10 @@ int linux_deinit(void* port)
 int port_comm_write(void* p, uint16_t reg, const uint8_t* buffer, uint16_t buffer_size)
 {
     int ret = E_PORT_UNAVAILABLE;
+    int mutex_stat;
     portLinux_t * hal = p;
-    pthread_mutex_lock(&hal->bus_lock);
+    mutex_stat = pthread_mutex_lock(hal->bus_lock);
+    //printf("mutx ret %d\n", mutex_stat);
 
     if (hal->bus_type == SENSOR_BUS_I2C) {
 #if I2C_SENSOR
@@ -284,15 +372,17 @@ int port_comm_write(void* p, uint16_t reg, const uint8_t* buffer, uint16_t buffe
         ret = linux_modbus_write(&hal->modbus, reg, buffer, buffer_size);
 #endif
     }
-    pthread_mutex_unlock(&hal->bus_lock);
+    pthread_mutex_unlock(hal->bus_lock);
     return ret;
 }
 
 int port_comm_read (void* p, uint16_t reg, uint8_t* buffer, uint16_t buffer_size)
 {
     int ret = E_PORT_UNAVAILABLE;
+    int mutex_stat;
     portLinux_t * hal = p;
-    pthread_mutex_lock(&hal->bus_lock);
+    mutex_stat = pthread_mutex_lock(hal->bus_lock);
+    //printf("mutx ret %d\n", mutex_stat);
 
     if (hal->bus_type == SENSOR_BUS_I2C) {
 #if I2C_SENSOR
@@ -304,7 +394,7 @@ int port_comm_read (void* p, uint16_t reg, uint8_t* buffer, uint16_t buffer_size
         ret = linux_modbus_read(&hal->modbus, reg, buffer, buffer_size);
 #endif
     }
-    pthread_mutex_unlock(&hal->bus_lock);
+    pthread_mutex_unlock(hal->bus_lock);
     return ret;
 }
 
