@@ -229,7 +229,7 @@ int factory_reset(sensor_t* sensor)
     uint16_t trigger = TRIGGER_FACTORY_RESET;
     int ret = sensor_write(sensor, TRIGGER_REQUESTS, &trigger, sizeof(trigger));
     if (ret == E_OK)
-        p->delay(7000);//sleep, allow for probe to reset
+        p->delay(3000);//sleep, allow for probe to reset
     return ret;
 }
 
