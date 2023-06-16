@@ -398,6 +398,102 @@ int port_comm_read (void* p, uint16_t reg, uint8_t* buffer, uint16_t buffer_size
     return ret;
 }
 
+
+/*!*******************************************************************
+int port_comm_indirect_reg_write
+
+Brief: function to write to indirect access registers while
+		the mutex is locked during the whole process
+
+Input: void *p, pointer to port structure
+	   uint16_t	reg, indirect access register (0x32-0x35)
+	   uint8_t* buffer: payload of the write
+	   uint16_t buffer_size, expected number of bytes returned from read
+	   uint16_t access_reg, access register address to set the indirect access register
+	   uint8_t *access_buf, contains the address we want to read from in the indirect access register space
+	   uint16_t access_buf_size, size of the address
+
+
+
+
+
+*********************************************************************/
+int port_comm_indirect_reg_write(void* p, uint16_t reg, const uint8_t* buffer, uint16_t buffer_size, uint16_t access_reg, const uint8_t *access_buf, uint16_t access_buf_size)
+{
+    int ret = E_PORT_UNAVAILABLE;
+    int mutex_stat;
+    portLinux_t * hal = p;
+    mutex_stat = pthread_mutex_lock(hal->bus_lock);
+    //printf("mutx ret %d\n", mutex_stat);
+
+    if (hal->bus_type == SENSOR_BUS_I2C) {
+#if I2C_SENSOR
+    	ret = linux_i2c_write(&hal->i2c, access_reg, access_buf, access_buf_size);
+    	if(ret)
+    	{
+    		pthread_mutex_unlock(hal->bus_lock);
+    		return ret;
+    	}
+        ret = linux_i2c_write(&hal->i2c, reg, buffer, buffer_size);
+#endif
+    }
+    else if (hal->bus_type == SENSOR_BUS_MODBUS) {
+#if MODBUS_SENSOR
+        ret = linux_modbus_write(&hal->modbus, reg, buffer, buffer_size);
+#endif
+    }
+    pthread_mutex_unlock(hal->bus_lock);
+    return ret;
+}
+
+
+/*!*******************************************************************
+int port_comm_indirect_reg_read
+
+Brief: function to read to indirect access registers while
+		the mutex is locked during the whole process
+
+Input: void *p, pointer to port structure
+	   uint16_t	reg, indirect access register (0x32-0x35)
+	   uint16_t buffer_size, expected number of bytes returned from read
+	   uint16_t access_reg, access register address to set the indirect access register
+	   uint8_t *access_buf, contains the address we want to read from in the indirect access register space
+	   uint16_t access_buf_size, size of the address
+
+Output: uint8_t* buffer: receive buffer from the i2c
+
+
+
+*********************************************************************/
+
+int port_comm_indirect_reg_read (void* p, uint16_t reg, uint8_t* buffer, uint16_t buffer_size, uint16_t access_reg, const uint8_t *access_buf, uint16_t access_buf_size)
+{
+    int ret = E_PORT_UNAVAILABLE;
+    int mutex_stat;
+    portLinux_t * hal = p;
+    mutex_stat = pthread_mutex_lock(hal->bus_lock);
+    //printf("mutx ret %d\n", mutex_stat);
+
+    if (hal->bus_type == SENSOR_BUS_I2C) {
+#if I2C_SENSOR
+    	ret = linux_i2c_write(&hal->i2c, access_reg, access_buf, access_buf_size);
+    	if(ret)
+    	{
+    		pthread_mutex_unlock(hal->bus_lock);
+    		return ret;
+    	}
+        ret = linux_i2c_read(&hal->i2c, reg, buffer, buffer_size);
+#endif
+    }
+    else if (hal->bus_type == SENSOR_BUS_MODBUS) {
+#if MODBUS_SENSOR
+        ret = linux_modbus_read(&hal->modbus, reg, buffer, buffer_size);
+#endif
+    }
+    pthread_mutex_unlock(hal->bus_lock);
+    return ret;
+}
+
 int port_heartbeat_start (void* p, uint32_t period_ms)
 {
     portLinux_t * hal = p;
@@ -479,6 +575,8 @@ void* get_platform(void* cfg)
         portLinux->base.deinit = linux_deinit;
         portLinux->base.read = port_comm_read;
         portLinux->base.write = port_comm_write;
+        portLinux->base.indirect_read = port_comm_indirect_reg_read;
+        portLinux->base.indirect_write = port_comm_indirect_reg_write;
         portLinux->base.delay = port_sleep_ms;
         portLinux->base.bus_type = port_bus_type;
         portLinux->base.event_get = port_event_get;

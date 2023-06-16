@@ -49,6 +49,8 @@ typedef int     (*port_bus_open_t)(void* p);
 typedef int     (*port_bus_close_t)(void* p);
 typedef int     (*port_bus_read_t)(void* p, uint16_t reg, uint8_t* buf, uint16_t buf_size);
 typedef int     (*port_bus_write_t)(void* p, uint16_t reg, const uint8_t* buf, uint16_t buf_size);
+typedef int     (*port_bus_indirect_read_t)(void* p, uint16_t reg, uint8_t* buf, uint16_t buf_size, uint16_t access_reg, const uint8_t *access_buf, uint16_t access_buf_size);
+typedef int     (*port_bus_indirect_write_t)(void* p, uint16_t reg, const uint8_t* buf, uint16_t buf_size, uint16_t access_reg, const uint8_t *access_buf, uint16_t access_buf_size);
 typedef void    (*port_bus_delay_t)(uint32_t ms);
 typedef int     (*port_init_t)(void*p);
 typedef int     (*port_deinit_t)(void*p);
@@ -66,6 +68,8 @@ typedef struct {
     port_deinit_t       deinit;
     port_bus_type_t     bus_type;
     port_bus_read_t     read;
+    port_bus_indirect_read_t indirect_read;
+    port_bus_indirect_write_t indirect_write;
     port_bus_write_t    write;
     port_bus_delay_t    delay;
     port_timer_start_t  timer_start;

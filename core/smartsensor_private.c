@@ -162,18 +162,37 @@ int sensor_indexed_read(sensor_t* sensor, ss_register_t base_reg, uint8_t index,
 
     port_ENTER_CRITICAL_SECTION();
 
-    if (p->bus_type(p) == SENSOR_BUS_I2C) {
+    if (p->bus_type(p) == SENSOR_BUS_I2C)
+    {
         reg_addr = reg->i2c_addr + index * (reg->size + reg->offset);
-        if ((ret = i2c_set_index(sensor, reg_addr, &reg_addr) != E_OK)) {
-            goto ERROR;
+        if (reg_addr >= 0x00 && reg_addr <= 0xff)
+        {
+            // only read up to the actual data size
+            ret = p->read(p, reg_addr, buffer, reg->size);
         }
+        else if(reg_addr > 0xff && reg_addr < 0x8000)
+        {//this is an indirect register read
+    		uint8_t indirect_address[2];
+    		indirect_address[0] = reg_addr >> 8u;
+    		indirect_address[1] = reg_addr & 0xff;
+
+    		reg_addr = ((reg_addr >> 10u) + R_ACCESS_FACTORY_INDEX);
+    		ret = p->indirect_read(p, reg_addr, buffer, reg->size, R_REGISTER_ACCESS, &indirect_address[0], 2);
+
+        }
+    	else
+    	{
+    		ret = E_INVALID_ADDR;
+    	}
     }
-    else {
+    else
+    {
         reg_addr = reg->modbus_addr + (index * (reg->size + reg->offset))/2;
+        // only read up to the actual data size
+        ret = p->read(p, reg_addr, buffer, reg->size);
     }
 
-    // only read up to the actual data size
-    ret = p->read(p, reg_addr, buffer, reg->size);
+
     if(ret == E_OK)
     {
     	if(reg->access & STR)
@@ -194,9 +213,6 @@ int sensor_indexed_read(sensor_t* sensor, ss_register_t base_reg, uint8_t index,
     port_EXIT_CRITICAL_SECTION();
     return ret;
 
-ERROR:
-    port_EXIT_CRITICAL_SECTION();
-    return ret;
 }
 
 int sensor_read(sensor_t* sensor, ss_register_t ss_register, void* buffer, uint16_t buffer_sz)
@@ -289,28 +305,39 @@ int sensor_indexed_write(sensor_t* sensor, ss_register_t base_register, uint8_t 
     if (index >= reg->nInstance)
         return E_INVALID_PARAM;
 
+    if (!(reg->access & BYTES))    // reverse I2C data (in MSB) to LSB format
+        reverse_bytes(buffer, buffer_sz);
+
     port_ENTER_CRITICAL_SECTION();
 
     if (p->bus_type(p) == SENSOR_BUS_I2C) {
         reg_addr = reg->i2c_addr + index * (reg->size + reg->offset);
-        if ((ret = i2c_set_index(sensor, reg_addr, &reg_addr) != E_OK))
-            goto ERROR;
+        if (reg_addr >= 0x00 && reg_addr <= 0xff)
+        {
+            // only write up to the actual data size
+            ret = p->write(p, reg_addr, buffer, buffer_sz);
+        }
+        else if(reg_addr > 0xff && reg_addr < 0x8000)
+        {//this is an indirect register read
+    		uint8_t indirect_address[2];
+    		indirect_address[0] = reg_addr >> 8u;
+    		indirect_address[1] = reg_addr & 0xff;
+
+    		reg_addr = ((reg_addr >> 10u) + R_ACCESS_FACTORY_INDEX);
+    		ret = p->indirect_write(p, reg_addr, buffer, buffer_sz, R_REGISTER_ACCESS, &indirect_address[0], 2);
+
+        }
     }
     else {
         reg_addr = reg->modbus_addr + (index * (reg->size + reg->offset))/2;
+        // only write up to the actual data size
+        ret = p->write(p, reg_addr, buffer, buffer_sz);
     }
 
-    // only write up to the actual data size
-    if (ret == E_OK && !(reg->access & BYTES))    // reverse I2C data (in MSB) to LSB format
-        reverse_bytes(buffer, buffer_sz);
-    ret = p->write(p, reg_addr, buffer, buffer_sz);
 
     port_EXIT_CRITICAL_SECTION();
     return ret;
 
-ERROR:
-    port_EXIT_CRITICAL_SECTION();
-    return ret;
 }
 
 int sensor_write(sensor_t* sensor, ss_register_t ss_register, void* buffer, uint16_t buffer_sz)
