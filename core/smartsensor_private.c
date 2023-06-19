@@ -333,7 +333,9 @@ int sensor_indexed_write(sensor_t* sensor, ss_register_t base_register, uint8_t 
         // only write up to the actual data size
         ret = p->write(p, reg_addr, buffer, buffer_sz);
     }
-
+    //read the system status to hold the i2c line so the write cane get to the probe
+    uint8_t sys_stat[2];
+    p->read(p, R_SYSTEM_STATUS, &sys_stat[0], 2);
 
     port_EXIT_CRITICAL_SECTION();
     return ret;
