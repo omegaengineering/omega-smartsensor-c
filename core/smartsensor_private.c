@@ -296,6 +296,17 @@ int sensor_indexed_write(sensor_t* sensor, ss_register_t base_register, uint8_t 
     uint16_t reg_addr;
     const _register_t *reg;
     port_t* p = sensor->platform;
+    uint16_t trigger_cmd =0;
+    uint8_t is_reset=0;
+
+    if(base_register == TRIGGER_REQUESTS)
+    {
+    	trigger_cmd = *(uint16_t*)buffer;
+    	if(trigger_cmd == TRIGGER_FACTORY_RESET || trigger_cmd == TRIGGER_DEVICE_RESET || trigger_cmd == TRIGGER_POWER_RESET)
+    	{
+    		is_reset = 1;
+    	}
+    }
 
     if (!(reg = get_register_entry(base_register)))
         return E_INVALID_PARAM;
@@ -333,9 +344,12 @@ int sensor_indexed_write(sensor_t* sensor, ss_register_t base_register, uint8_t 
         // only write up to the actual data size
         ret = p->write(p, reg_addr, buffer, buffer_sz);
     }
-    //read the system status to hold the i2c line so the write cane get to the probe
-    uint8_t sys_stat[2];
-    p->read(p, R_SYSTEM_STATUS, &sys_stat[0], 2);
+    if(!is_reset)
+    {
+		//read the system status to hold the i2c line so the write cane get to the probe
+		uint8_t sys_stat[2];
+		p->read(p, R_SYSTEM_STATUS, &sys_stat[0], 2);
+    }
 
     port_EXIT_CRITICAL_SECTION();
     return ret;
