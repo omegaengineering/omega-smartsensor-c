@@ -339,7 +339,8 @@ int sensor_indexed_write(sensor_t* sensor, ss_register_t base_register, uint8_t 
 
         }
     }
-    else {
+    else
+    {
         reg_addr = reg->modbus_addr + (index * (reg->size + reg->offset))/2;
         // only write up to the actual data size
         ret = p->write(p, reg_addr, buffer, buffer_sz);
@@ -359,6 +360,39 @@ int sensor_indexed_write(sensor_t* sensor, ss_register_t base_register, uint8_t 
 int sensor_write(sensor_t* sensor, ss_register_t ss_register, void* buffer, uint16_t buffer_sz)
 {
     return sensor_indexed_write(sensor, ss_register, INDEX_0, buffer, buffer_sz);
+}
+
+int sensor_bootstrap_write(sensor_t* sensor, ss_register_t base_register, void* buffer, uint16_t buffer_sz)
+{
+    int ret = 0;
+    uint16_t reg_addr;
+    const _register_t *reg;
+    port_t* p = sensor->platform;
+
+    if (!(reg = get_register_entry(base_register)))
+        return E_INVALID_PARAM;
+    if (!(reg->access & BYTES) && buffer_sz != reg->size
+        || (reg->access & BYTES) && buffer_sz > reg->size)
+        return E_BUFFER_MEM_SIZE;
+
+    port_ENTER_CRITICAL_SECTION();
+
+    if (p->bus_type(p) == SENSOR_BUS_I2C)
+    {
+        reg_addr = reg->i2c_addr ;
+    }
+    else
+    {
+        reg_addr = reg->modbus_addr ;
+    }
+
+    // only write up to the actual data size
+    if (ret == E_OK && !(reg->access & BYTES))    // reverse I2C data (in MSB) to LSB format
+        reverse_bytes(buffer, buffer_sz);
+    ret = p->write(p, reg_addr, buffer, buffer_sz);
+
+    port_EXIT_CRITICAL_SECTION();
+    return ret;
 }
 
 const char* sensor_strerror (sensor_t* sensor, int err)

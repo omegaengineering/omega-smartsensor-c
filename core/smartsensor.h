@@ -145,6 +145,19 @@ int sensor_indexed_read     (sensor_t* sensor, ss_register_t base_reg, uint8_t i
 int sensor_write            (sensor_t* sensor, ss_register_t ss_register, void* buffer, uint16_t buffer_sz);
 
 /**
+ * Write data provided from data buffer to register
+ *
+ *      - data buffer must be large enough to hold data size of the register, otherwise
+ *          E_BUFFER_MEM_SIZE is returned.
+ *      - Only actual data size of the register are read from the buffer and written to sensor.
+ * @param ctx sensor instance
+ * @param ss_register register to write
+ * @param buffer buffer to write from
+ * @return see @error_t
+ */
+int sensor_bootstrap_write(sensor_t* sensor, ss_register_t ss_register, void* buffer, uint16_t buffer_sz);
+
+/**
  * Write register with the specified instance index from provided data buffer
  * Eg:  SENSOR_0_DATA can have 4 indexed instances which are SENSOR_(0 1 2 3)_DATA
  *      SENSOR_1_DATA can have 3 indexed instances which are SENSOR(1 2 3)_DATA
