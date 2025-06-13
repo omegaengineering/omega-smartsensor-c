@@ -1,5 +1,5 @@
 /*!********************************************************************************************
-  @file     common.h
+  @file     bus_stm32_i2c.h
 
   @copyright
             Copyright (c) 2019, Omega Engineering Inc.
@@ -24,21 +24,38 @@
             SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
   @author   Binh Dinh
-  @date     June 5th, 2019
+  @date     August 2nd, 2019
   @details
 
 
 ***********************************************************************************************/
+#ifndef OMEGA_SMARTSENSOR_C_BUS_stm32_I2C_H
+#define OMEGA_SMARTSENSOR_C_BUS_stm32_I2C_H
 
-#ifndef OMEGA_SMARTSENSOR_C_COMMON_H
-#define OMEGA_SMARTSENSOR_C_COMMON_H
 
-#include <stdint.h>
+#include "common/common.h"
+#include "hw/bus.h"
+
+#define I2C_INSTANCE_CNT    1
+#define I2C_BUFFER_SIZE     64
 
 typedef struct {
-    uint8_t * const data;
-    const uint16_t data_len;
-} data_buffer_t;
+//    uint8_t         periph_idx;
+//    I2C_BitRate     bit_rate;
+//    uint8_t         sda_pin;
+//    uint8_t         clk_pin;
 
+    uint8_t         slave_addr;
+    uint32_t        timeout;
+} bus_stm32_i2c_cfg_t;
 
-#endif //OMEGA_SMARTSENSOR_C_COMMON_H
+int bus_stm32_i2c_new(bus_t **ctx);
+int bus_stm32_i2c_free(bus_t *ctx);
+int bus_stm32_i2c_open(bus_t *ctx, void *cfg);
+int bus_stm32_i2c_read_raw(bus_t *ctx, data_buffer_t *buffer);
+int bus_stm32_i2c_read(bus_t *ctx, uint16_t reg_addr, data_buffer_t *buffer);
+int bus_stm32_i2c_write_raw(bus_t *ctx, data_buffer_t *buffer);
+int bus_stm32_i2c_write(bus_t *ctx, uint16_t reg_addr, data_buffer_t *buffer);
+int bus_stm32_i2c_close(bus_t *ctx);
+
+#endif //OMEGA_SMARTSENSOR_C_BUS_stm32_I2C_H

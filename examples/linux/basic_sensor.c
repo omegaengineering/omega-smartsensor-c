@@ -38,24 +38,30 @@
 #include <string.h>
 #include <signal.h>
 #include "smartsensor.h"
+#include "log.h"
+#include "errno.h"
+#include "port/linux/port_linux.h"
 
+#define USE_PLATFORM_THREAD     1
+#define USE_I2C_SENSOR          1
 
 static int do_exit = 0;
+static sensor_t g_sensor = SENSOR_INIT;
 
-void signal_handler(int sig)
+static void signal_handler(int sig)
 {
     do_exit = 1;
 }
 
-void get_readings(sensor_t *sensor)
+static void get_readings(sensor_t* sensor)
 {
     int ret;
-    data_time_t time;
+    sensor_time_t time;
     ret = get_current_time(sensor, &time);
     assert(ret == E_OK);
-    printf("Current time %d days %d hours %d mins %d secs\n", time.days, time.hours, time.mins, time.secs);
+    s_log("Current time %d days %d hours %d mins %d secs\n", time.days, time.hours, time.mins, time.secs);
 
-    printf("Sensor Reading = ");
+    s_log("Sensor Reading = ");
     for (int idx = 0; idx < MAX_SENSOR_COUNT; idx++)
     {
         float reading;
@@ -66,27 +72,28 @@ void get_readings(sensor_t *sensor)
         ret = get_sensor_unit(sensor, idx, unit);
         if (ret != E_OK)
             return;
-        printf("%0.2f %s \t", reading, unit);
+        s_log("%0.2f %s \t", reading, unit);
     }
-    printf("\n");
+    s_log("\n");
 }
 
 
-void example_callback(api_event_t event, void* ctx)
+static void example_callback(api_event_t event, void* ctx)
 {
-    sensor_t *sensor = *(sensor_t**) ctx;
-
+    if (!ctx)
+        return;
+    sensor_t* sensor = (sensor_t*) ctx;
     if (event & API_DATA_READY)
     {
         get_readings(sensor);
     }
     if (event & API_EVENT_SENSOR_ATTACHED)
     {
-        printf("API_EVENT_SENSOR_ATTACHED\n");
+        s_log("API_EVENT_SENSOR_ATTACHED\n");
     }
     if (event & API_EVENT_SENSOR_DETACHED)
     {
-        printf("API_EVENT_SENSOR_DETACHED\n");
+        s_log("API_EVENT_SENSOR_DETACHED\n");
     }
 }
 
@@ -94,71 +101,112 @@ void example_callback(api_event_t event, void* ctx)
 int main()
 {
     int ret;
-    sensor_t *sensor;
     signal(SIGINT, signal_handler);
-
-    sensor_init_t init = {
-#if USE_MODBUS_INTERFACE
-            .bus_id = "/dev/ttyACM0",
-            .bus_type = SENSOR_BUS_MODBUS,
-#else
-            .bus_id = "/dev/i2c-3",
-            .bus_type = SENSOR_BUS_I2C,
-#endif
-            .interrupt_pin = 16,
-            .event_callback = example_callback,
-            .event_callback_ctx = &sensor,
-            .heartbeat_period = 1
-    };
-
-    ret = sensor_new(&sensor, &init);
-    assert(ret == E_OK);
-    ret = sensor_open(sensor);
-    assert(ret == E_OK);
-
+    sensor_t* sensor = &g_sensor;
+    api_event_t event;
     uint8_t data[32];
-    data_buffer_t buffer = {.data = data, .data_len = 32};
+    uint16_t u16_data;
+    uint32_t u32_data;
 
-    ret = sensor_read(sensor, DEVICE_ID, &buffer);
-    assert(ret == E_OK);
-    printf("Device Id: 0x%08X\n", *(uint32_t*)buffer.data );
+    linuxConfig_t config = {
+#if I2C_SENSOR && USE_I2C_SENSOR
+        .comm.i2c.bus = "/dev/i2c-1",
+        .comm.i2c.interrupt_pin = -1,
+        .comm.i2c.i2c_addr = 0x68,
+        .bus_type = SENSOR_BUS_I2C,
+#elif MODBUS_SENSOR && !USE_I2C_SENSOR
+        .comm.modbus.bus = "/dev/ttyACM0",
+        .comm.modbus.modbus_addr = 0x01,
+        .comm.modbus.baud_rate = 115200,
+        .comm.modbus.data_bit = 8,
+        .comm.modbus.parity = 'E',
+        .comm.modbus.stop_bit = 1,
+        .bus_type = SENSOR_BUS_MODBUS,
+#endif
+#if USE_PLATFORM_THREAD
+        .event_callback = example_callback,
+#endif
+        .event_callback_ctx = sensor,
+    };
+    sensor->platform = get_platform(&config);
 
-    ret = sensor_read(sensor, FIRMARE_VERSION, &buffer);
+    ret = sensor_open(sensor);
+    perror("got error");
+    s_log("%d %d\n", ret, errno);
     assert(ret == E_OK);
-    printf("Firmware: 0x%08X\n", *(uint32_t*)buffer.data);
 
     device_name_t device_name;
     ret = get_device_name(sensor, device_name);
     assert(ret == E_OK);
-    printf("Device name: %s\n", device_name);
+    s_log("Device name: %s\n", device_name);
 
-    calendar_t calendar;
-    ret = get_calibration_date(sensor, &calendar);
+    strcpy(device_name, "testing123");
+    ret = set_device_name(sensor, device_name);
     assert(ret == E_OK);
-    printf("Calibration date: %02d/%02d/%04d\n", calendar.month, calendar.day, calendar.year);
-    ret = get_manufacturing_date(sensor, &calendar);
-    assert(ret == E_OK);
-    printf("MFR date: %02d/%02d/%04d\n", calendar.month, calendar.day, calendar.year);
 
-    operating_stat_t stat;
-    ret = get_operating_stat(sensor, &stat);
+    ret = get_device_name(sensor, device_name);
     assert(ret == E_OK);
-    printf("Sensor Temperature = %d.\n"
-           "Sensor Voltage = %d.\n", stat.operating_temp, stat.operating_voltage);
-    io_count_t io_count;
-    ret = get_io_count(sensor, &io_count);
-    assert(ret == E_OK);
-    printf("On-board %d sensors.\n", io_count.sensor_count);
-    printf("On-board %d outputs.\n", io_count.output_count);
+    s_log("Device name: %s\n", device_name);
+
+    goto EXIT;
 
     while (!do_exit)
     {
-        sleep(100);
+        ret = sensor_read(sensor, FIRMARE_VERSION, data, sizeof(data));
+        assert(ret == E_OK);
+        s_log("Firmware: 0x%08X\n", *(uint32_t*)data);
+
+        u16_data = 2;
+        ret = set_sample_time(sensor, u16_data);
+        assert(ret == E_OK);
+
+        device_name_t device_name;
+        ret = get_device_name(sensor, device_name);
+        assert(ret == E_OK);
+        s_log("Device name: %s\n", device_name);
+
+        sensor_date_t calendar;
+        ret = get_calibration_date(sensor, &calendar);
+        assert(ret == E_OK);
+        s_log("Calibration date: %02d/%02d/%04d\n", calendar.month, calendar.day, calendar.year);
+        ret = get_manufacturing_date(sensor, &calendar);
+        assert(ret == E_OK);
+        s_log("MFR date: %02d/%02d/%04d\n", calendar.month, calendar.day, calendar.year);
+
+        operating_stat_t stat;
+        ret = get_operating_stat(sensor, &stat);
+        assert(ret == E_OK);
+        s_log("Sensor Temperature = %d.\n"
+              "Sensor Voltage = %d.\n", stat.operating_temp, stat.operating_voltage);
+        io_count_t io_count;
+        ret = get_io_count(sensor, &io_count);
+        assert(ret == E_OK);
+        s_log("On-board %d sensors.\n", io_count.sensor_count);
+        s_log("On-board %d outputs.\n", io_count.output_count);
+
+//        ret = sensor_heartbeat_enable(sensor, 2000);
+//        printf("heart beat %d\n", ret);
+//        assert(ret == E_OK);
+
+//        ret = probe_default_init(sensor);
+//        assert(ret == E_OK);
     }
 
+    while (!do_exit)
+    {
+#if USE_PLATFORM_THREAD
+        sleep(1);
+#else
+        if ((ret = sensor_poll_event(sensor, &event)) == E_OK) {
+            example_callback(event, sensor);
+        }
+#endif
+    }
+
+EXIT:
     // close the device
+    s_log("Sensor closing");
     ret = sensor_close(sensor);
     assert(ret == E_OK);
-    ret = sensor_free(sensor);
-    printf("Device closed with status %d\n", ret);
+    s_log("Device closed with status %d\n", ret);
 }

@@ -1,5 +1,5 @@
 /*!********************************************************************************************
-  @file     log.c
+  @file     freertos_memory.c
 
   @copyright
             Copyright (c) 2019, Omega Engineering Inc.
@@ -24,26 +24,20 @@
             SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
   @author   Binh Dinh
-  @date     June 5th, 2019
+  @date     August 5th, 2019
   @details
 
 
 ***********************************************************************************************/
 
-#include "common/common.h"
-#include "common/log.h"
+#include "platform/memory.h"
 
-void print_buffer(const data_buffer_t * buffer)
+void* s19_mem_malloc(size_t size)
 {
-    for(int i = 0; i < buffer->data_len; i++)
-    {
-        printf("%02X ", buffer->data[i]);
-    }
-    printf("\n");
-    fflush(stdout);
+    return malloc(size);
 }
 
-void sprint_buffer(uint8_t * buffer, const data_buffer_t * data)
+void s19_mem_free(void *ptr)
 {
-
+    free(ptr);
 }

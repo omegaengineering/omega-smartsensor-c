@@ -1,5 +1,5 @@
-/cmake-build-debug-rpi
-/cmake-build-debug
+/cmake-build*
 /.vscode
 /.idea
 /examples/contiki/build
+/build*

@@ -34,21 +34,24 @@
 #ifndef OMEGA_SMARTSENSOR_C_SMARTSENSOR_H
 #define OMEGA_SMARTSENSOR_C_SMARTSENSOR_H
 
-#include "common/common.h"
-#include "common/errors.h"
 #include "registers.h"
+#include "smartsensor_errors.h"
 
-
-#define SMARTSENSOR_I2C_ADDR            0x68
+#define SMARTSENSOR_SDK_VERSION         0x00010005
+#define SMARTSENSOR_I2C_ADDR            0x6c
 #define SMARTSENSOR_MODBUS_ADDR         0x01
 #define SMARTSENSOR_MODBUS_BAUDRATE     38400
+
+#ifndef DEFAULT_SAMPLE_TIME
 #define DEFAULT_SAMPLE_TIME             1
-#define HEARTBEAT                       1
-#define HEARTBEAT_MAX_MISS              3
+#endif
+#ifndef HEARTBEAT_MAX_MISS
+#define HEARTBEAT_MAX_MISS              1
+#endif
+#ifndef FORCE_SAMPLE_TIME
+#define FORCE_SAMPLE_TIME               1
+#endif
 
-struct _sensor;
-
-typedef struct _sensor sensor_t;
 
 typedef enum {
     API_SENSOR_CHANGE           = SENSOR_CHANGE_INTR,
@@ -59,8 +62,9 @@ typedef enum {
     API_DATA_READY              = DATA_READY_INTR,
     API_FUNCTION_BLOCK          = FUNCTION_BLOCK_INTR,
     API_LOG_DATA_READY          = LOG_DATA_READY_INTR,
-    API_EVENT_SENSOR_ATTACHED   = 0x00010000,
-    API_EVENT_SENSOR_DETACHED   = 0x00020000
+    API_EVENT_CONTINUE          = 0x00010000,           // no event
+    API_EVENT_SENSOR_ATTACHED   = 0x00020000,
+    API_EVENT_SENSOR_DETACHED   = 0x00040000,
 } api_event_t;
 
 typedef void (*event_callback_t)(api_event_t event, void *);
@@ -71,29 +75,33 @@ typedef enum {
 } sensor_bus_type_t;
 
 typedef struct {
-    char                bus_id[128];            /**< bus name string eg: /dev/ttyAMC0 */
-    sensor_bus_type_t   bus_type;               /**< bus type @sensor_bus_type_t */
-    int                 interrupt_pin;          /**< gpio pin to receive interrupts */
-    event_callback_t    event_callback;         /**< user callback, pass NULL to disable interrupt processing */
-    void*               event_callback_ctx;     /**< user provided data pointer to be passed into callback, pass NULL to disable */
-    int                 heartbeat_period;       /**< heartbeat period to check for sensor online, pass 0 to disable */
-} sensor_init_t;
+    uint8_t     sensor_attached;
+    uint32_t    stat_attach_counter;
+    uint32_t    heartbeat_misses;
+} data_t;
 
-/**
- * Create an instance of smartsensor device
- * @param ctx instance to create
- * @param init pointer to init structure. User owns this memory and it is no longer needed
- * after the function returns
- * @return see @error_t
- */
-int sensor_new              (sensor_t **ctx, const sensor_init_t *init);
+typedef struct _sensor {
+    data_t              data;               /**< internal data */
+    uint8_t             ready;              /**< flag to prevent interrupts from using the SDK if sensor has not been opened */
+    void*               platform;
+} sensor_t;
+
+#define SENSOR_INIT     (sensor_t){0}
 
 /**
  * Open the communicating bus and initialize the device
  * @param ctx sensor instance
  * @return see @error_t
  */
-int sensor_open             (sensor_t *ctx);
+int sensor_open             (sensor_t* sensor);
+
+int sensor_close            (sensor_t* sensor);
+
+int sensor_poll_event       (sensor_t* sensor, api_event_t* event);
+
+int sensor_heartbeat_enable (sensor_t* sensor, int period_ms);
+
+int sensor_heartbeat_disable(sensor_t* sensor);
 
 /**
  * Read register into provided data buffer
@@ -105,7 +113,7 @@ int sensor_open             (sensor_t *ctx);
  * @param buffer data to read into
  * @return see @error_t
  */
-int sensor_read             (sensor_t *ctx, ss_register_t ss_register, data_buffer_t * buffer);
+int sensor_read             (sensor_t* sensor, ss_register_t ss_register, void* buffer, uint16_t buffer_sz);
 
 /**
  * Read register with the specified instance index into provided data buffer
@@ -116,12 +124,12 @@ int sensor_read             (sensor_t *ctx, ss_register_t ss_register, data_buff
  *          E_BUFFER_MEM_SIZE is returned.
  *      - Only actual data size of the register are read into the provided buffer.
  * @param ctx sensor instance
- * @param ss_register register base to read
+ * @param base_reg register base to read
  * @param index instance index
  * @param buffer buffer data to read into
  * @return see @error_t
  */
-int sensor_indexed_read     (sensor_t *ctx, ss_register_t ss_register, uint8_t index, data_buffer_t * buffer);
+int sensor_indexed_read     (sensor_t* sensor, ss_register_t base_reg, uint8_t index, void* buffer, uint16_t buffer_sz);
 
 /**
  * Write data provided from data buffer to register
@@ -134,7 +142,20 @@ int sensor_indexed_read     (sensor_t *ctx, ss_register_t ss_register, uint8_t i
  * @param buffer buffer to write from
  * @return see @error_t
  */
-int sensor_write            (sensor_t *ctx, ss_register_t ss_register, data_buffer_t * buffer);
+int sensor_write            (sensor_t* sensor, ss_register_t ss_register, void* buffer, uint16_t buffer_sz);
+
+/**
+ * Write data provided from data buffer to register
+ *
+ *      - data buffer must be large enough to hold data size of the register, otherwise
+ *          E_BUFFER_MEM_SIZE is returned.
+ *      - Only actual data size of the register are read from the buffer and written to sensor.
+ * @param ctx sensor instance
+ * @param ss_register register to write
+ * @param buffer buffer to write from
+ * @return see @error_t
+ */
+int sensor_bootstrap_write(sensor_t* sensor, ss_register_t ss_register, void* buffer, uint16_t buffer_sz);
 
 /**
  * Write register with the specified instance index from provided data buffer
@@ -145,177 +166,73 @@ int sensor_write            (sensor_t *ctx, ss_register_t ss_register, data_buff
  *          E_BUFFER_MEM_SIZE is returned.
  *      - Only actual data size of the register are read from the buffer and written to sensor.
  * @param ctx sensor instance
- * @param ss_register register to write
+ * @param base_register register to write
  * @param index instance index
  * @param buffer buffer to write from
  * @return see @error_t
  */
-int sensor_indexed_write    (sensor_t *ctx, ss_register_t ss_register, uint8_t index, data_buffer_t * buffer);
+int sensor_indexed_write    (sensor_t* sensor, ss_register_t base_register, uint8_t index, void* buffer, uint16_t buffer_sz);
+
 
 /**
- * Close the communicating bus and deinitialize the device
- * @param ctx sensor instance
- * @return see @error_t
- */
-int sensor_close            (sensor_t *ctx);
-
-/**
- * Free the sensor instance
- * @param ctx sensor instance
- * @return see @error_t
- */
-int sensor_free             (sensor_t *ctx);
-
-/**
- * Get the number of possible instances to index from a base register
+ * Get the number of possible instances to index from a base register.
+ * To be used in indexed read/write parameter.
  * Eg:  SENSOR_0_DATA can have 4 indexed instances which are SENSOR_(0 1 2 3)_DATA
  *      SENSOR_1_DATA can have 3 indexed instances which are SENSOR(1 2 3)_DATA
  * @param ss_register
  * @return
  */
-int get_max_instance        (ss_register_t ss_register);
+int get_register_instance_cnt (ss_register_t ss_register);
 
 /**
- * Get sensor reading
- * @param ctx sensor instance
- * @param sensor_num
- * @return see @error_t
+ * Return a string that describes the error with provided errnum
+ * @param sensor
+ * @param errnum
+ * @return
  */
-int get_sensor_reading      (sensor_t *ctx, int sensor_num, const float *reading);
+const char* sensor_strerror (sensor_t* sensor, int errnum);
 
-/**
- * Get sensor gain
- * @param ctx sensor instance
- * @param sensor_num
- * @return see @error_t
- */
-int get_sensor_gain         (sensor_t *ctx, int sensor_num, const float *gain);
+int get_sensor_reading      (sensor_t* sensor, int sensor_num, float *reading);
+int get_sensor_gain         (sensor_t* sensor, int sensor_num, float *gain);
+int get_sensor_offset       (sensor_t* sensor, int sensor_num, float *offset);
+int set_sensor_gain         (sensor_t* sensor, int sensor_num, float *gain);
+int set_sensor_offset       (sensor_t* sensor, int sensor_num, float *offset);
+int get_sensor_unit         (sensor_t* sensor, int sensor_num, sensor_unit_t unit);
+int get_sensor_descriptor   (sensor_t* sensor, int sensor_num, sensor_descriptor_t *descriptor);
+int get_sensor_name(sensor_t* sensor, int sensor_num, sensor_name_t name);
+int set_sensor_name(sensor_t* sensor, int sensor_num, sensor_name_t name);
+int get_sensor_type         (sensor_t* sensor, int sensor_num, measurement_type_t *sensor_type);
+int get_device_name         (sensor_t* sensor, device_name_t name);
+int get_system_status       (sensor_t* sensor, system_status_t *status);
+int get_interrupt_status    (sensor_t* sensor, interrupt_status_t *status);
+int get_current_time        (sensor_t* sensor, sensor_time_t *time);
+int get_io_count            (sensor_t* sensor, io_count_t *io_count);
+int get_operating_stat      (sensor_t* sensor, operating_stat_t *stat);
+int get_calibration_date    (sensor_t* sensor, sensor_date_t *date);
+int get_manufacturing_date  (sensor_t* sensor, sensor_date_t *date);
+int get_current_time_epoch  (sensor_t* sensor, uint32_t* timestamp);
 
-/**
- * Get sensor offset
- * @param ctx sensor instance
- * @param sensor_num
- * @return see @error_t
- */
-int get_sensor_offset       (sensor_t *ctx, int sensor_num, const float *offset);
 
-/**
- * Get sensor name
- * @param ctx sensor instance
- * @return see @error_t
- */
-int get_device_name         (sensor_t *ctx, device_name_t name);
+int set_current_time        (sensor_t* sensor, uint32_t time);
+int set_current_time_epoch  (sensor_t* sensor, uint32_t timestamp);
+int set_interrupt_control   (sensor_t* sensor, interrupt_control_t control);
+int set_sample_time         (sensor_t* sensor, uint16_t sample_time);
+int get_sample_time         (sensor_t* sensor, uint16_t* sample_time);
+int set_device_name         (sensor_t* sensor, device_name_t name);
+int set_sensor_descriptor   (sensor_t* sensor, int sensor_num, sensor_descriptor_t *descriptor);
 
-/**
- * Get sensor unit
- * @param ctx sensor instance
- * @return see @error_t
- */
-int get_sensor_unit         (sensor_t *ctx, int sensor_num, sensor_unit_t unit);
+int wait_for_device_ready   (sensor_t* sensor, int max_wait_msec);
+int soft_reset              (sensor_t* sensor, uint8_t wait_ready);
+int factory_reset           (sensor_t* sensor);
+int password_reset(sensor_t* sensor);
+int preset_config           (sensor_t* sensor);
+unsigned int sensor_sdk_version();
+const char* measurement_str (measurement_type_t meas);
 
-/**
- * Get sensor descriptor
- * @param ctx sensor instance
- * @return see @error_t
- */
-int get_sensor_descriptor   (sensor_t *ctx, int sensor_num, sensor_descriptor_t *descriptor);
+int probe_default_init      (sensor_t* sensor);
 
-/**
- * Get sensor type
- * @param ctx sensor instance
- * @return see @error_t
- */
-int get_sensor_type         (sensor_t *ctx, int sensor_num, measurement_type_t *sensor_type);
-
-/**
- * Get system status
- * @param ctx sensor instance
- * @return see @error_t
- */
-int get_system_status       (sensor_t *ctx, system_status_t *status);
-
-/**
- * Get interrupt status
- * @param ctx sensor instance
- * @return see @error_t
- */
-int get_interrupt_status    (sensor_t *ctx, interrupt_status_t *status);
-
-/**
- * Get sensor time
- * @param ctx sensor instance
- * @return see @error_t
- */
-int get_current_time        (sensor_t *ctx, data_time_t *time);
-
-/**
- * Get input/output count
- * @param ctx sensor instance
- * @return see @error_t
- */
-int get_io_count            (sensor_t *ctx, io_count_t *io_count);
-
-/**
- * Get operating stat
- * @param ctx sensor instance
- * @return see @error_t
- */
-int get_operating_stat      (sensor_t *ctx, operating_stat_t *stat);
-
-/**
- * Get calibration date
- * @param ctx sensor instance
- * @return see @error_t
- */
-int get_calibration_date    (sensor_t *ctx, calendar_t *calendar);
-
-/**
- * Get manufacturing date
- * @param ctx sensor instance
- * @return see @error_t
- */
-int get_manufacturing_date  (sensor_t *ctx, calendar_t *calendar);
-
-/**
- * Set device name
- * @param ctx sensor instance
- * @return see @error_t
- */
-int set_device_name         (sensor_t *ctx, device_name_t name);
-
-/**
- * Set current time
- * @param ctx sensor instance
- * @return see @error_t
- */
-int set_current_time        (sensor_t *ctx, data_time_t *time);
-
-/**
- * Set interrupt control
- * @param ctx sensor instance
- * @return see @error_t
- */
-int set_interrupt_control   (sensor_t *ctx, interrupt_control_t control);
-
-/**
- * Poll for device ready by checking device ready bit of system status register
- * @param ctx sensor instance
- * @return see @error_t
- */
-int wait_for_device_ready   (sensor_t *ctx, int max_wait_msec);
-
-/**
- * Do soft reset
- * @param ctx sensor instance
- * @return see @error_t
- */
-int soft_reset              (sensor_t *ctx);
-
-/**
- * Configure sensor to default configuration
- * @param ctx sensor instance
- * @return see @error_t
- */
-int preset_config           (sensor_t *ctx);
+int system_control_clear_bits(sensor_t* sensor, system_control_t bits);
+int system_control_set_bits  (sensor_t* sensor, system_control_t bits);
+int system_control_write_bits(sensor_t* sensor, system_control_t bits);
 
 #endif //OMEGA_SMARTSENSOR_C_SMARTSENSOR_H

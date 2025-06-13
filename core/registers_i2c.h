@@ -67,11 +67,11 @@
 #define R_EXTRACT_START_TIME        0x0028
 #define R_EXTRACT_END_TIME          0x002c
 
-#define R_ACCESS_REGISTER           0x0030
-#define R_FACTORY_ACCESS            0x0032
-#define R_BLOCK_ACCESS              0x0033
-#define R_SENSOR_ACCESS             0x0034
-#define R_EXTENSION_ACCESS          0x0035
+//#define R_ACCESS_REGISTER     0x0030
+//#define R_FACTORY_ACCESS      0x0032
+//#define R_BLOCK_ACCESS              0x0033
+//#define R_SENSOR_ACCESS             0x0034
+//#define R_EXTENSION_ACCESS          0x0035
 
 #define R_NUMBER_RECORDS            0x0036
 
@@ -96,8 +96,6 @@
 #define R_SENSOR_0_FORMAT           0x0061
 #define R_SENSOR_0_CONFIG           0x0062
 #define R_SENSOR_0_DEVICE           0x0063
-
-#define R_SENSOR_UNITS              0x0064
 #define R_SENSOR_0_UNITS            0x0064
 
 #define R_SENSOR_1_DESCRIPTOR       0x0068
@@ -187,6 +185,9 @@
 #define R_SENTINEL                          0x013e    // SENTINEL
 #define R_IO_DEVICE_LIST_NAMES              0x0140    // treated as an array of bytes...
 
+#define R_CONFIG_PASSWORD 0x0380
+#define R_CONN_PASSWORD 0x0390
+
 #define R_OUTPUT_0_NAMELIST                 0x0700
 #define R_OUTPUT_1_NAMELIST                 0x0740
 #define R_OUTPUT_2_NAMELIST                 0x0780
@@ -195,7 +196,7 @@
 #define R_SENSOR_0_NAMELIST                 0x0800
 #define R_SENSOR_0_IPSO_TYPE                0x08a8
 #define R_SENSOR_0_PRECISION                0x08aa  // int8_t giving number of of digits of precision, ie: 12.345  -> Precision = +3, negative prc implies  12?.? -> Precision = -1
-#define R_SENSOR_0_RESET_MINMAX             0x08ac  // Write any value to reset the Min/Max values
+#define R_SENSOR_0_FUNCTION             0x08ac  // Refer to the sensor function enum
 
 #define R_SENSOR_0_MINVALUE                 0x08b0  // float giving minimum Value
 #define R_SENSOR_0_MAXVALUE                 0x08b4  // float giving maximum Value
@@ -210,7 +211,7 @@
 
 #define R_SENSOR_1_IPSO_TYPE                0x09a8
 #define R_SENSOR_1_PRECISION                0x09aa  // int8_t giving number of of digits of precision, ie: 12.345  -> Precision = +3, negative prc implies  12?.? -> Precision = -1
-#define R_SENSOR_1_RESET_MINMAX             0x09ac  // Write any value to reset the Min/Max values
+#define R_SENSOR_1_FUNCTION             0x09ac  // Refer to the sensor function enum
 
 #define R_SENSOR_1_MINVALUE                 0x09b0  // float giving minimum Value
 #define R_SENSOR_1_MAXVALUE                 0x09b4  // float giving maximum Value
@@ -225,7 +226,7 @@
 
 #define R_SENSOR_2_IPSO_TYPE                0x0aa8
 #define R_SENSOR_2_PRECISION                0x0aaa  // int8_t giving number of of digits of precision, ie: 12.345  -> Precision = +3, negative prc implies  12?.? -> Precision = -1
-#define R_SENSOR_2_RESET_MINMAX             0x0aac  // Write any value to reset the Min/Max values
+#define R_SENSOR_2_FUNCTION             0x0aac  // Refer to the sensor function enum
 
 #define R_SENSOR_2_MINVALUE                 0x0ab0  // float giving minimum Value
 #define R_SENSOR_2_MAXVALUE                 0x0ab4  // float giving maximum Value
@@ -240,7 +241,7 @@
 
 #define R_SENSOR_3_IPSO_TYPE                0x0ba8
 #define R_SENSOR_3_PRECISION                0x0baa  // int8_t giving number of of digits of precision, ie: 12.345  -> Precision = +3, negative prc implies  12?.? -> Precision = -1
-#define R_SENSOR_3_RESET_MINMAX             0x0bac  // Write any value to reset the Min/Max values
+#define R_SENSOR_3_FUNCTION             0x0bac  // Refer to the sensor function enum
 
 #define R_SENSOR_3_MINVALUE                 0x0bb0  // float giving minimum Value
 #define R_SENSOR_3_MAXVALUE                 0x0bb4  // float giving maximum Value
@@ -253,73 +254,162 @@
 
 #define R_NAME_LIST                         0x0e00    // Names of Sensors, Output, Parameters etc...
 #define R_SENSOR_0_NAME                     0x0e00
-#define R_SENSOR_1_NAME                     0x0e08
-#define R_SENSOR_2_NAME                     0x0e10
-#define R_SENSOR_3_NAME                     0x0e18
+#define R_SENSOR_1_NAME                     0x0e10
+#define R_SENSOR_2_NAME                     0x0e20
+#define R_SENSOR_3_NAME                     0x0e30
 
-#define R_OUTPUT_0_NAME                     0x0e20
-#define R_OUTPUT_1_NAME                     0x0e28
-#define R_OUTPUT_2_NAME                     0x0e30
-#define R_OUTPUT_3_NAME                     0x0e38
+#define R_OUTPUT_0_NAME                     0x0e40
+#define R_OUTPUT_1_NAME                     0x0e50
+#define R_OUTPUT_2_NAME                     0x0e60
+#define R_OUTPUT_3_NAME                     0x0e70
 
-#define R_USER_PARAMETER_0_NAME             0x0e40
-#define R_USER_PARAMETER_1_NAME             0x0e48
-#define R_USER_PARAMETER_2_NAME             0x0e50
-#define R_USER_PARAMETER_3_NAME             0x0e58
-#define R_USER_PARAMETER_4_NAME             0x0e60
-#define R_USER_PARAMETER_5_NAME             0x0e68
-#define R_USER_PARAMETER_6_NAME             0x0e70
-#define R_USER_PARAMETER_7_NAME             0x0e78
-#define R_USER_PARAMETER_8_NAME             0x0e80
-#define R_USER_PARAMETER_9_NAME             0x0e88
-#define R_USER_PARAMETER_10_NAME            0x0e90
-#define R_USER_PARAMETER_11_NAME            0x0e98
-#define R_USER_PARAMETER_12_NAME            0x0ea0
-#define R_USER_PARAMETER_13_NAME            0x0ea8
-#define R_USER_PARAMETER_14_NAME            0x0eb0
-#define R_USER_PARAMETER_15_NAME            0x0eb8
+#define R_USER_PARAMETER_0_NAME             0x0e80
+#define R_USER_PARAMETER_1_NAME             0x0e90
+#define R_USER_PARAMETER_2_NAME             0x0ea0
+#define R_USER_PARAMETER_3_NAME             0x0eb0
+#define R_USER_PARAMETER_4_NAME             0x0ec0
+#define R_USER_PARAMETER_5_NAME             0x0ed0
+#define R_USER_PARAMETER_6_NAME             0x0ee0
+#define R_USER_PARAMETER_7_NAME             0x0ef0
 
-#define R_FUNCTION_BLOCK_0_NAME             0x0ec0
-#define R_FUNCTION_BLOCK_1_NAME             0x0ec8
-#define R_FUNCTION_BLOCK_2_NAME             0x0ed0
-#define R_FUNCTION_BLOCK_3_NAME             0x0ed8
-#define R_FUNCTION_BLOCK_4_NAME             0x0ee0
-#define R_FUNCTION_BLOCK_5_NAME             0x0ee8
-#define R_FUNCTION_BLOCK_6_NAME             0x0ef0
-#define R_FUNCTION_BLOCK_7_NAME             0x0ef8
-#define R_FUNCTION_BLOCK_8_NAME             0x0f00
-#define R_FUNCTION_BLOCK_9_NAME             0x0f08
-#define R_FUNCTION_BLOCK_10_NAME            0x0f10
-#define R_FUNCTION_BLOCK_11_NAME            0x0f18
-#define R_FUNCTION_BLOCK_12_NAME            0x0f20
-#define R_FUNCTION_BLOCK_13_NAME            0x0f28
-#define R_FUNCTION_BLOCK_14_NAME            0x0f30
-#define R_FUNCTION_BLOCK_15_NAME            0x0f38
-#define R_FUNCTION_BLOCK_16_NAME            0x0f40
-#define R_FUNCTION_BLOCK_17_NAME            0x0f48
-#define R_FUNCTION_BLOCK_18_NAME            0x0f50
-#define R_FUNCTION_BLOCK_19_NAME            0x0f58
-#define R_FUNCTION_BLOCK_20_NAME            0x0f60
-#define R_FUNCTION_BLOCK_21_NAME            0x0f68
-#define R_FUNCTION_BLOCK_22_NAME            0x0f70
-#define R_FUNCTION_BLOCK_23_NAME            0x0f78
-#define R_FUNCTION_BLOCK_24_NAME            0x0f80
-#define R_FUNCTION_BLOCK_25_NAME            0x0f88
-#define R_FUNCTION_BLOCK_26_NAME            0x0f90
-#define R_FUNCTION_BLOCK_27_NAME            0x0f98
-#define R_FUNCTION_BLOCK_28_NAME            0x0fa0
-#define R_FUNCTION_BLOCK_29_NAME            0x0fa8
-#define R_FUNCTION_BLOCK_30_NAME            0x0fb0
-#define R_FUNCTION_BLOCK_31_NAME            0x0fb8
+#define R_USER_PARAMETER_8_NAME             0x0f00
+#define R_USER_PARAMETER_9_NAME             0x0f10
+#define R_USER_PARAMETER_10_NAME            0x0f20
+#define R_USER_PARAMETER_11_NAME            0x0f30
+#define R_USER_PARAMETER_12_NAME            0x0f40
+#define R_USER_PARAMETER_13_NAME            0x0f50
+#define R_USER_PARAMETER_14_NAME            0x0f60
+#define R_USER_PARAMETER_15_NAME            0x0f70
 
-#define R_FB_PARAMETER_0_NAME               0x0fc0
-#define R_FB_PARAMETER_1_NAME               0x0fc8
-#define R_FB_PARAMETER_2_NAME               0x0fd0
-#define R_FB_PARAMETER_3_NAME               0x0fd8
-#define R_FB_PARAMETER_4_NAME               0x0fe0
-#define R_FB_PARAMETER_5_NAME               0x0fe8
-#define R_FB_PARAMETER_6_NAME               0x0ff0
-#define R_FB_PARAMETER_7_NAME               0x0ff8
+#define R_REGISTER_ACCESS                   0x0030
+
+#define R_ACCESS_FACTORY_INDEX              0x0032
+#define R_ACCESS_FACTORY_START              0x0000
+#define R_ACCESS_FACTORY_END                0x03ff
+
+/********************************************************************************************************/
+
+#define R_ACCESS_BLOCK_INDEX                0x0033
+#define R_ACCESS_BLOCK_START                0x0400
+
+#define R_FUNCTION_BLOCK_PROGRAM	        0x0400      // 512 byte block program
+#define R_FUNCTION_BLOCK_PROGRAM_0          R_FUNCTION_BLOCK_PROGRAM
+#define R_FUNCTION_BLOCK_PROGRAM_1          0x0404
+
+#define R_FUNCTION_BLOCK_PARAMETER          0x0600      // 128 byte block param
+#define R_FUNCTION_BLOCK_PARAMETER_0	    R_FUNCTION_BLOCK_PARAMETER
+#define R_FUNCTION_BLOCK_PARAMETER_1	    0x0604
+#define R_FUNCTION_BLOCK_PARAMETER_2	    0x0608
+#define R_FUNCTION_BLOCK_PARAMETER_3	    0x060c
+#define R_FUNCTION_BLOCK_PARAMETER_4	    0x0610
+#define R_FUNCTION_BLOCK_PARAMETER_5	    0x0614
+#define R_FUNCTION_BLOCK_PARAMETER_6	    0x0618
+#define R_FUNCTION_BLOCK_PARAMETER_7	    0x061c
+#define R_FUNCTION_BLOCK_PARAMETER_8	    0x0620
+#define R_FUNCTION_BLOCK_PARAMETER_9	    0x0624
+#define R_FUNCTION_BLOCK_PARAMETER_10	    0x0628
+#define R_FUNCTION_BLOCK_PARAMETER_11	    0x062c
+#define R_FUNCTION_BLOCK_PARAMETER_12	    0x0630
+#define R_FUNCTION_BLOCK_PARAMETER_13	    0x0634
+#define R_FUNCTION_BLOCK_PARAMETER_14	    0x0638
+#define R_FUNCTION_BLOCK_PARAMETER_15	    0x063c
+#define R_FUNCTION_BLOCK_PARAMETER_16	    0x0640
+#define R_FUNCTION_BLOCK_PARAMETER_17	    0x0644
+#define R_FUNCTION_BLOCK_PARAMETER_18	    0x0648
+#define R_FUNCTION_BLOCK_PARAMETER_19	    0x064c
+#define R_FUNCTION_BLOCK_PARAMETER_20	    0x0650
+#define R_FUNCTION_BLOCK_PARAMETER_21	    0x0654
+#define R_FUNCTION_BLOCK_PARAMETER_22	    0x0658
+#define R_FUNCTION_BLOCK_PARAMETER_23	    0x065c
+#define R_FUNCTION_BLOCK_PARAMETER_24	    0x0660
+#define R_FUNCTION_BLOCK_PARAMETER_25	    0x0664
+#define R_FUNCTION_BLOCK_PARAMETER_26	    0x0668
+#define R_FUNCTION_BLOCK_PARAMETER_27	    0x066c
+#define R_FUNCTION_BLOCK_PARAMETER_28	    0x0670
+#define R_FUNCTION_BLOCK_PARAMETER_29	    0x0674
+#define R_FUNCTION_BLOCK_PARAMETER_30	    0x0678
+#define R_FUNCTION_BLOCK_PARAMETER_31	    0x067c
+
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_0	0x0680
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_1	0x0682
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_2	0x0684
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_3	0x0686
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_4	0x0688
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_5	0x068a
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_6	0x068c
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_7	0x068e
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_8	0x0690
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_9	0x0692
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_10	0x0694
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_11	0x0696
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_12	0x0698
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_13	0x069a
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_14	0x069c
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_15	0x069e
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_16	0x06a0
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_17	0x06a2
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_18	0x06a4
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_19	0x06a6
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_20	0x06a8
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_21	0x06aa
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_22	0x06ac
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_23	0x06ae
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_24	0x06b0
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_25	0x06b2
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_26	0x06b4
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_27	0x06b6
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_28	0x06b8
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_29	0x06ba
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_30	0x06bc
+#define R_FUNCTION_BLOCK_PARAMETER_TYPE_31	0x06be
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_0   0x06c0
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_1   0x06c2
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_2   0x06c4
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_3   0x06c6
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_4   0x06c8
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_5   0x06ca
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_6   0x06cc
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_7   0x06ce
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_8   0x06d0
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_9   0x06d2
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_10	0x06d4
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_11	0x06d6
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_12	0x06d8
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_13	0x06da
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_14	0x06dc
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_15	0x06de
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_16	0x06e0
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_17	0x06e2
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_18	0x06e4
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_19	0x06e6
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_20	0x06e8
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_21	0x06ea
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_22	0x06ec
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_23	0x06ee
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_24	0x06f0
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_25	0x06f2
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_26	0x06f4
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_27	0x06f6
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_28	0x06f8
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_29	0x06fa
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_30	0x06fc
+#define R_FUNCTION_BLOCK_CONTROL_STATUS_31	0x06fe
+
+#define R_ACCESS_BLOCK_END                  0x07ff
+
+/********************************************************************************************************/
+
+#define R_ACCESS_SENSOR_INDEX               0x0034  // Sensor space
+#define R_ACCESS_SENSOR_START               0x0800
+
+#define R_ACCESS_SENSOR_END                 0x0bff
+
+#define R_ACCESS_EXTENSION_INDEX            0x0035
+#define R_ACCESS_EXTENSION_START            0x0c00
+
+#define R_ACCESS_EXTENSION_END              0x0fff
+
+/********************************************************************************************************/
 
 #define R_MAX_REGISTER_INDEX                0x0fff
 
@@ -409,6 +499,24 @@
 #define X_STATS_ATTACH_COUNT                0x1104
 #define X_STATS_NAK_COUNT                   0x1105
 #define X_STATS_PWRFLT_COUNT                0x1106
+
+#define R_EXTENSION_VBAT 0x0c02
+#define R_EXTENSION_VPOWER 0x0c04
+#define R_EXTENSION_STATUS					0x0c06
+#define R_EXTENSION_BATT_CAPACITY 0x0c0a
+#define R_PROBE_STATUS                      0x0c0e
+
+#define R_CAL_CH0_G16_GAIN 0x020c
+#define R_CAL_CH0_G16_OFFSET 0x0208
+#define R_CAL_CH0_G32_GAIN 0x021c
+#define R_CAL_CH0_G32_OFFSET 0x0218
+#define R_CAL_CH1_G16_GAIN 0x022c
+#define R_CAL_CH1_G16_OFFSET 0x0228
+#define R_CAL_CH1_G32_GAIN 0x023c
+#define R_CAL_CH1_G32_OFFSET 0x0238
+
+#define R_CAL_CJC_1_OFFSET 0x0248
+#define R_CAL_CJC_2_OFFSET 0x0258
 
 #endif /* I2C_REGISTERS_H */
 

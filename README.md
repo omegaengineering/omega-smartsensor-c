@@ -53,6 +53,17 @@ gpio -g mode 23 up
 gpio -g mode 24 up
 ```
 
+### Build configurations
+```
+The following Cmake flags can configure the sdk:
+
+I2C_SENSOR=1      # enable/disable I2C interface
+MODBUS_SENSOR=1   # enable/disable modbus interface (uart)
+
+Eg:
+cmake .. -DCMAKE_BUILD_TYPE=Debug -DI2C_SENSOR=1 
+```
+
 ### Compile from source
 
 Clone source code and build source:
@@ -66,12 +77,11 @@ make
 ```
 
 To run basic_sensor example (in build/example/linux directory). Note that hardware connection must match with configuration specified in `linux/basic_sensor.c`
-
-The default configuration would be: 
-
-> Bus : /dev/i2c-3    
-Bus type: I2C  
-Interrupt Pin: 16 
+The example can handle I2C sensor in sdk thread or in user thread. It also can handle Modbus sensor accordingly.
+```
+#define USE_PLATFORM_THREAD     0
+#define USE_I2C_SENSOR          0
+```
 
 ```
 cd examples/linux
